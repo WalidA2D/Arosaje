@@ -1,0 +1,25 @@
+{
+  "name": "backarosaje",
+  "version": "1.0.0",
+  "description": "Back end Arosaje",
+  "main": "index.js",
+  "scripts": {
+    "test": "console.log(\"YIIIHAAA\")"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Massil-a/Arosaje.git"
+  },
+  "keywords": [
+    "backend",
+    "back",
+    "arosaje",
+    "mspr"
+  ],
+  "author": "Massil",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Massil-a/Arosaje/issues"
+  },
+  "homepage": "https://github.com/Massil-a/Arosaje#readme"
+}
