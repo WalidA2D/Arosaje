@@ -1,55 +1,72 @@
 import React, { useState } from 'react';
 import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+// Définir les types des paramètres de navigation
+type RootStackParamList = {
+  ProfilScreen: undefined;
+  calendrier: undefined;
+};
+
+// Définir le type de navigation pour l'écran de profil
+type ProfilScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  'ProfilScreen'
+>;
 
 export default function ProfilScreen() {
-  const [selectedTab, setSelectedTab] = useState('Posts'); // État pour gérer le sélecteur
+  const [selectedTab, setSelectedTab] = useState('Posts'); // État pour gérer le sélecteur d'onglet
+  const navigation = useNavigation<ProfilScreenNavigationProp>(); // Définir le type de navigation
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>Options</Text>
+        <TouchableOpacity>
+          {/* Ici pourrait être un bouton de retour ou une autre action */}
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Text style={styles.headerText}>Profil</Text>
         </View>
-        <TouchableOpacity style={styles.headerButton}>
-          <Text style={styles.headerButtonText}>Déconnexion</Text>
+        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('calendrier')}>
+          <Ionicons name="today" size={35} color='#FFF' />
         </TouchableOpacity>
       </View>
-      
+
       <View style={styles.profileImageContainer}>
         <Image
           source={require('@/assets/images/pp_base.jpg')}
           style={styles.profileImage}
         />
       </View>
-      
+
       <View style={styles.fixedDetails}>
         <View style={styles.profileDetails}>
           <Text style={styles.profileName}>Victoria Robertson</Text>
           <Text style={styles.profileRole}>Rôle | Localisation</Text>
         </View>
-        
+
         <View style={styles.selectorContainer}>
-          <TouchableOpacity 
-            style={[styles.selectorButton, selectedTab === 'Posts' && styles.activeButton]} 
+          {/* Sélecteur pour changer entre les posts et les images */}
+          <TouchableOpacity
+            style={[styles.selectorButton, selectedTab === 'Posts' && styles.activeButton]}
             onPress={() => setSelectedTab('Posts')}
           >
             <Text style={[styles.selectorText, selectedTab === 'Posts' && styles.activeText]}>Posts</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.selectorButton, selectedTab === 'Images' && styles.activeButton]} 
+          <TouchableOpacity
+            style={[styles.selectorButton, selectedTab === 'Images' && styles.activeButton]}
             onPress={() => setSelectedTab('Images')}
           >
             <Text style={[styles.selectorText, selectedTab === 'Images' && styles.activeText]}>Images</Text>
           </TouchableOpacity>
         </View>
       </View>
-      
+
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.body}>
-          {/* Contenu affiché en fonction du sélecteur */}
+          {/* Contenu affiché en fonction de l'onglet sélectionné */}
           {selectedTab === 'Posts' ? (
             <View>
               <View style={styles.post}>
@@ -86,10 +103,11 @@ export default function ProfilScreen() {
   );
 }
 
+// Styles pour les différents composants de l'écran
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF', 
+    backgroundColor: '#FFF',
   },
   header: {
     height: 200,
@@ -114,11 +132,11 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     padding: 10,
-    paddingBottom: 50,
+    paddingBottom: 80,
   },
   headerButtonText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 14,
     paddingBottom: 50,
   },
   profileImageContainer: {
@@ -134,7 +152,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
-    borderColor: '#FFF', 
+    borderColor: '#FFF',
   },
   fixedDetails: {
     marginTop: 40,
@@ -145,7 +163,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   profileName: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
   },
   profileRole: {
@@ -153,7 +171,7 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   scrollViewContent: {
-    paddingTop: 20, 
+    paddingTop: 20,
   },
   body: {
     flex: 1,
@@ -167,7 +185,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
     borderRadius: 25,
     overflow: 'hidden',
-    width: '90%', 
+    width: '90%',
   },
   selectorButton: {
     flex: 1,

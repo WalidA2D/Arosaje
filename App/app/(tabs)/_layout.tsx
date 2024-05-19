@@ -57,6 +57,13 @@ export default function TabLayout() {
           ),
         }}
       />
-    </Tabs>
+        <Tabs.Screen
+          name="calendrier"
+          options={{
+            title: 'Calendrier',
+            tabBarButton: () => null,
+          }}
+        />
+      </Tabs>
   );
 }
