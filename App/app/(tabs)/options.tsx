@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -66,7 +65,7 @@ export default function OptionsScreen() {
       <View style={styles.fixedDetailsBtn}>
         <View style={styles.selectorContainer}>
             <TouchableOpacity style={styles.selectorButton}>
-                <Text style={{color : '#FFF', fontSize : 14}}>Se déconnecter</Text>
+                <Text style={{color : '#FFF', fontSize : 14, fontWeight: 'bold',}}>Se déconnecter</Text>
             </TouchableOpacity>
         </View>
         </View>
@@ -129,15 +128,14 @@ const styles = StyleSheet.create({
   },
   separatorDetails: {
     height: 1,
-    backgroundColor: 'grey',
+    backgroundColor: '#E8E8E8',
     width: '95%',
     marginVertical: 5,
     alignSelf : 'center',
-    opacity : 50,
   },
   selectorButton: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 20,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#668F80',
