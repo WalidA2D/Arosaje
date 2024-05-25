@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/Massil-a/Arosaje/issues"
   },
-  "homepage": "https://github.com/Massil-a/Arosaje#readme"
+  "homepage": "https://github.com/Massil-a/Arosaje#readme",
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
 }
