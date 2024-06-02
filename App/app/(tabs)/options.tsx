@@ -1,74 +1,33 @@
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import BigButtonDown from '../../components/BigButtonDown';
+import ListDash from '../../components/ListDash';
+import HeaderTitle from '../../components/HeaderTitle';
 
 export default function OptionsScreen() {
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerText}>Options</Text>
-        </View>
+      <HeaderTitle title="Options" />
       </View>
       
       <View style={styles.fixedDetails}>
-        <TouchableOpacity style={[styles.selectorOptions, { width: '100%' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={styles.selectorOptionsText}>Informations personnelles</Text>
-                <Ionicons name="chevron-forward-outline" size={18} color="black" />
-            </View>
-        </TouchableOpacity>
+        <ListDash buttonText="Informations personnelles" />
         <View style={styles.separatorDetails}/>
-        <TouchableOpacity style={[styles.selectorOptions, { width: '100%' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={styles.selectorOptionsText}>Sécurité du compte</Text>
-                <Ionicons name="chevron-forward-outline" size={18} color="black" />
-            </View>
-        </TouchableOpacity>
+        <ListDash buttonText="Sécurité du compte" />
         <View style={styles.separatorDetails}/>
-        <TouchableOpacity style={[styles.selectorOptions, { width: '100%' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={styles.selectorOptionsText}>Notifications</Text>
-                <Ionicons name="chevron-forward-outline" size={18} color="black" />
-            </View>
-        </TouchableOpacity>
+        <ListDash buttonText="Notifications" />
         <View style={styles.separatorDetails}/>
-        <TouchableOpacity style={[styles.selectorOptions, { width: '100%' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={styles.selectorOptionsText}>Devenir botaniste</Text>
-                <Ionicons name="chevron-forward-outline" size={18} color="black" />
-            </View>
-        </TouchableOpacity>
+        <ListDash buttonText="Devenir botaniste" />
         <View style={styles.separatorDetails}/>
-        <TouchableOpacity style={[styles.selectorOptions, { width: '100%' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={styles.selectorOptionsText}>Questions</Text>
-                <Ionicons name="chevron-forward-outline" size={18} color="black" />
-            </View>
-        </TouchableOpacity>
+        <ListDash buttonText="Questions" />
         <View style={styles.separatorDetails}/>
-        <TouchableOpacity style={[styles.selectorOptions, { width: '100%' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={styles.selectorOptionsText}>Mes données</Text>
-                <Ionicons name="chevron-forward-outline" size={18} color="black" />
-            </View>
-        </TouchableOpacity>
+        <ListDash buttonText="Mes données" />
         <View style={styles.separatorDetails}/>
-        <TouchableOpacity style={[styles.selectorOptions, { width: '100%' }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={styles.selectorOptionsText}>Informations légales</Text>
-                <Ionicons name="chevron-forward-outline" size={18} color="black" />
-            </View>
-        </TouchableOpacity>
+        <ListDash buttonText="Informations légales" />
         <View style={styles.separatorDetails}/>
       </View>
-      <View style={styles.fixedDetailsBtn}>
-        <View style={styles.selectorContainer}>
-            <TouchableOpacity style={styles.selectorButton}>
-                <Text style={{color : '#FFF', fontSize : 14, fontWeight: 'bold',}}>Se déconnecter</Text>
-            </TouchableOpacity>
-        </View>
-        </View>
+      <BigButtonDown buttonText="Déconnecter" />
     </View>
   );
 }
@@ -94,19 +53,9 @@ const styles = StyleSheet.create({
     top: 50,
     alignItems: 'center',
   },
-  headerText: {
-    color: '#FFF',
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
   fixedDetails: {
     marginTop: 30,
     alignItems: 'flex-start',
-  },
-  fixedDetailsBtn: {
-    paddingTop : 100,
-    marginTop: 100,
-    alignItems: 'center',
   },
   scrollViewContent: {
     paddingTop: 20, 
@@ -117,28 +66,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: '#FFF',
   },
-  selectorContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-    backgroundColor: '#E0E0E0',
-    borderRadius: 25,
-    overflow: 'hidden',
-    width: '90%', 
-    alignItems: 'center',
-  },
   separatorDetails: {
     height: 1,
     backgroundColor: '#E8E8E8',
     width: '95%',
     marginVertical: 5,
     alignSelf : 'center',
-  },
-  selectorButton: {
-    flex: 1,
-    paddingVertical: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#668F80',
   },
   selectorOptions: {
     padding : 10,

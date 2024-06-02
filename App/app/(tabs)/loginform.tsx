@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import HeaderTitle from '../../components/HeaderTitle';
+import BigButtonDown from '../../components/BigButtonDown';
 
 export default function loginFormScreen() {
 
@@ -16,9 +18,7 @@ export default function loginFormScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerText}>{headerTitle}</Text>
-        </View>
+        <HeaderTitle title={headerTitle} />
       </View>
     
       {!isLoginFormVisible && (
@@ -166,12 +166,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 50,
     alignItems: 'center',
-  },
-
-  headerText: {
-    color: '#FFF',
-    fontSize: 24,
-    fontWeight: 'bold',
   },
 
   fixedDetailsCo: {

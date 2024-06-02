@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import HeaderTitle from '../../components/HeaderTitle';
 
 // Configuration des noms des jours et des mois en français
 LocaleConfig.locales['fr'] = {
@@ -142,7 +143,7 @@ export default function CalendarScreen() {
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('profil')}>
           <Ionicons name="arrow-back" size={24} color="#FFF" />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Calendrier</Text>
+        <HeaderTitle title="Calendrier" />
       </View>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {currentDate && (
@@ -220,15 +221,6 @@ const styles = StyleSheet.create({
   backButton: {
     top: 15,
     right: 5,
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFF',
-    textAlign: 'center',
-    flex: 1,
-    top: 15,
-    marginRight: 20,
   },
   scrollViewContent: {
     padding: 16,

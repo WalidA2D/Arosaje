@@ -3,6 +3,7 @@ import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'rea
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import HeaderTitle from '../../components/HeaderTitle';
 
 // Définir les types des paramètres de navigation
 type RootStackParamList = {
@@ -26,9 +27,7 @@ export default function ProfilScreen() {
         <TouchableOpacity>
           {/* Ici pourrait être un bouton de retour ou une autre action */}
         </TouchableOpacity>
-        <View style={styles.headerTitleContainer}>
-          <Text style={styles.headerText}>Profil</Text>
-        </View>
+        <HeaderTitle title="Profil" />
         <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('calendrier')}>
           <Ionicons name="today" size={35} color='#FFF' />
         </TouchableOpacity>
@@ -124,11 +123,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 50,
     alignItems: 'center',
-  },
-  headerText: {
-    color: '#FFF',
-    fontSize: 24,
-    fontWeight: 'bold',
   },
   headerButton: {
     padding: 10,
