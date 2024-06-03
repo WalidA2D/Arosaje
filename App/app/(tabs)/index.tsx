@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Dimensions, FlatList, Image } from 'react-native';
 import ContentItem from '../../components/navigation/ContentItem';
+import HeaderTitle from '../../components/HeaderTitle';
 
 
 export default function HomeScreen() {
@@ -10,8 +11,8 @@ export default function HomeScreen() {
     <>
       <View style={styles.container}>
         <View style={styles.header}>
+        <HeaderTitle title="Accueil" />
           <View style={styles.headerContent}>
-            <Text style={styles.headerText}>Accueil</Text>
             <TouchableOpacity style={styles.headerButton}>
               <Text style={styles.headerButtonText}>Filtrer</Text>
             </TouchableOpacity>
@@ -72,14 +73,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     position: 'relative',
-  },
-  headerText: {
-    color: '#FFF',
-    fontSize: 24,
-    fontWeight: 'bold',
-    position: 'absolute',
-    left: '50%',
-    transform: [{ translateX: -50 }],
   },
   headerButton: {
     position: 'absolute',
