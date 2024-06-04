@@ -4,7 +4,7 @@
   "description": "Back end Arosaje",
   "main": "index.js",
   "scripts": {
-    "test": "test script"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Massil-a/Arosaje#readme",
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "jest":"^28.6.0"
   }
 }

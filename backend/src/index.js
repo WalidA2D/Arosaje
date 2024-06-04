@@ -1,29 +1,57 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const api = require('../components/API'); // Routes de l'API
-const { PORT } = require('../config/config'); // Configuration
-const User = require('./models/User'); // Modèle User
+const api = require('../components/API');
+const { PORT } = require('../config/config');
+const sqlite3 = require('sqlite3');
+const User = require('../database/models/createUser');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
-app.use(bodyParser.json()); // Utiliser bodyParser pour les JSON
+app.use(bodyParser.json());
 
-// Connexion à la base de données SQLiiiite
-const db = new sqlite3.Database('database.sqlite', (err) => {
+const dbPath = path.resolve(__dirname, '../database/database.sqlite');
+const sqlPath = path.resolve(__dirname, '../database/index.sql');
+
+if (!fs.existsSync(dbPath)) {
+  fs.writeFileSync(dbPath, '');
+}
+
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('Erreur lors de la connexion à la base de données');
-    process.exit(1); // Arrêter le processus en cas d'erreur
+    console.error('Erreur lors de la connexion à la base de données : ', err);
+    process.exit(1);
   }
   console.log('Connexion à la base de données réussie');
+
+  db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='users'", (err, row) => {
+    if (err) {
+      console.error('Erreur lors de la vérification de l\'existence de la table : ', err);
+      process.exit(1);
+    }
+    if (!row) {
+      console.log('La table n\'existe pas, exécution du script SQL pour créer la table.');
+      const initSQL = fs.readFileSync(sqlPath, 'utf-8');
+      console.log('Contenu du fichier index.sql :\n', initSQL); // Ajoutez cette ligne pour afficher le contenu du fichier
+      db.exec(initSQL, (err) => {
+        if (err) {
+          console.error('Erreur lors de l\'initialisation de la base de données : ', err);
+        } else {
+          console.log('Base de données initialisée avec succès');
+        }
+      });
+    } else {
+      console.log('La table existe déjà, aucune action nécessaire.');
+    }
+  });
 });
 
-// Redirection vers l'index public
-app.use(express.static('../../Web/Public'));
+app.use(express.static(path.resolve(__dirname, '../../Web/Public')));
 
 app.get('/', (req, res) => {
-  res.sendFile('Index.html', { root: '../Web/Public' }); // Redirection vers l'index.html
+  res.sendFile('Index.html', { root: path.resolve(__dirname, '../../Web/Public') });
 });
 
-// Routes pour gérer les utilisateurs (pour l'instant c'est un exemple)
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.all(db);
@@ -47,7 +75,7 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-// Routes de l'API
+app.use('/api', api);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

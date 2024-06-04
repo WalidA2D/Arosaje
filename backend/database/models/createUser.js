@@ -30,14 +30,14 @@ class User {
           resolve();
         });
       } else {
-        db.run('INSERT INTO users (name, email) VALUES (?, ?)', [this.name, this.email], (err, stmt) => {
+        db.run('INSERT INTO users (name, email) VALUES (?, ?)', [this.name, this.email], function(err) {
           if (err) {
             reject(err);
             return;
           }
-          this.id = stmt.lastID;
+          this.id = this.lastID;
           resolve();
-        });
+        }.bind(this));
       }
     });
   }
