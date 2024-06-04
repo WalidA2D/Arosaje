@@ -4,7 +4,7 @@
   "description": "Back end Arosaje",
   "main": "index.js",
   "scripts": {
-    "test": "console.log(\"YIIIHAAA\")"
+    "test": "test script"
   },
   "repository": {
     "type": "git",
