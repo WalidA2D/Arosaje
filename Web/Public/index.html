@@ -3,9 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Enregistrement d'utilisateur</title>
 </head>
 <body>
-    AROSAJE WOAAAW
+    <h1>Enregistrement d'utilisateur</h1>
+    <form id="userForm">
+        <label for="name">Nom:</label><br>
+        <input type="text" id="name" name="name"><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email"><br><br>
+        <button type="submit">Envoyer</button>
+    </form>
+
+    <script>
+        document.getElementById('userForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const name = formData.get('name');
+            const email = formData.get('email');
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erreur lors de l\'enregistrement de l\'utilisateur');
+                }
+
+                const data = await response.json();
+                alert(data.message); // Afficher un message de succès
+            } catch (error) {
+                console.error(error);
+                alert('Une erreur est survenue, veuillez réessayer.');
+            }
+        });
+    </script>
 </body>
 </html>
