@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, TextInput,  Alert  } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HeaderTitle from '../../components/HeaderTitle';
 import BigButtonDown from '../../components/BigButtonDown';
@@ -14,6 +14,15 @@ export default function loginFormScreen() {
     const [email, onChangeEmail] = React.useState('');
     const [motDePasse, onChangeMotDePasse] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
+
+  function handleLogin() {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex simple pour validation d'email
+    if (emailRegex.test(email) && motDePasse.length > 0) {
+      Alert.alert("Succès", "Connexion réussie");
+    } else {
+      Alert.alert("Échec", "Email non conforme ou mot de passe incorrect");
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -117,7 +126,9 @@ export default function loginFormScreen() {
 
         <View style={styles.selectorContainer}>
 
-            <TouchableOpacity style={styles.selectorButton}>
+            <TouchableOpacity style={styles.selectorButton} onPress={() => {
+              handleLogin();
+            }}>
                 <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>{isLoginFormVisible ? 'Inscription' : 'Connexion'}</Text>
             </TouchableOpacity>
 
