@@ -1,10 +1,8 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 
 export default function TabLayout() {
-
   return (
     <Tabs
       screenOptions={{
@@ -57,13 +55,20 @@ export default function TabLayout() {
           ),
         }}
       />
-        <Tabs.Screen
-          name="calendrier"
-          options={{
-            title: 'Calendrier',
-            tabBarButton: () => null,
-          }}
-        />
-      </Tabs>
+      <Tabs.Screen
+        name="calendrier"
+        options={{
+          title: 'Calendrier',
+          tabBarButton: () => null,
+        }}
+      />
+      <Tabs.Screen
+        name="message"
+        options={{
+          title: 'Conersation',
+          tabBarButton: () => null,
+        }}
+      />
+    </Tabs>
   );
 }
