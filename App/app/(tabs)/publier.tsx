@@ -1,31 +1,92 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StackNavigationProp } from '@react-navigation/stack';
+
 import BigButtonDown from '../../components/BigButtonDown';
 import ListDash from '../../components/ListDash';
-import HeaderTitle from '../../components/HeaderTitle';
 
-export default function PublierScreen() {
+import PubTitre from '../pubnav/pubtitre';
+import PubDate from '../pubnav/pubdate';
+import PubPhoto from '../pubnav/pubphoto';
+import PubDesc from '../pubnav/pubdesc';
+import PubLoca from '../pubnav/publoca';
+import PubEspece from '../pubnav/pubespece';
+import PubEntretien from '../pubnav/pubentretien';
+
+const Stack = createNativeStackNavigator();
+
+function PublierScreen({ }) {
+
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator initialRouteName="Publier"
+      screenOptions ={{
+        headerStyle:{
+          backgroundColor: '#668F80',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle:{
+          color: '#FFF',
+          fontSize: 24,
+          fontWeight: 'bold',
+        },
+      }}>
+        <Stack.Screen name="Publier" component={PublierContent} />
+        <Stack.Screen name="Titre" component={PubTitre}
+        options={{
+          headerBackTitleVisible: false
+      }} />
+        <Stack.Screen name="Date(s)" component={PubDate}
+        options={{
+          headerBackTitleVisible: false
+      }} />
+        <Stack.Screen name="Photo(s)" component={PubPhoto}
+        options={{
+          headerBackTitleVisible: false
+      }} />
+        <Stack.Screen name="Description" component={PubDesc}
+        options={{
+          headerBackTitleVisible: false
+      }} />
+        <Stack.Screen name="Localisation" component={PubLoca}
+        options={{
+          headerBackTitleVisible: false
+      }} />
+        <Stack.Screen name="Espèce(s)" component={PubEspece}
+        options={{
+          headerBackTitleVisible: false
+      }} />
+        <Stack.Screen name="Entretien" component={PubEntretien}
+        options={{
+          headerBackTitleVisible: false
+      }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+function PublierContent() {
+  const navigation = useNavigation<StackNavigationProp<any>>();
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <HeaderTitle title="Publier" />
-      </View>
-    
+
     <View style={styles.fixedDetails}>
-      <ListDash buttonText="Titre" />
+      <ListDash buttonText="Titre" onPress={() => navigation.navigate('Titre')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Date(s)" />
+      <ListDash buttonText="Date(s)" onPress={() => navigation.navigate('Date(s)')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Photo(s)" />
+      <ListDash buttonText="Photo(s)" onPress={() => navigation.navigate('Photo(s)')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Description" />
+      <ListDash buttonText="Description" onPress={() => navigation.navigate('Description')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Localisation" />
+      <ListDash buttonText="Localisation" onPress={() => navigation.navigate('Localisation')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Espèce(s)" />
+      <ListDash buttonText="Espèce(s)" onPress={() => navigation.navigate('Espèce(s)')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Exigence d'entretien (optionel)" />
+      <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
       <View style={styles.separatorDetails}/>
     </View>
     <BigButtonDown buttonText="Valider" />
@@ -36,7 +97,7 @@ export default function PublierScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF', 
+    backgroundColor: '#FFF',
   },
   header: {
     height: 100,
@@ -59,7 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   scrollViewContent: {
-    paddingTop: 20, 
+    paddingTop: 20,
   },
   body: {
     flex: 1,
@@ -82,3 +143,5 @@ const styles = StyleSheet.create({
     fontSize : 14,
   }
 });
+
+export default PublierScreen;

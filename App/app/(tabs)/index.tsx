@@ -84,8 +84,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   searchContainer: {
-    marginTop: 20,
+    marginTop: 10,
     paddingHorizontal: 20,
+    paddingBottom: 10,
   },
   searchInput: {
     height: 40,
