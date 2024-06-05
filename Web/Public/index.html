@@ -15,6 +15,9 @@
         <button type="submit">Envoyer</button>
     </form>
 
+    <h2>Liste des utilisateurs :</h2>
+    <ul id="userList"></ul>
+
     <script>
         document.getElementById('userForm').addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -38,11 +41,36 @@
 
                 const data = await response.json();
                 alert(data.message); // Afficher un message de succès
+
+                // Recharger la liste des utilisateurs
+                await loadUsers();
             } catch (error) {
                 console.error(error);
                 alert('Une erreur est survenue, veuillez réessayer.');
             }
         });
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/users');
+                const users = await response.json();
+
+                const userList = document.getElementById('userList');
+                userList.innerHTML = ''; // Effacer la liste existante
+
+                users.forEach((user) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Nom: ${user.name}, Email: ${user.email}`;
+                    userList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Erreur lors de la récupération des utilisateurs :', error);
+                alert('Erreur lors de la récupération des utilisateurs.');
+            }
+        }
+
+        // Charger les utilisateurs au chargement de la page
+        window.addEventListener('load', loadUsers);
     </script>
 </body>
 </html>

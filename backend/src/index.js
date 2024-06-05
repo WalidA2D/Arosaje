@@ -1,17 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const api = require('../components/API');
-const { PORT } = require('../config/config');
-const sqlite3 = require('sqlite3');
-const User = require('../database/models/createUser');
 const fs = require('fs');
 const path = require('path');
+const apiRouter = require('../components/API');
+const { PORT, DATABASE_URL } = require('../config/config');
+const sqlite3 = require('sqlite3').verbose();
 
+// Initialiser l'application express
 const app = express();
 app.use(bodyParser.json());
 
-const dbPath = path.resolve(__dirname, '../database/database.sqlite');
-const sqlPath = path.resolve(__dirname, '../database/index.sql');
+// Configurer la base de données SQLite
+const dbPath = path.resolve(__dirname, '..', DATABASE_URL);
+const sqlPath = path.resolve(__dirname, '..', 'database', 'index.sql');
 
 if (!fs.existsSync(dbPath)) {
   fs.writeFileSync(dbPath, '');
@@ -32,7 +33,6 @@ const db = new sqlite3.Database(dbPath, (err) => {
     if (!row) {
       console.log('La table n\'existe pas, exécution du script SQL pour créer la table.');
       const initSQL = fs.readFileSync(sqlPath, 'utf-8');
-      console.log('Contenu du fichier index.sql :\n', initSQL); // Ajoutez cette ligne pour afficher le contenu du fichier
       db.exec(initSQL, (err) => {
         if (err) {
           console.error('Erreur lors de l\'initialisation de la base de données : ', err);
@@ -46,39 +46,19 @@ const db = new sqlite3.Database(dbPath, (err) => {
   });
 });
 
-app.use(express.static(path.resolve(__dirname, '../../Web/Public')));
+// Définir les routes API
+app.use('/api', apiRouter);
+
+// Servir les fichiers statiques depuis le dossier public
+app.use(express.static(path.resolve(__dirname, '..', '..', 'Web', 'Public')));
 
 app.get('/', (req, res) => {
-  res.sendFile('Index.html', { root: path.resolve(__dirname, '../../Web/Public') });
+  res.sendFile('index.html', { root: path.resolve(__dirname, '..', '..', 'Web', 'Public') });
 });
 
-app.get('/api/users', async (req, res) => {
-  try {
-    const users = await User.all(db);
-    res.json(users);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Erreur lors de la récupération des utilisateurs');
-  }
-});
-
-app.post('/api/users', async (req, res) => {
-  const { name, email } = req.body;
-  const user = new User(null, name, email);
-
-  try {
-    await user.save(db);
-    res.json({ message: 'Utilisateur créé avec succès' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Erreur lors de la création de l\'utilisateur');
-  }
-});
-
-app.use('/api', api);
-
+// Démarrer le serveur
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+    console.log(`Serveur en écoute sur le port ${PORT}`);
 });
 
 module.exports = app;
