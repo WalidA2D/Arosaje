@@ -1,28 +1,10 @@
 {
-  "name": "backarosaje",
-  "version": "1.0.0",
-  "description": "Back end Arosaje",
-  "main": "index.js",
-  "scripts": {
-    "test": "test script"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Massil-a/Arosaje.git"
-  },
-  "keywords": [
-    "backend",
-    "back",
-    "arosaje",
-    "mspr"
-  ],
-  "author": "Massil",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Massil-a/Arosaje/issues"
-  },
-  "homepage": "https://github.com/Massil-a/Arosaje#readme",
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7",
+    "sqlite3": "^5.1.7"
   }
 }
