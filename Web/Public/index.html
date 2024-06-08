@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test API</title>
 </head>
+
 <body>
     <h1>Liste des Utilisateurs</h1>
     <ul id="userList"></ul>
@@ -15,10 +17,21 @@
     <button id="createUserBtn">Créer Utilisateur</button>
 
     <script>
-        // Fonction pour afficher la liste des utilisateurs
         async function displayUsers() {
-            const response = await fetch('/api/getUsers');
-            const users = await response.json();
+            let users = []
+            fetch('http://localhost:3000/api/getUsers', {
+                method: 'GET',
+                headers: {
+                    'x-access-token': 'your-secure-token'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    users = data
+                    console.log(data)
+                })
+                .catch(error => console.error('Error:', error));
+
 
             const userList = document.getElementById('userList');
             userList.innerHTML = '';
@@ -30,25 +43,27 @@
             });
         }
 
-        // Fonction pour créer un nouvel utilisateur
         document.getElementById('createUserBtn').addEventListener('click', async () => {
             const name = document.getElementById('name').value;
             const age = document.getElementById('age').value;
 
-            await fetch('/api/createUser', {
+            fetch('/api/createUser', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ name, age })
-            });
+            })
+                .then(response.json())
+                .then((res) => {
+                    console.log(res)
+                })
 
-            // Actualiser la liste des utilisateurs après création
             await displayUsers();
         });
 
-        // Afficher la liste des utilisateurs au chargement de la page
         displayUsers();
     </script>
 </body>
+
 </html>
