@@ -1,31 +1,20 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../database/models/createUser');
-const authMiddleware = require('../middlewares/auth');
+const { verifyToken } = require('../middlewares/auth');
+const manageUser = require('../database/models/manageUsers');
 
-router.use(authMiddleware);
+// Middleware d'authentification pour toutes les routes de l'API
+router.use(verifyToken);
 
-router.get('/users', async (req, res) => {
-    try {
-        const users = await User.all();
-        res.json(users);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Erreur lors de la récupération des utilisateurs');
-    }
+// Routes API
+router.get('/getUsers', async (req, res) => {
+    const users = await manageUser.getAllUsers();
+    res.json(users);
 });
 
-router.post('/users', async (req, res) => {
-    const { name, email } = req.body;
-    const user = new User(null, name, email);
-
-    try {
-        await user.save();
-        res.json({ message: 'Utilisateur créé avec succès' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Erreur lors de la création de l\'utilisateur');
-    }
+router.post('/createUser', async (req, res) => {
+    const userCreated = await manageUser.addUser(req.body.name,req.body.age);
+    res.json(userCreated);
 });
 
 module.exports = router;
