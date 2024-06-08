@@ -4,7 +4,7 @@ const { verifyToken } = require('../middlewares/auth');
 const manageUser = require('../database/models/manageUsers');
 
 // Middleware d'authentification pour toutes les routes de l'API
-router.use(verifyToken);
+// router.use(verifyToken);
 
 // Routes API
 router.get('/getUsers', async (req, res) => {
@@ -18,10 +18,10 @@ router.get('/getUsers', async (req, res) => {
 
 router.post('/createUser', async (req, res) => {
     try{
-        const userCreated = await manageUser.addUser(req.body.name,req.body.age);
-        res.json(userCreated);
+        const response = await manageUser.addUser(req.body.name,req.body.age);
+        res.json(response);
     } catch(e){
-        console.error('',e)
+        console.error('Erreur lors de la route createUser',e)
     }
 });
 
