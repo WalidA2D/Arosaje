@@ -3,74 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enregistrement d'utilisateur</title>
+    <title>Test API</title>
 </head>
 <body>
-    <h1>Enregistrement d'utilisateur</h1>
-    <form id="userForm">
-        <label for="name">Nom:</label><br>
-        <input type="text" id="name" name="name"><br>
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email"><br><br>
-        <button type="submit">Envoyer</button>
-    </form>
-
-    <h2>Liste des utilisateurs :</h2>
+    <h1>Liste des Utilisateurs</h1>
     <ul id="userList"></ul>
 
+    <h2>Créer un Nouvel Utilisateur</h2>
+    <input type="text" id="name" placeholder="Nom">
+    <input type="number" id="age" placeholder="Âge">
+    <button id="createUserBtn">Créer Utilisateur</button>
+
     <script>
-        document.getElementById('userForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
+        // Fonction pour afficher la liste des utilisateurs
+        async function displayUsers() {
+            const response = await fetch('/api/getUsers');
+            const users = await response.json();
 
-            const formData = new FormData(event.target);
-            const name = formData.get('name');
-            const email = formData.get('email');
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
 
-            try {
-                const response = await fetch('/api/users', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Erreur lors de l\'enregistrement de l\'utilisateur');
-                }
-
-                const data = await response.json();
-                alert(data.message); // Afficher un message de succès
-
-                // Recharger la liste des utilisateurs
-                await loadUsers();
-            } catch (error) {
-                console.error(error);
-                alert('Une erreur est survenue, veuillez réessayer.');
-            }
-        });
-
-        async function loadUsers() {
-            try {
-                const response = await fetch('/api/users');
-                const users = await response.json();
-
-                const userList = document.getElementById('userList');
-                userList.innerHTML = ''; // Effacer la liste existante
-
-                users.forEach((user) => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `Nom: ${user.name}, Email: ${user.email}`;
-                    userList.appendChild(listItem);
-                });
-            } catch (error) {
-                console.error('Erreur lors de la récupération des utilisateurs :', error);
-                alert('Erreur lors de la récupération des utilisateurs.');
-            }
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = `Nom: ${user.name}, Âge: ${user.age}`;
+                userList.appendChild(li);
+            });
         }
 
-        // Charger les utilisateurs au chargement de la page
-        window.addEventListener('load', loadUsers);
+        // Fonction pour créer un nouvel utilisateur
+        document.getElementById('createUserBtn').addEventListener('click', async () => {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+
+            await fetch('/api/createUser', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, age })
+            });
+
+            // Actualiser la liste des utilisateurs après création
+            await displayUsers();
+        });
+
+        // Afficher la liste des utilisateurs au chargement de la page
+        displayUsers();
     </script>
 </body>
 </html>
