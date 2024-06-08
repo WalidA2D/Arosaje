@@ -8,13 +8,21 @@ router.use(verifyToken);
 
 // Routes API
 router.get('/getUsers', async (req, res) => {
-    const users = await manageUser.getAllUsers();
-    res.json(users);
+    try{
+        const users = await manageUser.getAllUsers();
+        res.json(users);
+    } catch(e){
+        console.error('Erreur lors de la route getUsers : \n',e)
+    }
 });
 
 router.post('/createUser', async (req, res) => {
-    const userCreated = await manageUser.addUser(req.body.name,req.body.age);
-    res.json(userCreated);
+    try{
+        const userCreated = await manageUser.addUser(req.body.name,req.body.age);
+        res.json(userCreated);
+    } catch(e){
+        console.error('',e)
+    }
 });
 
 module.exports = router;
