@@ -1,2 +1,2 @@
--- SQLite
-INSERT INTO users VALUES (4,"massil",12)
+SELECT * FROM users;
+DELETE FROM users

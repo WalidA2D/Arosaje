@@ -17,53 +17,40 @@
     <button id="createUserBtn">Créer Utilisateur</button>
 
     <script>
-        async function displayUsers() {
-            let users = []
-            fetch('http://localhost:3000/api/getUsers', {
-                method: 'GET',
-                headers: {
-                    'x-access-token': 'your-secure-token'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    users = data
-                    console.log(data)
-                })
-                .catch(error => console.error('Error:', error));
-
-
-            const userList = document.getElementById('userList');
-            userList.innerHTML = '';
-
-            users.forEach(user => {
-                const li = document.createElement('li');
-                li.textContent = `Nom: ${user.name}, Âge: ${user.age}`;
-                userList.appendChild(li);
+        function displayUsers(){
+            fetch('http://localhost:3000/api/getUsers')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                document.querySelector('#userList').innerHTML = data;
             });
         }
-
-        document.getElementById('createUserBtn').addEventListener('click', async () => {
-            const name = document.getElementById('name').value;
-            const age = document.getElementById('age').value;
-
-            fetch('/api/createUser', {
+        
+        document.querySelector('#createUserBtn').addEventListener('click', async () => {
+            let name = document.querySelector('#name').value;
+            let age = document.querySelector('#age').value;
+            console.log(name, age);
+            let options = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ name, age })
+            };
+            fetch('/api/createUser', options)
+            .then(response => response.json())
+            .then(res => {
+                console.log(res);
+                displayUsers();
             })
-                .then(response.json())
-                .then((res) => {
-                    console.log(res)
-                })
-
-            await displayUsers();
+            .catch(e => {
+                console.error(e);
+            });
         });
-
+    
         displayUsers();
     </script>
+    
 </body>
 
 </html>
