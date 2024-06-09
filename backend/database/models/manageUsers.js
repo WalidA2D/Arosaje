@@ -1,22 +1,23 @@
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
-const { handleDBOperation } = require('../../components/DreamTeamUtils');
+const { handleDBOperation, encryptMethod } = require('../../components/DreamTeamUtils');
 
 const pathToDB = path.resolve(__dirname, '..', 'BASE.db');
 const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
     if (err) {
-        return console.error('Erreur lors de la connexion à la BDD : \n', err);
+        return console.error('Erreur manageUsers.js lors de la connexion à la BDD : \n', err);
     } else {
-        console.log('Connecté au serveur SQL');
+        console.log('Connecté au serveur SQL : manageUsers.js');
     }
 });
 
 // CREER UN UTILISATEUR
-const addUser = async (name, age) => {
+const addUser = async (lastName, firstName, email, address, phone, cityName, password) => {
+    const passwordEncrypted = encryptMethod(password)
     try {
-        const sql = 'INSERT INTO users (nom, age) VALUES (?, ?)';
+        const sql = 'INSERT INTO Users (lastName, firstName, email, address, phone, cityName, password) VALUES (?, ?, ?, ?, ?, ?, ?)';
         const result = await handleDBOperation((callback) => {
-            db.run(sql, [name, age], function (err) {
+            db.run(sql, [lastName, firstName, email, address, phone, cityName, passwordEncrypted], function (err) {
                 callback(err, { lastID: this.lastID });
             });
         });
@@ -37,7 +38,7 @@ const addUser = async (name, age) => {
 // LIRE LES USERS
 const getAllUsers = async () => {
     try {
-        const sql = 'SELECT * FROM users';
+        const sql = 'SELECT * FROM Users';
         const rows = await handleDBOperation((callback) => {
             db.all(sql, [], callback);
         });
@@ -58,7 +59,7 @@ const getAllUsers = async () => {
 // UPDATE UN USER
 const updateUser = async (id, name, age) => {
     try {
-        const sql = 'UPDATE users SET nom = ?, age = ? WHERE id = ?';
+        const sql = 'UPDATE Users SET nom = ?, age = ? WHERE id = ?';
         await handleDBOperation((callback) => {
             db.run(sql, [name, age, id], callback);
         });
