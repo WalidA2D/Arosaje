@@ -1,2 +1,2 @@
-SELECT * FROM users;
-DELETE FROM users
+INSERT INTO Posts (title, description, dateStart, dateEnd, address, cityName, idUser, idPlant) 
+VALUES ('Je cherche ma polante', 'je deconne jdeconne', '02/11/2024', '14/11/2024', 'allée dupuit', 'asbzoo', 17, 152)
