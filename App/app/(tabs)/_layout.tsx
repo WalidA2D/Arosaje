@@ -8,10 +8,10 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#668F80',
         headerShown: false,
-        tabBarStyle: { backgroundColor: '#FFF' }
+        tabBarStyle: { backgroundColor: '#FFF' },
       }}>
       <Tabs.Screen
-        name="index"
+        name="actu"
         options={{
           title: 'Actualités',
           tabBarIcon: ({ color, focused }) => (
@@ -70,12 +70,15 @@ export default function TabLayout() {
         }}
       />
         <Tabs.Screen
-        name="loginform"
+        name="index"
         options={{
-          title: 'loginform',
+          title: 'startscreen',
           tabBarButton: () => null,
+          tabBarStyle: { display: 'none' }
         }}
       />
     </Tabs>
   );
 }
+
+
