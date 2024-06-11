@@ -69,6 +69,13 @@ export default function TabLayout() {
           tabBarButton: () => null,
         }}
       />
+        <Tabs.Screen
+        name="loginform"
+        options={{
+          title: 'loginform',
+          tabBarButton: () => null,
+        }}
+      />
     </Tabs>
   );
 }
