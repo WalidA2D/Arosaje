@@ -1,109 +1,100 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Dimensions, FlatList, Image } from 'react-native';
-import ContentItem from '../../components/navigation/ContentItem';
-import HeaderTitle from '../../components/HeaderTitle';
+import { StyleSheet, View, Text, TouchableOpacity, Image, Modal, Button } from 'react-native';
+import { HelloWave } from '../../components/HelloWave';
+import ConnexionScreen from './login/connexion';
+import InscriptionScreen from './login/inscription';
 
+export default function StartApp() {
+  const [modalType, setModalType] = useState('');
 
-export default function HomeScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const setModalVisible = (isVisible: boolean, modalType: string) => {
+    if (isVisible) {
+      setModalType(modalType);
+    } else {
+      setModalType('');
+    }
+  };
 
   return (
-    <>
-      <View style={styles.container}>
-        <View style={styles.header}>
-        <HeaderTitle title="Accueil" />
-          <View style={styles.headerContent}>
-            <TouchableOpacity style={styles.headerButton}>
-              <Text style={styles.headerButtonText}>Filtrer</Text>
-            </TouchableOpacity>
-          </View>
+    <View style={styles.container}>
+      <Text style={styles.logo}>LOGO</Text>
+      <HelloWave />
+      <View style={styles.fixedDetailsBtn}>
+        <View style={styles.selectorContainer}>
+          <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true, 'connexion')}>
+            <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
+              Connexion
+            </Text>
+          </TouchableOpacity>
         </View>
-
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Rechercher..."
-            placeholderTextColor="#888"
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
-          />
+        <View style={styles.selectorContainer}>
+          <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true, 'inscription')}>
+            <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
+              Inscription
+            </Text>
+          </TouchableOpacity>
         </View>
-
-        <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <View style={styles.body}>
-            <ContentItem
-              images={[
-                'https://picsum.photos/600/300',
-                'https://picsum.photos/610/300',
-                'https://picsum.photos/620/300',
-              ]}
-              title="Titre du slider"
-              description="Description du slider"
-              time="Il y a 8 minutes"
-            />
-            <ContentItem
-              images={[
-                'https://picsum.photos/590/300',
-              ]}
-              title="Titre du slider"
-              description="Description du slider"
-              time="Il y a 18 minutes"
-            />
-          </View>
-        </ScrollView>
       </View>
-    </>
+
+      <Modal visible={modalType === 'connexion'} animationType="slide">
+        <ConnexionScreen />
+        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false, 'connexion')}>
+            <Text style={{ color: '#fff' }}>Fermer</Text>
+          </TouchableOpacity>
+      </Modal>
+
+      <Modal visible={modalType === 'inscription'} animationType="slide">
+        <InscriptionScreen />
+        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false, 'inscription')}>
+          <Text style={{ color: '#fff' }}>Fermer</Text>
+        </TouchableOpacity>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
-  },
-  header: {
-    height: 100,
     backgroundColor: '#668F80',
     justifyContent: 'center',
-    paddingHorizontal: 10,
-    paddingTop: 20,
-  },
-  headerContent: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    position: 'relative',
   },
-  headerButton: {
-    position: 'absolute',
-    right: 10,
-    padding: 10,
+  logo:{
+    alignSelf: 'center',
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFF'
   },
-  headerButtonText: {
-    color: '#FFF',
-    fontSize: 16,
+  selectorContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 25,
+    overflow: 'hidden',
+    width: '90%',
+    alignItems: 'center',
   },
-  searchContainer: {
-    marginTop: 10,
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-  },
-  searchInput: {
-    height: 40,
-    borderColor: '#CCC',
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingLeft: 15,
-    backgroundColor: '#F0F0F0',
-    color: '#000',
-  },
-  scrollViewContent: {
-    paddingTop: 20,
-  },
-  body: {
+  selectorButton: {
     flex: 1,
-    width: '100%',
-    paddingHorizontal: 20,
+    paddingVertical: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#FFF',
+  },
+  fixedDetailsBtn: {
+    position: 'absolute',
+    bottom: 30,
+    width: '100%',
+    alignItems: 'center',
+  },
+  closeButton: {
+    backgroundColor: '#668F80',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 50,
+    margin: 'auto',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
