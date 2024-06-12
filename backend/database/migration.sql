@@ -1,5 +1,5 @@
 CREATE TABLE Users (
-    idUsers INT PRIMARY KEY,
+    idUsers INTEGER PRIMARY KEY AUTOINCREMENT,
     lastName VARCHAR(50) NOT NULL,
     firstName VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
@@ -11,22 +11,23 @@ CREATE TABLE Users (
     isBotanist BOOLEAN NOT NULL DEFAULT FALSE,
     isAdmin BOOLEAN NOT NULL DEFAULT FALSE,
     isBan BOOLEAN NOT NULL DEFAULT FALSE,
-    note DECIMAL(5, 2)
+    note DECIMAL(5, 2),
+    uid varchar(50) NOT NULL DEFAULT ''
 );
 
 CREATE TABLE Comments (
-    idComments INT PRIMARY KEY,
+    idComments INTEGER PRIMARY KEY AUTOINCREMENT,
     text VARCHAR(1500) NOT NULL,
     note DECIMAL(5, 2),
     publishedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    idUser INT,
-    idPost INT,
+    idUser INTEGER,
+    idPost INTEGER,
     FOREIGN KEY (idUser) REFERENCES Users(idUsers),
     FOREIGN KEY (idPost) REFERENCES Posts(idPosts)
 );
 
 CREATE TABLE Posts (
-    idPosts INT PRIMARY KEY,
+    idPosts INTEGER PRIMARY KEY AUTOINCREMENT,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(1000) NOT NULL,
     publishedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -36,55 +37,55 @@ CREATE TABLE Posts (
     cityName VARCHAR(50) NOT NULL,
     state BOOLEAN NOT NULL DEFAULT FALSE,
     accepted BOOLEAN NOT NULL DEFAULT FALSE,
-    idUser INT,
-    idPlant INT,
+    idUser INTEGER,
+    idPlant INTEGER,
     FOREIGN KEY (idUser) REFERENCES Users(idUsers),
     FOREIGN KEY (idPlant) REFERENCES Plants(idPlants)
 );
 
 CREATE TABLE Plants (
-    idPlants INT PRIMARY KEY,
+    idPlants INTEGER PRIMARY KEY AUTOINCREMENT,
     description VARCHAR(1000) NOT NULL,
     origin VARCHAR(100) NOT NULL,
     requirements VARCHAR(1000) NOT NULL,
     type VARCHAR(100) NOT NULL,
-    idUser INT,
+    idUser INTEGER,
     FOREIGN KEY (idUser) REFERENCES Users(idUsers)
 );
 
 CREATE TABLE Images (
-    idImages INT PRIMARY KEY,
+    idImages INTEGER PRIMARY KEY AUTOINCREMENT,
     title VARCHAR(50) NOT NULL,
     url VARCHAR(255) NOT NULL,
-    idPlant INT,
+    idPlant INTEGER,
     FOREIGN KEY (idPlant) REFERENCES Plants(idPlants)
 );
 
 CREATE TABLE Favorites (
-    idFavorites INT PRIMARY KEY,
-    idPost INT,
-    idUser INT,
+    idFavorites INTEGER PRIMARY KEY AUTOINCREMENT,
+    idPost INTEGER,
+    idUser INTEGER,
     FOREIGN KEY (idPost) REFERENCES Posts(idPosts),
     FOREIGN KEY (idUser) REFERENCES Users(idUsers)
 );
 
 CREATE TABLE Conversations (
-    idConversations INT PRIMARY KEY,
+    idConversations INTEGER PRIMARY KEY AUTOINCREMENT,
     dateStart TIMESTAMP NOT NULL,
     dateEnd TIMESTAMP NOT NULL,
     seen BOOLEAN NOT NULL DEFAULT FALSE,
-    idUser1 INT,
-    idUser2 INT,
+    idUser1 INTEGER,
+    idUser2 INTEGER,
     FOREIGN KEY (idUser1) REFERENCES Users(idUsers),
     FOREIGN KEY (idUser2) REFERENCES Users(idUsers)
 );
 
 CREATE TABLE Messages (
-    idMessages INT PRIMARY KEY,
+    idMessages INTEGER PRIMARY KEY AUTOINCREMENT,
     text VARCHAR(500) NOT NULL,
     publishedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    idConversation INT,
-    idUser INT,
+    idConversation INTEGER,
+    idUser INTEGER,
     FOREIGN KEY (idConversation) REFERENCES Conversations(idConversations),
     FOREIGN KEY (idUser) REFERENCES Users(idUsers)
 );

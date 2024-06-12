@@ -22,7 +22,7 @@ const addPlant = async (description, origin, requirements, type) => {
         });
         console.log("Nouvelle plante créée , Type : ",type)
         return { 
-            body: "Plante créée!!!",
+            message: "Plante créée!!!",
             status: 200, 
             success: true
         };
@@ -35,20 +35,37 @@ const addPlant = async (description, origin, requirements, type) => {
     }
 };
 
-// GET TOUTES LES PLANTES
+// GET PLANTE PAR ID
 const getPlantWithID = async (plantID) => {
     try {
-        const sql = 'SELECT * FROM Plants WHERE idPlants = ?';
+        if(plantID == undefined || plantID == null || plantID < 0 || !Number.isInteger(plantID)){
+            return { 
+                message:"ID incorrect",
+                status: 400, 
+                success: false 
+            };
+        }
+        //const sql = 'SELECT idPlants, description, origin, requirements, type, idUser FROM Plants WHERE idPlants = ?';
+        const sql = 'SELECT * FROM Plants';
         const result = await handleDBOperation((callback) => {
-            db.run(sql, [plantID], function (err) {
-                callback(err);
+            db.all(sql, [plantID], function (err, row) {
+                callback(err, row);
             });
         });
-        return { 
-            body: result,
-            status: 200, 
-            success: true
-        };
+        if (result) {
+            return { 
+                body: result,
+                status: 200, 
+                success: true
+            };
+        } else {
+            console.error('Aucune plante trouvée avec l\'ID :', plantID);
+            return { 
+                message: 'Plante non trouvée',
+                status: 404, 
+                success: false
+            };
+        }
     } catch (e) {
         console.error('Erreur lors de la fonction getPlantWithID', e);
         return { 
