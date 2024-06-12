@@ -1,10 +1,19 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Modal, Button } from 'react-native';
 import { HelloWave } from '../../components/HelloWave';
-import LoginFormScreen from './loginform';
+import ConnexionScreen from './login/connexion';
+import InscriptionScreen from './login/inscription';
 
 export default function StartApp() {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState('');
+
+  const setModalVisible = (isVisible: boolean, modalType: string) => {
+    if (isVisible) {
+      setModalType(modalType);
+    } else {
+      setModalType('');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -12,25 +21,33 @@ export default function StartApp() {
       <HelloWave />
       <View style={styles.fixedDetailsBtn}>
         <View style={styles.selectorContainer}>
-          <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true)}>
+          <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true, 'connexion')}>
             <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
               Connexion
             </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.selectorContainer}>
-          <TouchableOpacity style={styles.selectorButton} >
+          <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true, 'inscription')}>
             <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
               Inscription
             </Text>
           </TouchableOpacity>
         </View>
       </View>
-      <Modal visible={modalVisible} animationType="slide">
-        <LoginFormScreen />
-        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+
+      <Modal visible={modalType === 'connexion'} animationType="slide">
+        <ConnexionScreen />
+        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false, 'connexion')}>
             <Text style={{ color: '#fff' }}>Fermer</Text>
           </TouchableOpacity>
+      </Modal>
+
+      <Modal visible={modalType === 'inscription'} animationType="slide">
+        <InscriptionScreen />
+        <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false, 'inscription')}>
+          <Text style={{ color: '#fff' }}>Fermer</Text>
+        </TouchableOpacity>
       </Modal>
     </View>
   );
