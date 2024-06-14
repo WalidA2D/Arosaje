@@ -1,0 +1,158 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+.container {
+    display: flex;
+    width: 70%;
+    height: 70%;
+    max-width: 1200px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.left {
+    background-color: #fff;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left h1 {
+    font-size: 3em;
+    color: #5a7d7c;
+}
+
+.right {
+    background-color: #668F80;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    text-align: left;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+input {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.password-container {
+    position: relative;
+}
+
+.password-container input[type="password"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+/* si le user appuis sur montrer, le type change, donc on applique en avance a l'autre type*/
+.password-container input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.password-container button[type="button"] {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-90%);
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    color: #5a7d7c;
+    font-size: 0.9em;
+}
+
+button[type="submit"] {
+    padding: 1em;
+    width: auto;
+    background-color: #A0AF84;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-bottom: 2em;
+}
+
+#message {
+    margin-top: 10px;
+    text-align: center;
+    color: red;
+}
+
+.register-link {
+    display: block;
+    color: #ddd;
+    text-decoration: none;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    background-color: #ffcdd2; 
+    color: #c62828; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards, fadeOut 0.5s ease forwards 2.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
