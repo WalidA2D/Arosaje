@@ -22,7 +22,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Messages',
+          title: 'Message',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'chatbox-ellipses' : 'chatbox-outline'} color={color} />
           ),
@@ -55,20 +55,8 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="calendrier"
-        options={{
-          title: 'Calendrier',
-          tabBarButton: () => null,
-        }}
-      />
-      <Tabs.Screen
-        name="message"
-        options={{
-          title: 'Conersation',
-          tabBarButton: () => null,
-        }}
-      />
     </Tabs>
+
+    
   );
 }

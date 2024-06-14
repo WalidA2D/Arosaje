@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
-import HeaderTitle from '../../components/HeaderTitle';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 type RootStackParamList = {
   explore: undefined;
@@ -43,24 +43,34 @@ export default function MessageScreen() {
   const route = useRoute<MessageScreenRouteProp>();
   const { userName, initialMessages: initialMessagesRaw } = route.params;
 
-  // Convert timestamps from string to Date
   const initialMessages = initialMessagesRaw.map(message => ({
     ...message,
     timestamp: new Date(message.timestamp)
   }));
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearchBar, setShowSearchBar] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
   const [messages, setMessages] = useState(initialMessages);
-  const [newMessage, setNewMessage] = useState('');
-  const [isSelecting, setIsSelecting] = useState(false);
+  const [newMessage, setNewMessage] = useState<string>('');
+  const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [selectedMessages, setSelectedMessages] = useState<number[]>([]);
-  const [hasSentMessage, setHasSentMessage] = useState(false);
+  const [hasSentMessage, setHasSentMessage] = useState<boolean>(false);
   const scrollViewRef = useRef<ScrollView>(null);
+  const inputRef = useRef<TextInput>(null);
 
   const filteredMessages = messages
     .filter(message => message.text.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity onPress={() => setShowSearchBar(!showSearchBar)} style={{ marginRight: 10 }}>
+          <Icon name="filter" size={20} color="#fff" />
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, showSearchBar]);
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
@@ -100,6 +110,11 @@ export default function MessageScreen() {
     setSelectedMessages([]);
   };
 
+  const handleCancelSelection = () => {
+    setIsSelecting(false);
+    setSelectedMessages([]);
+  };
+
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -126,21 +141,11 @@ export default function MessageScreen() {
   );
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={90}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate('explore')}>
-            <Text style={styles.headerText}>Retour</Text>
-          </TouchableOpacity>
-          <HeaderTitle title="Message" />
-          <TouchableOpacity onPress={() => setShowSearchBar(prev => !prev)}>
-            <Text style={styles.headerText}>Filtrer</Text>
-          </TouchableOpacity>
-        </View>
         {showSearchBar && (
           <TextInput
             style={styles.searchInput}
-            placeholder="Rechercher dans les messages..."
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -173,9 +178,14 @@ export default function MessageScreen() {
           ))}
         </ScrollView>
         {isSelecting && selectedMessages.length > 0 && (
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteMessages}>
-            <Text style={styles.deleteButtonText}>Supprimer</Text>
-          </TouchableOpacity>
+          <View style={styles.selectionButtonsContainer}>
+            <TouchableOpacity style={styles.cancelButton} onPress={handleCancelSelection}>
+              <Text style={styles.cancelButtonText}>Annuler</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteMessages}>
+              <Text style={styles.deleteButtonText}>Supprimer</Text>
+            </TouchableOpacity>
+          </View>
         )}
         {!hasSentMessage && (
           <View style={styles.warningContainer}>
@@ -184,6 +194,7 @@ export default function MessageScreen() {
         )}
         <View style={styles.footer}>
           <TextInput
+            ref={inputRef}
             style={styles.input}
             placeholder="Écrire ici..."
             value={newMessage}
@@ -191,7 +202,7 @@ export default function MessageScreen() {
             onFocus={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
           />
           <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-            <Text style={styles.sendButtonText}>➤</Text>
+            <Icon name="arrow-up" size={15} color="#FFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -209,15 +220,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 40, // Increased padding to make the header larger
+    paddingVertical: 40,
     backgroundColor: '#668F80',
   },
   headerText: {
     color: 'white',
-    fontSize: 18, // Adjusted font size
+    fontSize: 18,
   },
   headerTitle: {
-    fontSize: 24, // Adjusted font size
+    fontSize: 24,
     fontWeight: 'bold',
   },
   searchInput: {
@@ -229,11 +240,29 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#333',
   },
+  selectionButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+  },
+  cancelButton: {
+    backgroundColor: '#CCC',
+    padding: 15,
+    borderRadius: 10,
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  cancelButtonText: {
+    color: '#FFF',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
   deleteButton: {
     backgroundColor: '#FF0000',
-    padding: 10,
-    margin: 10,
+    padding: 15,
     borderRadius: 10,
+    flex: 1,
+    marginHorizontal: 5,
   },
   deleteButtonText: {
     color: '#FFF',
@@ -243,8 +272,8 @@ const styles = StyleSheet.create({
   chatHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center', // Center align
-    padding: 20, // Increased padding to make the chat header larger
+    justifyContent: 'center',
+    padding: 20,
     borderBottomColor: '#E8E8E8',
     borderBottomWidth: 1,
   },
@@ -255,7 +284,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   chatName: {
-    fontSize: 22, // Adjusted font size
+    fontSize: 22,
     color: '#333',
   },
   messagesContainer: {
@@ -263,7 +292,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   messageContainer: {
-    flexDirection: 'column', // Changed to column to stack the timestamp below the message
+    flexDirection: 'column',
     alignItems: 'flex-start',
     marginBottom: 10,
   },
@@ -317,6 +346,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderTopColor: '#E8E8E8',
     borderTopWidth: 1,
+    backgroundColor: '#FFF',
   },
   input: {
     flex: 1,
@@ -329,9 +359,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#668F80',
     borderRadius: 20,
     padding: 10,
-  },
-  sendButtonText: {
-    color: '#FFF',
-    fontSize: 16,
   },
 });
