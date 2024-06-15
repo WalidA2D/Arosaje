@@ -1,6 +1,6 @@
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
-const { handleDBOperation, encryptMethod, validateUserInputCreation } = require('../../components/DreamTeamUtils');
+const { handleDBOperation, encryptMethod, validateUserInputCreation } = require('../../framework/DreamTeamUtils');
 
 const pathToDB = path.resolve(__dirname, '..', 'BASE.db');
 const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
@@ -27,19 +27,57 @@ const addUser = async (lastName, firstName, email, address, phone, cityName, pas
         }
 
         const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-        const uid = firstName+ lastName + cityName + date.getHours() + date.getMinutes() + date.getSeconds() + password.length + getRandomNumber(1, 100);
-        console.log(uid)
+        const resRandomNumber = getRandomNumber(
+            getRandomNumber(
+                date.getMilliseconds() * date.getSeconds(),
+                getRandomNumber(date.getFullYear()*6, password.length)
+            ),
+            getRandomNumber(
+                date.getMonth() * date.getMinutes(),
+                getRandomNumber(date.getTime()*6, date.getMilliseconds() * 2)
+            )
+        );
+        let uid = firstName+ lastName + cityName + password.length
+        let uidResult = ''
+
+        const forbiddenChars = ['"', "'", '\\', '/', '<', '>', '&', '%', '@', '`', '?', " ","%","|"];
+
+        for (let i = 0; i < uid.length; i++) {
+            let charCode = uid.charCodeAt(i);
+            let newCharCode;
+            let validChar = false;
+
+            while (!validChar) {
+                newCharCode = charCode + resRandomNumber;
+
+                // Si newCharCode dépasse la plage des caractères imprimables, on le réajuste
+                if (newCharCode < 32 || newCharCode > 126) {
+                    newCharCode = ((newCharCode - 32) % 95) + 32;
+                }
+
+                const newChar = String.fromCharCode(newCharCode);
+
+                // Vérifie si le nouveau caractère est valide et non interdit
+                if (newCharCode >= 32 && newCharCode <= 126 && !forbiddenChars.includes(newChar)) {
+                    validChar = true;
+                } else {
+                    charCode++;
+                }
+            }
+
+            uidResult += String.fromCharCode(newCharCode);
+        }
 
         const sql = 'INSERT INTO Users (lastName, firstName, email, address, phone, cityName, password, uid) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
         const result = await handleDBOperation((callback) => {
-            db.run(sql, [lastName, firstName, email, address, phone, cityName, passwordEncrypted, uid], function (err) {
+            db.run(sql, [lastName, firstName, email, address, phone, cityName, passwordEncrypted, uidResult], function (err) {
                 callback(err, { lastID: this.lastID });
             });
         });
         return { 
+            body: result,
             status: 200, 
-            success: true, 
-            userId: result.lastID 
+            success: true,
         };
     } catch (e) {
         console.error('Erreur lors de la fonction addUser', e);
@@ -74,7 +112,7 @@ const getAllUsers = async () => {
 // UPDATE UN USER
 const updateUser = async (uid, lastName, firstName, email, address, phone, cityName) => {
     try {
-        const sql = 'UPDATE Users SET lastName = ?, firstName = ?, email = ?, address = ?, phone = ?, cityName = ? WHERE id = ?';
+        const sql = 'UPDATE Users SET lastName = ?, firstName = ?, email = ?, address = ?, phone = ?, cityName = ? WHERE uid = ?';
         await handleDBOperation((callback) => {
             db.run(sql, [lastName, firstName, email, address, phone, cityName, uid], callback);
         });
