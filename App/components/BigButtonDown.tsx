@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
 
-const BigButtonDown = ({ buttonText }: { buttonText: string }) => {
+const screenHeight = Dimensions.get('window').height;
+
+const BigButtonDown = ({ buttonText, onPress }: { buttonText: string, onPress?: () => void }) => {
   return (
     <View style={styles.fixedDetailsBtn}>
     <View style={styles.selectorContainer}>
-      <TouchableOpacity style={styles.selectorButton}>
+      <TouchableOpacity style={styles.selectorButton} onPress={onPress}>
         <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
             {buttonText}
         </Text>
@@ -17,8 +19,8 @@ const BigButtonDown = ({ buttonText }: { buttonText: string }) => {
 
 const styles = StyleSheet.create({
     fixedDetailsBtn: {
-        paddingTop : 100,
-        marginTop: 100,
+        paddingTop : screenHeight / 5,
+        marginTop: screenHeight / 15,
         alignItems: 'center',
       },
   selectorContainer: {
