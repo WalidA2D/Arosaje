@@ -139,13 +139,7 @@ export default function CalendarScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('profil')}>
-          <Ionicons name="arrow-back" size={24} color="#FFF" />
-        </TouchableOpacity>
-        <HeaderTitle title="Calendrier" />
-      </View>
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      
         {currentDate && (
           <Calendar
             key={currentDate} // Ajout de la clé pour forcer la mise à jour du composant
@@ -179,6 +173,7 @@ export default function CalendarScreen() {
             onMonthChange={(month) => setCurrentDate(`${month.year}-${month.month.toString().padStart(2, '0')}-01`)}
           />
         )}
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.eventsList}>
           {sortedEvents.map((event, index) => {
             const eventStatus = getEventStatus(event);

@@ -1,36 +1,63 @@
 import React, { useState } from 'react';
 import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationContainer } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import HeaderTitle from '../../components/HeaderTitle';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import Calendrier from '../profilnav/calendar';
+
+const Stack = createNativeStackNavigator();
+
+function ProfScreen() {
+  return (
+    <NavigationContainer independent={true}>
+      <Stack.Navigator
+        initialRouteName="Profil"
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#668F80',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            color: '#FFF',
+            fontSize: 24,
+            fontWeight: 'bold',
+          },
+        }}
+      >
+        <Stack.Screen 
+          name="Profil" 
+          component={ProfilScreen} 
+          options={({ navigation }) => ({
+            headerRight: () => (
+              <TouchableOpacity onPress={() => navigation.navigate('Calendrier')} style={{ marginRight: 10 }}>
+                <Ionicons name="today" size={24} color="#fff" />
+              </TouchableOpacity>
+            ),
+          })}
+        />
+        <Stack.Screen name="Calendrier" component={Calendrier} options={{ headerBackTitleVisible: false }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 // Définir les types des paramètres de navigation
 type RootStackParamList = {
   ProfilScreen: undefined;
-  calendrier: undefined;
+  Calendrier: undefined;
 };
 
-// Définir le type de navigation pour l'écran de profil
-type ProfilScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'ProfilScreen'
->;
-
-export default function ProfilScreen() {
+export function ProfilScreen() {
   const [selectedTab, setSelectedTab] = useState('Posts'); // État pour gérer le sélecteur d'onglet
-  const navigation = useNavigation<ProfilScreenNavigationProp>(); // Définir le type de navigation
+  const navigation = useNavigation<StackNavigationProp<any>>();
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity>
-          {/* Ici pourrait être un bouton de retour ou une autre action */}
-        </TouchableOpacity>
-        <HeaderTitle title="Profil" />
-        <TouchableOpacity style={styles.headerButton} onPress={() => navigation.navigate('calendrier')}>
-          <Ionicons name="today" size={35} color='#FFF' />
-        </TouchableOpacity>
+
       </View>
 
       <View style={styles.profileImageContainer}>
@@ -109,7 +136,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   header: {
-    height: 200,
+    height: 135,
     backgroundColor: '#668F80',
     flexDirection: 'row',
     alignItems: 'center',
@@ -135,7 +162,7 @@ const styles = StyleSheet.create({
   },
   profileImageContainer: {
     position: 'absolute',
-    top: 100,
+    top: 35,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -218,3 +245,5 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
 });
+
+export default ProfScreen;
