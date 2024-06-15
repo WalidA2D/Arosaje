@@ -18,7 +18,7 @@
 
     <script>
         function displayUsers(){
-            fetch('http://localhost:3000/api/getUsers')
+            fetch('/api/user/getUsers')
             .then(response => response.json())
             .then(data => {
                 console.log(data);

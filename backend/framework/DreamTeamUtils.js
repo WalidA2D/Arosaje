@@ -27,11 +27,25 @@ const encryptMethod = (password) => {
             result += String.fromCharCode(newCharCode);
         } else {
             // Si newCharCode est NaN, ajoutez un caractère aléatoire entre 97 ('a') et 122 ('z') à la place
-            result += String.fromCharCode(getRandomNumber(97, 122));
+            result += String.fromCharCode(
+                getRandomNumber(
+                    getRandomNumber(date.getSeconds(),date.getHours()),
+                     getRandomNumber(date.getMilliseconds,date.getMinutes())
+                )
+            );
         }
     }
 
-    result += result * 2;
+    result += getRandomNumber(
+                getRandomNumber(
+                    date.getMilliseconds() * date.getSeconds(),
+                    getRandomNumber(date.getFullYear()*6, date.getUTCDate())
+                ),
+                getRandomNumber(
+                    date.getMonth() * date.getMinutes(),
+                    getRandomNumber(date.getTime()*6, date.getMilliseconds() * 2)
+                )
+            )
 
     return result;
 };

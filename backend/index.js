@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
-const apiRouter = require('./components/API');
+const apiRouter = require('./routes/APIRouteur');
 const { PORT } = require('./config/config');
 const { apiLimiter } = require('./middlewares/apiLimiter');
 

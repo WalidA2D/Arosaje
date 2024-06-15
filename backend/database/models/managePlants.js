@@ -1,6 +1,6 @@
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
-const { handleDBOperation } = require('../../components/DreamTeamUtils');
+const { handleDBOperation } = require('../../framework/DreamTeamUtils');
 
 const pathToDB = path.resolve(__dirname, '..', 'BASE.db');
 const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
