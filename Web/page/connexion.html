@@ -1,0 +1,45 @@
+<body>
+    <div class="container">
+        <div class="left">
+            <h1>Logo</h1>
+        </div>
+        <div class="right">
+
+            <!-- Formulaire de connexion-->
+
+            <div class="login-container">
+                <form id="loginForm" method="post" class="active-form">
+                    <input type="email" id="email" name="email" placeholder="Email" autocomplete="off">
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" placeholder="Mot de passe">
+                        <button type="button" id="togglePassword"
+                            onclick="togglePasswordVisibility('password', this)">Montrer</button>
+                    </div>
+                    <button type="button" id="connexionBtn" onclick="validateLoginForm()">Connexion</button>
+                </form>
+
+                <!-- Formulaire d'inscription-->
+                <form id="registerForm" action="" method="post" class="inactive-form" style="display: none;">
+                    <input type="email" id="registerEmail" name="registerEmail" placeholder="Email">
+                    <div class="password-container">
+                        <input type="password" id="registerPassword" name="registerPassword" placeholder="Mot de passe">
+                        <button type="button" id="toggleRegisterPassword"
+                            onclick="togglePasswordVisibility('registerPassword', this)">Montrer</button>
+                    </div>
+                    <input type="password" id="confirmPassword" name="confirmPassword"
+                        placeholder="Confirmer le mot de passe">
+                    <button type="submit" id="inscriptionBtn"
+                        onclick="return validateRegistrationForm();">S'inscrire</button>
+                </form>
+
+                <a href="#" id="registerLink" class="register-link"
+                    onclick="toggleForms('registerLink'); return false;">Pas de compte ? Inscrivez-vous</a>
+                <a href="#" id="alreadyHaveAccountBtn" class="register-link" style="display: none;"
+                    onclick="toggleForms('alreadyHaveAccountBtn'); return false;">J'ai déjà un compte</a>
+
+                <!-- Container pour afficher les messages d'alerte -->
+                <div id="message-container"></div>
+            </div>
+        </div>
+    </div>
+</body>

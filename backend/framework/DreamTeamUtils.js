@@ -11,45 +11,34 @@ const handleDBOperation = (operation) => {
 };
 
 const encryptMethod = (password) => {
-    const date = new Date();
-
-    // Fonction pour obtenir un nombre aléatoire entre min et max inclus
-    const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
     let result = '';
+    let decalage = password.length + 4;
+    const forbiddenChars = ['"', "'", '\\', '/', '<', '>', '&', '%', '@', '`', '?', " ", "%", "|"];
 
     for (let i = 0; i < password.length; i++) {
         let charCode = password.charCodeAt(i);
-        let newCharCode = charCode + date.getHours() + date.getMinutes() + date.getSeconds() + password.length + getRandomNumber(1, 100);
-        
-        // Vérifier si newCharCode n'est pas NaN avant de l'ajouter
-        if (!isNaN(newCharCode)) {
-            result += String.fromCharCode(newCharCode);
-        } else {
-            // Si newCharCode est NaN, ajoutez un caractère aléatoire entre 97 ('a') et 122 ('z') à la place
-            result += String.fromCharCode(
-                getRandomNumber(
-                    getRandomNumber(date.getSeconds(),date.getHours()),
-                     getRandomNumber(date.getMilliseconds,date.getMinutes())
-                )
-            );
-        }
-    }
 
-    result += getRandomNumber(
-                getRandomNumber(
-                    date.getMilliseconds() * date.getSeconds(),
-                    getRandomNumber(date.getFullYear()*6, date.getUTCDate())
-                ),
-                getRandomNumber(
-                    date.getMonth() * date.getMinutes(),
-                    getRandomNumber(date.getTime()*6, date.getMilliseconds() * 2)
-                )
-            )
+        let newCharCode = charCode + decalage; // Décaler avec code ASCII
+
+        // Si newCharCode = NaN on le réajuste
+        if (newCharCode < 32 || newCharCode > 126) {
+            newCharCode = ((newCharCode - 32) % 95) + 32;
+        }
+
+        // Vérifier si newCharCode est autorisé
+        let newChar = String.fromCharCode(newCharCode);
+        while (forbiddenChars.includes(newChar)) {
+            newCharCode++;
+            if (newCharCode > 126) {
+                newCharCode = 32;
+            }
+            newChar = String.fromCharCode(newCharCode);
+        }
+        result += newChar;
+    }
 
     return result;
 };
-
 const validateUserInputCreation = (lastName, firstName, email, address, phone, cityName) => {
     const nameRegex = /^[a-zA-ZÀ-ÿ'-\s]{1,50}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
