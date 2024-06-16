@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Modal, Button } from 'react-native';
 import { HelloWave } from '../../components/HelloWave';
-import ConnexionScreen from './login/connexion';
-import InscriptionScreen from './login/inscription';
+import ConnexionScreen from '../(tabs)/Login/connexion';
+import InscriptionScreen from './Login/inscription';
 
 export default function StartApp() {
   const [modalType, setModalType] = useState('');
