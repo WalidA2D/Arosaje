@@ -38,7 +38,7 @@ router.post('/connexion', async (req, res) => {
     }
 });
 
-router.get('/getUser', async(req,res)=>{
+router.post('/getUser', async(req,res)=>{
     try{
         const r = req.body;
         const response = await manageUser.getUser(r.token);

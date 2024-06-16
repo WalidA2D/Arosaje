@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation, NavigationContainer } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import HeaderTitle from '../../components/HeaderTitle';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Calendrier from '../profilnav/calendar';
@@ -44,21 +42,68 @@ function ProfScreen() {
   );
 }
 
-// Définir les types des paramètres de navigation
-type RootStackParamList = {
-  ProfilScreen: undefined;
-  Calendrier: undefined;
-};
-
 export function ProfilScreen() {
-  const [selectedTab, setSelectedTab] = useState('Posts'); // État pour gérer le sélecteur d'onglet
-  const navigation = useNavigation<StackNavigationProp<any>>();
+  const [selectedTab, setSelectedTab] = useState('Posts');
+  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', cityName: '' });
+
+  useEffect(() => {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: 'OWb.RO]cReozwr^o!w#D',
+      }),
+    };
+
+    fetch('http://192.168.1.24:3000/api/user/getUser', options) // Changer l'IP
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const user = data.body[0];
+          setProfileData({
+            lastName: user.lastName,
+            firstName: user.firstName,
+            cityName: user.cityName,
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching profile data:', error);
+      });
+  }, []);
+
+  const openMap = (cityName: string) => {
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cityName)}`;
+
+    Alert.alert(
+      'Confirmation',
+      `Voulez-vous être redirigé vers la carte ?`,
+      [
+        { text: 'Non', style: 'cancel' },
+        {
+          text: 'Oui',
+          onPress: () => {
+            Linking.canOpenURL(url)
+              .then((supported) => {
+                if (supported) {
+                  return Linking.openURL(url);
+                } else {
+                  console.error("Don't know how to open URI: " + url);
+                }
+              })
+              .catch(err => console.error('An error occurred', err));
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-
-      </View>
+      <View style={styles.header}></View>
 
       <View style={styles.profileImageContainer}>
         <Image
@@ -69,12 +114,13 @@ export function ProfilScreen() {
 
       <View style={styles.fixedDetails}>
         <View style={styles.profileDetails}>
-          <Text style={styles.profileName}>Victoria Robertson</Text>
-          <Text style={styles.profileRole}>Rôle | Localisation</Text>
+          <Text style={styles.profileName}>{`${profileData.firstName} ${profileData.lastName}`}</Text>
+          <TouchableOpacity onPress={() => openMap(profileData.cityName)}>
+            <Text style={styles.profileRole}>{profileData.cityName}</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.selectorContainer}>
-          {/* Sélecteur pour changer entre les posts et les images */}
           <TouchableOpacity
             style={[styles.selectorButton, selectedTab === 'Posts' && styles.activeButton]}
             onPress={() => setSelectedTab('Posts')}
@@ -92,7 +138,6 @@ export function ProfilScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.body}>
-          {/* Contenu affiché en fonction de l'onglet sélectionné */}
           {selectedTab === 'Posts' ? (
             <View>
               <View style={styles.post}>
@@ -243,6 +288,25 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     resizeMode: 'cover',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'red',
   },
 });
 
