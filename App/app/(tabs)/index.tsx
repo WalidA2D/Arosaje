@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Modal, Button } from 'react-native';
 import { HelloWave } from '../../components/HelloWave';
-import ConnexionScreen from '../(tabs)/Login/connexion';
+import ConnexionScreen from './Login/connexion';
 import InscriptionScreen from './Login/inscription';
 
 export default function StartApp() {
