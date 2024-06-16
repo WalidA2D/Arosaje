@@ -53,6 +53,14 @@ function validateLoginForm() {
     .then(data=>{
         console.log(data)
         if(data.success){
+            const u = data.user
+            if (typeof localStorage.getItem("ArosajeToken") === 'undefined') localStorage.setItem("ArosajeToken", u.uid)
+            if (typeof localStorage.getItem("ArosajeFirstName") === 'undefined') localStorage.setItem("ArosajeFirstName", u.firstName)
+            if (typeof localStorage.getItem("ArosajeLastName") === 'undefined') localStorage.setItem("ArosajeLastName", u.lastName)
+            if (typeof localStorage.getItem("ArosajeEmail") === 'undefined') localStorage.setItem("ArosajeEmail", u.email)
+            if (typeof localStorage.getItem("ArosajeAddress") === 'undefined') localStorage.setItem("ArosajeAddress", u.address)
+            if (typeof localStorage.getItem("ArosajeCity") === 'undefined') localStorage.setItem("ArosajeCity", u.cityName)
+            if (typeof localStorage.getItem("ArosajePhone") === 'undefined') localStorage.setItem("ArosajePhone", u.phone)
             fetch('../page/accueil.html')
             .then(response=>{
                 return response.text();
@@ -60,11 +68,11 @@ function validateLoginForm() {
             .then(html=>{
                 console.log(html)
                 document.querySelector('body').innerHTML = html
-                document.getElementById('prenomUser').innerText = data.user.firstName + ' ' + data.user.lastName;
-                document.getElementById('mailUser').innerText = data.user.email;
-                document.getElementById('adresUser').innerText = data.user.address;
-                document.getElementById('villUser').innerText = data.user.cityName;
-                document.getElementById('phoneUser').innerText = data.user.phone;
+                document.getElementById('prenomUser').innerText = u.firstName + ' ' + u.lastName;
+                document.getElementById('mailUser').innerText = u.email;
+                document.getElementById('adresUser').innerText = u.address;
+                document.getElementById('villUser').innerText = u.cityName;
+                document.getElementById('phoneUser').innerText = u.phone;
             })
             .catch(e=>console.error(e))
         }

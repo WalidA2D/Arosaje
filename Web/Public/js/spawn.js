@@ -1,5 +1,5 @@
 let pathToDOM = "../page/"
-if(localStorage.getItem("tokenArosaje")==undefined){
+if(localStorage.getItem("ArosajeToken")==undefined){
     pathToDOM += "connexion.html"
 } else {
     pathToDOM += "accueil.html"
@@ -12,9 +12,13 @@ fetch(pathToDOM)
     document.querySelector('body').innerHTML = data
 })
 
-// localStorage.setItem("tokenArosaje","value")
+// localStorage.setItem("ArosajeToken","value")
 
-// localStorage.removeItem("tokenArosaje")
+// localStorage.removeItem("ArosajeToken")
 
 // effacer tout le localStorage
 // localStorage.clear()
+
+function setUserData(){
+    document.querySelector('.firstName') = localStorage.getItem("ArosajeFirstName")
+}
