@@ -88,23 +88,24 @@ const addUser = async (lastName, firstName, email, address, phone, cityName, pas
     }
 };
 
-// LIRE LES USERS
-const getAllUsers = async () => {
+// LIRE UN USER SELON L'UID
+const getUser = async (uid) => {
     try {
-        const sql = 'SELECT * FROM Users';
+        const sql = 'SELECT lastName, firstName, email, address, phone, cityName FROM Users WHERE Users.uid = ?';
         const rows = await handleDBOperation((callback) => {
-            db.all(sql, [], callback);
+            db.all(sql, [uid], callback);
         });
         return { 
-            body: rows, 
+            body: rows,
             status: 200, 
             success: true 
         };
     } catch (e) {
-        console.error('Erreur lors de la fonction getAllUsers', e);
+        console.error('Erreur lors de la fonction getUser', e);
         return { 
             status: 400, 
-            success: false 
+            success: false,
+            message: "Utilisateur non récupéré"
         };
     }
 };
@@ -165,6 +166,7 @@ const connexion = async (email, password) => {
             return { status: 401, success: false, message: 'Mot de passe incorrect' };
         }
         return { 
+            message: "Connexion réussit !",
             status: 200, 
             success: true, 
             user: {
@@ -185,7 +187,7 @@ const connexion = async (email, password) => {
 
 module.exports = {
     addUser,
-    getAllUsers,
+    getUser,
     updateUser,
     getUserByEmail,
     connexion

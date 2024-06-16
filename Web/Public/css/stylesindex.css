@@ -93,7 +93,7 @@ input {
     font-size: 0.9em;
 }
 
-button[type="submit"] {
+#connexionBtn {
     padding: 1em;
     width: auto;
     background-color: #A0AF84;

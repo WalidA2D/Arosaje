@@ -17,6 +17,7 @@ app.use('/api', apiRouter);
 
 // Servir les fichiers statiques depuis le dossier public
 app.use(express.static(path.resolve(__dirname, '..', 'Web', 'Public')));
+app.use('/page', express.static(path.resolve(__dirname, '..', "Web","page")))
 app.get('/', (req, res) => {
   res.sendFile('index.html', { root: path.resolve(__dirname, '..', '..', 'Web', 'Public') });
 });

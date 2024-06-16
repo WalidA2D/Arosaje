@@ -30,17 +30,49 @@ function validateLoginForm() {
 
     if (!email.trim()) {
         showAlerteMessage('Veuillez saisir votre adresse email.')
-        
         return false;
     }
-
     if (!password.trim()) {
         showAlerteMessage('Veuillez saisir votre mot de passe.');
-        
         return false;
     }
 
-    return true;
+    // Tests passés
+    const options = {
+        method: 'POST',
+        headers:{
+            'Content-Type':'application/json',
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password
+        })
+    }
+    fetch('/api/user/connexion',options)
+    .then(response=>response.json())
+    .then(data=>{
+        console.log(data)
+        if(data.success){
+            fetch('../page/accueil.html')
+            .then(response=>{
+                return response.text();
+            })
+            .then(html=>{
+                console.log(html)
+                document.querySelector('body').innerHTML = html
+                document.getElementById('prenomUser').innerText = data.user.firstName + ' ' + data.user.lastName;
+                document.getElementById('mailUser').innerText = data.user.email;
+                document.getElementById('adresUser').innerText = data.user.address;
+                document.getElementById('villUser').innerText = data.user.cityName;
+                document.getElementById('phoneUser').innerText = data.user.phone;
+            })
+            .catch(e=>console.error(e))
+        }
+        showAlerteMessage(data.message) //ici j'affiche le message reçu par la bdd
+    })
+    .catch(e=>{
+        console.error(e)
+    })
 }
 
 function validateRegistrationForm() {
@@ -49,24 +81,18 @@ function validateRegistrationForm() {
     const confirmPassword = document.getElementById('confirmPassword').value;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
     if (!emailRegex.test(registerEmail)) {
         showAlerteMessage('Veuillez saisir une adresse email valide.');
         return false;
     }
-
     if (registerPassword.trim() === '') {
         showAlerteMessage('Veuillez saisir votre mot de passe.');
         return false;
     }
-
-
     if (registerPassword !== confirmPassword) {
         showAlerteMessage('Les mots de passe ne correspondent pas.');
         return false;
     }
-
-    return true;
 }
 
 function showAlerteMessage(message) {
