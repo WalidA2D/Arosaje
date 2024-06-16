@@ -1,3 +1,4 @@
+// JavaScript pour gérer le changement de formulaire avec animation de hauteur
 function toggleForms(clickedElementId) {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -5,24 +6,30 @@ function toggleForms(clickedElementId) {
     const alreadyHaveAccountBtn = document.getElementById('alreadyHaveAccountBtn');
 
     if (clickedElementId === 'registerLink') {
-        loginForm.style.display = 'none';
-        registerForm.style.display = 'flex';
+        loginForm.classList.remove('active-form');
+        registerForm.classList.add('active-form');
         alreadyHaveAccountBtn.style.display = 'inline';
         registerLink.style.display = 'none';
+
+        // Affiche le formulaire d'inscription après un court délai
+        setTimeout(() => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'flex';
+        }, 300);
     } else if (clickedElementId === 'alreadyHaveAccountBtn') {
-        registerForm.style.display = 'none';
-        loginForm.style.display = 'flex';
+        registerForm.classList.remove('active-form');
+        loginForm.classList.add('active-form');
         registerLink.style.display = 'inline';
         alreadyHaveAccountBtn.style.display = 'none';
+
+        // Affiche le formulaire de connexion après un court délai
+        setTimeout(() => {
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'flex';
+        }, 300);
     }
 }
 
-function togglePasswordVisibility(inputFieldId, toggleButton) {
-    const inputField = document.getElementById(inputFieldId);
-    const type = inputField.getAttribute('type') === 'password' ? 'text' : 'password';
-    inputField.setAttribute('type', type);
-    toggleButton.textContent = type === 'password' ? 'Montrer' : 'Cacher';
-}
 
 function validateLoginForm() {
     const email = document.getElementById('email').value;
@@ -37,7 +44,6 @@ function validateLoginForm() {
         return false;
     }
 
-    // Tests passés
     const options = {
         method: 'POST',
         headers:{
@@ -76,7 +82,7 @@ function validateLoginForm() {
             })
             .catch(e=>console.error(e))
         }
-        showAlerteMessage(data.message) //ici j'affiche le message reçu par la bdd
+        showAlerteMessage(data.message)
     })
     .catch(e=>{
         console.error(e)
@@ -84,22 +90,104 @@ function validateLoginForm() {
 }
 
 function validateRegistrationForm() {
-    const registerEmail = document.getElementById('registerEmail').value;
-    const registerPassword = document.getElementById('registerPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
+    const lastName = document.getElementById('lastName').value.trim();
+    const firstName = document.getElementById('firstName').value.trim();
+    const registerEmail = document.getElementById('registerEmail').value.trim();
+    const address = document.getElementById('address').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const cityName = document.getElementById('cityName').value.trim();
+    const registerPassword = document.getElementById('registerPassword').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    if (!emailRegex.test(registerEmail)) {
-        showAlerteMessage('Veuillez saisir une adresse email valide.');
+    if (lastName === '') {
+        showAlerteMessage('Veuillez saisir votre nom.');
+        document.getElementById('lastName').focus();
         return false;
     }
-    if (registerPassword.trim() === '') {
+    if (firstName === '') {
+        showAlerteMessage('Veuillez saisir votre prénom.');
+        document.getElementById('firstName').focus();
+        return false;
+    }
+    if (!emailRegex.test(registerEmail)) {
+        showAlerteMessage('Veuillez saisir une adresse email valide.');
+        document.getElementById('registerEmail').focus();
+        return false;
+    }
+    if (address === '') {
+        showAlerteMessage('Veuillez saisir votre adresse.');
+        document.getElementById('address').focus();
+        return false;
+    }
+    if (phone === '') {
+        showAlerteMessage('Veuillez saisir votre numéro de téléphone.');
+        document.getElementById('phone').focus();
+        return false;
+    }
+    if (cityName === '') {
+        showAlerteMessage('Veuillez saisir le nom de votre ville.');
+        document.getElementById('cityName').focus();
+        return false;
+    }
+    if (registerPassword === '') {
         showAlerteMessage('Veuillez saisir votre mot de passe.');
+        document.getElementById('registerPassword').focus();
+        return false;
+    }
+    if (!passwordRegex.test(registerPassword)) {
+        showAlerteMessage('Le mot de passe doit comporter au moins 8 caractères, inclure une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.');
+        document.getElementById('registerPassword').focus();
         return false;
     }
     if (registerPassword !== confirmPassword) {
         showAlerteMessage('Les mots de passe ne correspondent pas.');
+        document.getElementById('confirmPassword').focus();
         return false;
+    }
+
+    const registrationData = {
+        lastName: lastName,
+        firstName: firstName,
+        email: registerEmail,
+        address: address,
+        phone: phone,
+        cityName: cityName,
+        password: registerPassword
+    };
+
+    fetch('/api/user/createUser', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(registrationData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlerteMessage('Inscription réussie.');
+            toggleForms('alreadyHaveAccountBtn');
+        } else {
+            showAlerteMessage('Échec de l\'inscription.');
+        }
+    })
+    .catch(error => {
+        showAlerteMessage('Erreur lors de l\'inscription.');
+    });
+
+    return false;
+}
+
+function togglePasswordVisibility(passwordFieldId, toggleButton) {
+    const passwordField = document.getElementById(passwordFieldId);
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleButton.textContent = 'Cacher';
+    } else {
+        passwordField.type = 'password';
+        toggleButton.textContent = 'Montrer';
     }
 }
 

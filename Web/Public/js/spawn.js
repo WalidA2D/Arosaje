@@ -17,7 +17,7 @@ fetch(pathToDOM)
 // localStorage.removeItem("ArosajeToken")
 
 // effacer tout le localStorage
-// localStorage.clear()
+localStorage.clear()
 
 function setUserData(){
     document.querySelector('.firstName') = localStorage.getItem("ArosajeFirstName")

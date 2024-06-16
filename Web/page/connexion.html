@@ -1,7 +1,7 @@
 <body>
     <div class="container">
         <div class="left">
-            <h1>Logo</h1>
+            <img src="../asset/icons/logo-Arosaje.png" alt="logo du site arosaje">
         </div>
         <div class="right">
 
@@ -12,24 +12,25 @@
                     <input type="email" id="email" name="email" placeholder="Email" autocomplete="off">
                     <div class="password-container">
                         <input type="password" id="password" name="password" placeholder="Mot de passe">
-                        <button type="button" id="togglePassword"
-                            onclick="togglePasswordVisibility('password', this)">Montrer</button>
+                        <button type="button" id="togglePassword" onclick="togglePasswordVisibility('password', this)">Montrer</button>
                     </div>
-                    <button type="button" id="connexionBtn" onclick="validateLoginForm()">Connexion</button>
+                    <button type="button" id="connexionBtn" class="connexionBtn" onclick="validateLoginForm()">Connexion</button>
                 </form>
 
                 <!-- Formulaire d'inscription-->
                 <form id="registerForm" action="" method="post" class="inactive-form" style="display: none;">
+                    <input type="text" id="lastName" name="lastName" placeholder="Nom">
+                    <input type="text" id="firstName" name="firstName" placeholder="Prénom">
                     <input type="email" id="registerEmail" name="registerEmail" placeholder="Email">
+                    <input type="text" id="address" name="address" placeholder="Adresse">
+                    <input type="text" id="phone" name="phone" placeholder="Téléphone">
+                    <input type="text" id="cityName" name="cityName" placeholder="Ville">
                     <div class="password-container">
                         <input type="password" id="registerPassword" name="registerPassword" placeholder="Mot de passe">
-                        <button type="button" id="toggleRegisterPassword"
-                            onclick="togglePasswordVisibility('registerPassword', this)">Montrer</button>
+                        <button type="button" id="toggleRegisterPassword" onclick="togglePasswordVisibility('registerPassword', this)">Montrer</button>
                     </div>
-                    <input type="password" id="confirmPassword" name="confirmPassword"
-                        placeholder="Confirmer le mot de passe">
-                    <button type="submit" id="inscriptionBtn"
-                        onclick="return validateRegistrationForm();">S'inscrire</button>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmer le mot de passe">
+                    <button type="button" id="inscriptionBtn" class="connexionBtn" onclick="return validateRegistrationForm();">S'inscrire</button>
                 </form>
 
                 <a href="#" id="registerLink" class="register-link"
@@ -38,8 +39,8 @@
                     onclick="toggleForms('alreadyHaveAccountBtn'); return false;">J'ai déjà un compte</a>
 
                 <!-- Container pour afficher les messages d'alerte -->
-                <div id="message-container"></div>
             </div>
         </div>
     </div>
+    <div id="message-container"></div>
 </body>
