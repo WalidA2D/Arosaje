@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
   res.sendFile('index.html', { root: path.resolve(__dirname, '..', '..', 'Web', 'Public') });
 });
 
+
 // Démarrer le serveur
 app.listen(PORT, () => {
     console.log(`Serveur en écoute sur le port ${PORT}`);
