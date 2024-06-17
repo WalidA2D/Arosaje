@@ -11,7 +11,6 @@ function toggleForms(clickedElementId) {
         alreadyHaveAccountBtn.style.display = 'inline';
         registerLink.style.display = 'none';
 
-
         // Affiche le formulaire d'inscription après un court délai
         setTimeout(() => {
             loginForm.style.display = 'none';
@@ -23,7 +22,7 @@ function toggleForms(clickedElementId) {
         registerLink.style.display = 'inline';
         alreadyHaveAccountBtn.style.display = 'none';
 
-        
+
         // Affiche le formulaire de connexion après un court délai
         setTimeout(() => {
             registerForm.style.display = 'none';
