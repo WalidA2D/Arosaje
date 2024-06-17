@@ -147,22 +147,20 @@ function validateRegistrationForm() {
         return false;
     }
 
-    const registrationData = {
-        lastName: lastName,
-        firstName: firstName,
-        email: registerEmail,
-        address: address,
-        phone: phone,
-        cityName: cityName,
-        password: registerPassword
-    };
-
     fetch('/api/user/createUser', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(registrationData)
+        body: JSON.stringify({
+                    lastName: lastName,
+                    firstName: firstName,
+                    email: registerEmail,
+                    address: address,
+                    phone: phone,
+                    cityName: cityName,
+                    password: registerPassword
+                })
     })
     .then(response => response.json())
     .then(data => {
