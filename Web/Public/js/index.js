@@ -5,6 +5,7 @@ function toggleForms(clickedElementId) {
     const registerLink = document.getElementById('registerLink');
     const alreadyHaveAccountBtn = document.getElementById('alreadyHaveAccountBtn');
 
+    
     if (clickedElementId === 'registerLink') {
         loginForm.classList.remove('active-form');
         registerForm.classList.add('active-form');

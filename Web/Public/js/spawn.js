@@ -12,6 +12,7 @@ fetch(pathToDOM)
     document.querySelector('body').innerHTML = data
 })
 
+
 // localStorage.setItem("ArosajeToken","value")
 
 // localStorage.removeItem("ArosajeToken")
