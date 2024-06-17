@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', Arial, sans-serif;
     display: flex;
     height: 100vh;
     justify-content: center;
@@ -10,117 +13,174 @@ body {
 
 .container {
     display: flex;
-    width: 70%;
-    height: 70%;
-    max-width: 1200px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 100vh;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    background-color: #fff;
+    opacity: 0;
+    animation: fadeInContainer 0.8s ease forwards;
+}
+
+@keyframes fadeInContainer {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .left {
-    background-color: #fff;
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.left h1 {
-    font-size: 3em;
-    color: #5a7d7c;
-}
-
-.right {
-    background-color: #668F80;
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 20px;
-    border-top-left-radius: 15px;
-    border-bottom-left-radius: 15px;
+    background: linear-gradient(135deg, #C3B59F, #ffffff);
 }
 
+.left img {
+    transition: transform 0.3s ease; /* Transition sur le survol */
+}
+
+.left h1:hover {
+    transform: scale(1.1); /* Zoom légèrement au survol */
+}
+
+
+.right {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #4A6670, #668F80);
+}
+
+/* Conteneur du formulaire de connexion */
 .login-container {
     width: 100%;
     max-width: 400px;
     text-align: center;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 20px;
+    -webkit-box-shadow: 5px 5px 6px -2px rgba(0,0,0,0.7); 
+box-shadow: 5px 5px 6px -2px rgba(0,0,0,0.7);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Animation de fond pour le formulaire de connexion */
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, #A0AF84, #668F80);
+    z-index: -1;
+    transition: transform 0.8s ease;
+    transform: rotate(45deg) scale(0);
+    transform-origin: bottom right;
+    border-radius: 50%;
+}
+
+/* Animation au survol */
+.login-container:hover::before {
+    transform: rotate(45deg) scale(2); /* Échelle augmentée pour l'effet de zoom */
 }
 
 form {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    position: relative;
 }
 
 label {
     text-align: left;
-    margin-bottom: 5px;
-    color: #fff;
+    margin-bottom: 10px;
+    color: #333;
+    width: 100%;
+    font-weight: 500;
 }
 
 input {
-    margin-bottom: 15px;
-    padding: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 8px;
     box-sizing: border-box;
+    width: 100%;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+input:focus {
+    border-color: #668F80;
+    outline: none;
+    box-shadow: 0 0 10px rgba(90, 125, 124, 0.5);
+}
+
+/* Container pour le champ de mot de passe avec bouton de toggle */
 .password-container {
     position: relative;
-}
-
-.password-container input[type="password"] {
     width: 100%;
-    box-sizing: border-box;
-}
-/* si le user appuis sur montrer, le type change, donc on applique en avance a l'autre type*/
-.password-container input[type="text"] {
-    width: 100%;
-    box-sizing: border-box;
 }
 
 .password-container button[type="button"] {
     position: absolute;
-    top: 50%;
+    top: 33%;
     right: 10px;
-    transform: translateY(-90%);
+    transform: translateY(-50%);
     border: none;
     background-color: transparent;
     cursor: pointer;
-    color: #5a7d7c;
+    color: #668F80;
     font-size: 0.9em;
+    transition: color 0.3s ease;
 }
 
-#connexionBtn {
+.password-container button[type="button"]:hover {
+    color: #333;
+}
+
+.connexionBtn {
     padding: 1em;
-    width: auto;
-    background-color: #A0AF84;
+    width: 100%;
+    background-color: #668F80;
     color: #fff;
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    margin-bottom: 2em;
+    margin-top: 20px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-#message {
-    margin-top: 10px;
-    text-align: center;
-    color: red;
+.connexionBtn:hover {
+    background-color: #4A6670;
+    transform: translateY(-3px);
 }
 
 .register-link {
     display: block;
-    color: #ddd;
+    color: #668F80;
     text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .register-link:hover {
     text-decoration: underline;
+    color: #333;
 }
 
 .alert {
+    z-index: 1000;
     background-color: #ffcdd2; 
     color: #c62828; 
     padding: 20px; 
@@ -137,6 +197,7 @@ input {
     opacity: 0;
     animation: fadeIn 0.5s ease forwards, fadeOut 0.5s ease forwards 2.5s;
 }
+
 
 @keyframes fadeIn {
     from {
@@ -156,3 +217,43 @@ input {
     }
 }
 
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        box-shadow: unset;
+        background: unset;  
+    }
+    body {
+        background: linear-gradient(135deg, #4A6670, #668F80); 
+        
+    }
+
+    .left {
+        display: none;
+    }
+
+    .right {
+        border-radius: 0;
+        box-shadow: unset;
+        background-color: unset;
+        background: unset;
+    }
+    
+
+    .login-container {
+        width: 80%;
+        padding: 20px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        width: 90%;
+        height: 90%;
+    }
+
+    .connexionBtn {
+        width: 100%;
+    }
+}

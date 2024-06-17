@@ -3,10 +3,12 @@
 
 -- DELETE FROM Users;
 
-SELECT lastName, firstName, email, address, phone, cityName FROM Users WHERE Users.uid = '05.(!05.(!-ASSILASBZOOw'
+-- SELECT lastName, firstName, email, address, phone, cityName FROM Users WHERE Users.uid = '05.(!05.(!-ASSILASBZOOw'
 
 
 SELECT * FROM Users
+
+
 
 -- ALTER TABLE Users ADD COLUMN uid varchar(50) NOT NULL DEFAULT ''
 
