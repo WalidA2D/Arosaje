@@ -161,6 +161,7 @@ export function ExploreScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          <Icon name="search" size={20} color="#668F80" style={styles.searchIcon} />
         </View>
       )}
       <ScrollView>
