@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform, Keyboard, Modal } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import * as ImagePicker from 'expo-image-picker';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 type RootStackParamList = {
   explore: undefined;
-  message: { userName: string; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }> };
+  message: { userName: string; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string, image?: string }> };
 };
 
 type MessageScreenNavigationProp = StackNavigationProp<RootStackParamList, 'message'>;
@@ -55,6 +57,8 @@ export default function MessageScreen() {
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [selectedMessages, setSelectedMessages] = useState<number[]>([]);
   const [hasSentMessage, setHasSentMessage] = useState<boolean>(false);
+  const [isImageViewerVisible, setIsImageViewerVisible] = useState<boolean>(false);
+  const [imageToView, setImageToView] = useState<{ url: string }[]>([]);
   const scrollViewRef = useRef<ScrollView>(null);
   const inputRef = useRef<TextInput>(null);
 
@@ -89,6 +93,21 @@ export default function MessageScreen() {
     }
   };
 
+  const handleSendImage = (uri: string) => {
+    const newMessageData = {
+      id: messages.length + 1,
+      text: '',
+      image: uri,
+      sender: 'right',
+      timestamp: new Date(),
+    };
+    setMessages([...messages, newMessageData]);
+    setHasSentMessage(true);
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
   const handleLongPressMessage = (id: number) => {
     setIsSelecting(true);
     setSelectedMessages([id]);
@@ -113,6 +132,26 @@ export default function MessageScreen() {
   const handleCancelSelection = () => {
     setIsSelecting(false);
     setSelectedMessages([]);
+  };
+
+  const openImagePicker = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets && result.assets[0]?.uri) {
+      handleSendImage(result.assets[0].uri);
+    }
+  };
+
+  const handleImagePress = (uri?: string) => {
+    if (uri) {
+      setImageToView([{ url: uri }]);
+      setIsImageViewerVisible(true);
+    }
   };
 
   useEffect(() => {
@@ -144,11 +183,14 @@ export default function MessageScreen() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={90}>
       <View style={styles.container}>
         {showSearchBar && (
-          <TextInput
-            style={styles.searchInput}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchInput}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <Icon name="search" size={20} color="#668F80" style={styles.searchIcon} />
+          </View>
         )}
         <View style={styles.chatHeader}>
           <Image source={{ uri: 'https://picsum.photos/620/300' }} style={styles.avatar} />
@@ -171,7 +213,13 @@ export default function MessageScreen() {
               ]}
             >
               <View style={message.sender === 'left' ? styles.messageBubbleLeft : styles.messageBubbleRight}>
-                <Text style={message.sender === 'left' ? styles.messageText : styles.messageTextRight}>{message.text}</Text>
+                {message.image ? (
+                  <TouchableOpacity onPress={() => handleImagePress(message.image)}>
+                    <Image source={{ uri: message.image }} style={styles.messageImage} />
+                  </TouchableOpacity>
+                ) : (
+                  <Text style={message.sender === 'left' ? styles.messageText : styles.messageTextRight}>{message.text}</Text>
+                )}
               </View>
               <Text style={styles.timestamp}>{formatDate(new Date(message.timestamp))}</Text>
             </TouchableOpacity>
@@ -193,6 +241,9 @@ export default function MessageScreen() {
           </View>
         )}
         <View style={styles.footer}>
+          <TouchableOpacity style={styles.attachmentButton} onPress={openImagePicker}>
+            <Icon name="paperclip" size={24} color="#668F80" />
+          </TouchableOpacity>
           <TextInput
             ref={inputRef}
             style={styles.input}
@@ -205,6 +256,11 @@ export default function MessageScreen() {
             <Icon name="arrow-up" size={15} color="#FFF" />
           </TouchableOpacity>
         </View>
+        {isImageViewerVisible && (
+          <Modal visible={isImageViewerVisible} transparent={true}>
+            <ImageViewer imageUrls={imageToView} onClick={() => setIsImageViewerVisible(false)} />
+          </Modal>
+        )}
       </View>
     </KeyboardAvoidingView>
   );
@@ -231,14 +287,22 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
-  searchInput: {
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#F0F0F0',
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginHorizontal: 10,
     marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1,
     color: '#333',
+  },
+  searchIcon: {
+    marginLeft: 10,
   },
   selectionButtonsContainer: {
     flexDirection: 'row',
@@ -322,6 +386,11 @@ const styles = StyleSheet.create({
   messageTextRight: {
     color: '#FFF',
   },
+  messageImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+  },
   timestamp: {
     fontSize: 10,
     color: 'gray',
@@ -359,5 +428,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#668F80',
     borderRadius: 20,
     padding: 10,
+  },
+  attachmentButton: {
+    marginRight: 10,
   },
 });
