@@ -16,7 +16,7 @@ router.post('/createPost', upload.array('images'), async (req, res) => {
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route createPost : \n', e);
-        res.json({ status: 500, success: false, message: 'Erreur interne du serveur', IDEr: 'QA1' });
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'});
     }
 });
 
@@ -26,7 +26,17 @@ router.get('/getPosts', async (req, res) => {
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route getPosts : \n', e);
-        res.json({ status: 500, success: false, message: 'Erreur interne du serveur', IDEr: '1LIJ' });
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'});
+    }
+});
+
+router.post('/postsOf', async (req, res) => {
+    try {
+        const response = await managePosts.postsOf(req.body.token);
+        res.json(response);
+    } catch (e) {
+        console.error('Erreur lors de la route postsOf : \n', e);
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'});
     }
 });
 

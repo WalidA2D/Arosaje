@@ -1,6 +1,7 @@
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
-const { handleDBOperation, encryptMethod, validateUserInputCreation } = require('../../framework/DreamTeamUtils');
+const { executeDBOperation, encryptMethod, validateUserInputCreation } = require('../../framework/DreamTeamUtils');
+const { addProfilePicture, getProfilePicture, deleteImage } = require('./manageProfilePictures');
 
 const pathToDB = path.resolve(__dirname, '..', 'BASE.db');
 const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
@@ -26,6 +27,7 @@ const addUser = async (lastName, firstName, email, address, phone, cityName, pas
             };
         }
 
+        //création du token
         const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
         const resRandomNumber = getRandomNumber(
             getRandomNumber(
@@ -69,11 +71,7 @@ const addUser = async (lastName, firstName, email, address, phone, cityName, pas
         }
 
         const sql = 'INSERT INTO Users (lastName, firstName, email, address, phone, cityName, password, uid) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        const result = await handleDBOperation((callback) => {
-            db.run(sql, [lastName, firstName, email, address, phone, cityName, passwordEncrypted, uidResult], function (err) {
-                callback(err, { lastID: this.lastID });
-            });
-        });
+        const result = await executeDBOperation(db, sql, [lastName, firstName, email, address, phone, cityName, passwordEncrypted, uidResult]);
         return { 
             body: result,
             status: 200, 
@@ -92,9 +90,7 @@ const addUser = async (lastName, firstName, email, address, phone, cityName, pas
 const getUser = async (uid) => {
     try {
         const sql = 'SELECT lastName, firstName, email, address, phone, cityName FROM Users WHERE Users.uid = ?';
-        const rows = await handleDBOperation((callback) => {
-            db.all(sql, [uid], callback);
-        });
+        const rows = await executeDBOperation(db, sql, [uid], "all");
         return { 
             body: rows,
             status: 200, 
@@ -111,12 +107,19 @@ const getUser = async (uid) => {
 };
 
 // UPDATE UN USER
-const updateUser = async (uid, lastName, firstName, email, address, phone, cityName) => {
+const updateUser = async (uid, lastName, firstName, email, address, phone, cityName, imageBuffer) => {
     try {
+
+        const profilePicFileName = `${uid}_profilePic`;
+
+        try {
+            await getProfilePicture('profile_pictures', profilePicFileName);
+        } catch (error) {
+            await addProfilePicture('profile_pictures', profilePicFileName, imageBuffer);
+        }
+
         const sql = 'UPDATE Users SET lastName = ?, firstName = ?, email = ?, address = ?, phone = ?, cityName = ? WHERE uid = ?';
-        await handleDBOperation((callback) => {
-            db.run(sql, [lastName, firstName, email, address, phone, cityName, uid], callback);
-        });
+        await executeDBOperation(db, sql, [lastName, firstName, email, address, phone, cityName, uid]);
         let u = await getUser(uid)
         u = u.body[0]
         if(u == undefined) {
@@ -133,12 +136,14 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
                 "email":u.email,
                 "address":u.address,
                 "cityName":u.cityName,
-                "phone":u.phone
+                "phone":u.phone,
+                "profilePicture":""
             } 
         };
     } catch (e) {
         console.error('Erreur lors de la fonction updateUser', e);
         return { 
+            message:"Erreur lors de l'update",
             status: 400, 
             success: false 
         };
@@ -149,9 +154,7 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
 const getUserByEmail = async (email) => {
     try {
         const sql = 'SELECT lastName, firstName, email, address, phone, cityName, password, uid FROM Users WHERE email = ?';
-        const user = await handleDBOperation((callback) => {
-            db.get(sql, [email], callback);
-        });
+        const user = await executeDBOperation(db, sql, [email], "get");
         return user;
     } catch (e) {
         console.error('Erreur lors de la fonction getUserByEmail', e);
@@ -163,6 +166,7 @@ const getUserByEmail = async (email) => {
 const connexion = async (email, password) => {
     try {
         const u = await getUserByEmail(email);
+        console.log(u)
         if (!u) {
             return { status: 404, success: false, message: 'Utilisateur non trouvé' };
         }
@@ -181,7 +185,8 @@ const connexion = async (email, password) => {
                 "email":u.email,
                 "address":u.address,
                 "cityName":u.cityName,
-                "phone":u.phone
+                "phone":u.phone,
+                "profilePic": await getProfilePicture("profilePictures",u.idUser+"_pp.jpg")
             } 
         };
     } catch (e) {
@@ -190,10 +195,31 @@ const connexion = async (email, password) => {
     }
 };
 
+// LIRE UN USER SELON L'ID
+const getSomeone = async (idUser) => {
+    try {
+        const sql = 'SELECT lastName, firstName, cityName FROM Users WHERE idUsers = ?';
+        const rows = await executeDBOperation(db, sql, [idUser], "all");
+        return { 
+            body: rows,
+            status: 200, 
+            success: true 
+        };
+    } catch (e) {
+        console.error('Erreur lors de la fonction getSomeone', e);
+        return { 
+            status: 400, 
+            success: false,
+            message: "Utilisateur non reconnu"
+        };
+    }
+};
+
 module.exports = {
     addUser,
     getUser,
     updateUser,
     getUserByEmail,
-    connexion
+    connexion,
+    getSomeone,
 };

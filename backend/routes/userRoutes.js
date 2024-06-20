@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const manageUser = require('../database/models/manageUsers');
+const managePP = require('../database/models/manageProfilePictures')
 
 // Middleware d'authentification pour toutes les routes des utilisateurs
 // router.use(verifyToken);
@@ -38,6 +39,7 @@ router.post('/connexion', async (req, res) => {
     }
 });
 
+//get un user selon le token
 router.post('/getUser', async(req,res)=>{
     try{
         const r = req.body;
@@ -48,5 +50,29 @@ router.post('/getUser', async(req,res)=>{
         res.json({ status: 500, success: false, message: 'Erreur interne du serveur'})
     }
 })
+
+//get un user selon l'id
+router.post('/getSomeone', async(req,res)=>{
+    try{
+        const response = await manageUser.getSomeone(req.body.idUser);
+        res.json(response)
+    } catch (e){
+        console.error('Erreur lors de la route getSomeone : \n', e);
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'})
+    }
+})
+
+//get un user selon l'id
+router.post('/getPP', async(req,res)=>{
+    try{
+        let nameFile = req.body.idUser + "_pp.png"
+        const response = await managePP.getProfilePicture("profilePictures",nameFile);
+        res.json(response)
+    } catch (e){
+        console.error('Erreur lors de la route getPP : \n', e);
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'})
+    }
+})
+
 
 module.exports = router;
