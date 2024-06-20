@@ -107,14 +107,14 @@ const getUser = async (uid) => {
 };
 
 // UPDATE UN USER
-const updateUser = async (uid, lastName, firstName, email, address, phone, cityName, imageBuffer) => {
+const updateUser = async (uid, lastName, firstName, email, address, phone, cityName) => {
     try {
 
-        const profilePicFileName = `${uid}_profilePic`;
+        const profilePicFileName = `${uid}_pp.png`;
 
         try {
             await getProfilePicture('profile_pictures', profilePicFileName);
-        } catch (error) {
+        } catch (e) {
             await addProfilePicture('profile_pictures', profilePicFileName, imageBuffer);
         }
 
@@ -136,8 +136,7 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
                 "email":u.email,
                 "address":u.address,
                 "cityName":u.cityName,
-                "phone":u.phone,
-                "profilePicture":""
+                "phone":u.phone
             } 
         };
     } catch (e) {
@@ -166,13 +165,18 @@ const getUserByEmail = async (email) => {
 const connexion = async (email, password) => {
     try {
         const u = await getUserByEmail(email);
-        console.log(u)
         if (!u) {
             return { status: 404, success: false, message: 'Utilisateur non trouvé' };
         }
         const encryptedPassword = encryptMethod(password);
         if (encryptedPassword !== u.password) {
             return { status: 401, success: false, message: 'Mot de passe incorrect' };
+        }
+        let ppU;
+        try{
+            ppU = await getProfilePicture("profilePictures",u.idUser+"_pp.png")
+        } catch (e){
+            ppU = await getProfilePicture("profilePictures","default_pp.png")
         }
         return { 
             message: "Connexion réussit !",
@@ -186,7 +190,7 @@ const connexion = async (email, password) => {
                 "address":u.address,
                 "cityName":u.cityName,
                 "phone":u.phone,
-                "profilePic": await getProfilePicture("profilePictures",u.idUser+"_pp.jpg")
+                "profilePic": ppU
             } 
         };
     } catch (e) {

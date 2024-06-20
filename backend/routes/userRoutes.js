@@ -28,6 +28,15 @@ router.post('/updateUser', async (req, res) => {
     }
 });
 
+router.post('/updatePP',async(req,res)=>{
+    try{
+        const response = await managePP.updatePP(req.body.data[0])
+    } catch (e){
+        console.error('Erreur lors de la route updatePP', e);
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'});
+    }
+})
+
 router.post('/connexion', async (req, res) => {
     try {
         const r = req.body;

@@ -35,14 +35,6 @@ const executeDBOperation = (db, sql, params, type = 'run') => {
             }
         };
 
-        if (type === 'all') {
-            stmnt.all(params, callback);
-        } else {
-            stmnt.run(params, function(err) {
-                callback(err, { lastID: this.lastID, changes: this.changes });
-            });
-        }
-
         switch(type){
             case "all":
                 stmnt.all(params, callback)
@@ -60,6 +52,7 @@ const executeDBOperation = (db, sql, params, type = 'run') => {
         stmnt.finalize()
     });
 };
+
 const encryptMethod = (password) => {
     let result = '';
     let decalage = password.length + 4;

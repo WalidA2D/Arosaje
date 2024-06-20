@@ -32,7 +32,7 @@ router.get('/getPosts', async (req, res) => {
 
 router.post('/postsOf', async (req, res) => {
     try {
-        const response = await managePosts.postsOf(req.body.token);
+        const response = await managePosts.postsOf(req.body.idUser);
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route postsOf : \n', e);
