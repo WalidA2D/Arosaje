@@ -19,7 +19,7 @@ router.post('/createUser', async (req, res) => {
 router.post('/updateUser', async (req, res) => {
     try {
         const r = req.body;
-        const response = await manageUser.updateUser(r.uid, r.lastName, r.firstName, r.email, r.address, r.phone, r.cityName);
+        const response = await manageUser.updateUser(r.token, r.lastName, r.firstName, r.email, r.address, r.phone, r.cityName);
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route updateUser', e);

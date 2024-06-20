@@ -117,6 +117,11 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
         await handleDBOperation((callback) => {
             db.run(sql, [lastName, firstName, email, address, phone, cityName, uid], callback);
         });
+        let u = await getUser(uid)
+        u = u.body[0]
+        if(u == undefined) {
+            console.log("Erreur lors de la fonction updateUser : l'id modifié n'est pas retrouvé??")
+        }
         return { 
             message: 'Update réussit', 
             status: 200, 
