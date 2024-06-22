@@ -17,7 +17,11 @@ type RootStackParamList = {
     'ConnexionScreen'
   >;
 
-export default function ConnexionScreen() {
+  interface ConnexionScreenProps {
+    setIsModalVisible: (isVisible: boolean, type: string) => void;
+}
+
+export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenProps) {
     const [email, onChangeEmail] = React.useState('a@a.com');
     const [motDePasse, onChangeMotDePasse] = React.useState('123');
     const [showPassword, setShowPassword] = React.useState(false);
@@ -25,8 +29,9 @@ export default function ConnexionScreen() {
     const navigation = useNavigation<ConnexionScreenNavigationProp>();
 
     function handleLogin() {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex simple pour validation d'email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (emailRegex.test(email) && motDePasse.length > 0) {
+          setIsModalVisible(false, 'connexion');
           navigation.navigate('actu');
         } else {
           Alert.alert("Échec", "Email non conforme ou mot de passe incorrect");

@@ -37,14 +37,14 @@ export default function StartApp() {
       </View>
 
       <Modal visible={modalType === 'connexion'} animationType="slide">
-        <ConnexionScreen />
+        <ConnexionScreen setIsModalVisible={(isVisible, type) => setModalVisible(isVisible, type)} />
         <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false, 'connexion')}>
             <Text style={{ color: '#fff' }}>Fermer</Text>
           </TouchableOpacity>
       </Modal>
 
       <Modal visible={modalType === 'inscription'} animationType="slide">
-        <InscriptionScreen />
+        <InscriptionScreen setIsModalVisible={(isVisible, type) => setModalVisible(isVisible, type)} />
         <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false, 'inscription')}>
           <Text style={{ color: '#fff' }}>Fermer</Text>
         </TouchableOpacity>
