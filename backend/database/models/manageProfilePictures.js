@@ -31,7 +31,6 @@ const addProfilePicture = (folderName, fileName, imageBuffer) => {
 const getProfilePicture = async (folderName, fileName) => {
     try {
         const filePath = path.resolve(__dirname, '..', 'images', folderName, fileName);
-        console.log(filePath)
         const data = await fs.readFile(filePath);
         return data;
     } catch (err) {

@@ -51,8 +51,7 @@ router.post('/connexion', async (req, res) => {
 //get un user selon le token
 router.post('/getUser', async(req,res)=>{
     try{
-        const r = req.body;
-        const response = await manageUser.getUser(r.token);
+        const response = await manageUser.getUser(req.body.token);
         res.json(response)
     } catch (e){
         console.error('Erreur lors de la route getUser : \n', e);

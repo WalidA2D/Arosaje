@@ -86,13 +86,56 @@ const addUser = async (lastName, firstName, email, address, phone, cityName, pas
     }
 };
 
+//
+const getRole = async(d) => {
+    try{
+        // let r = "";
+        // switch (d){
+        //     case 0:
+        //         r = "Utilisateur"
+        //         break;
+        //     case 1:
+        //         r = "Botaniste"
+        //         break
+        //     default:
+        //         //a implémenter?
+        //         r = "Non spécifié"
+        //         break;         
+        // }
+        // return r
+        return (d == 1 ? "Botaniste" : "Utilisateur"); 
+        // Pour l'instant, utilisation d'un ternaire. Si on modifie "isBotanist" pour que le champ puisse spécifier autre chose alors on utilisera switch case
+    } catch (e){
+        console.error('Erreur lors de la fonction getRole : ',e)
+        return "Non spécifié"
+    }
+}
+
 // LIRE UN USER SELON L'UID
 const getUser = async (uid) => {
     try {
-        const sql = 'SELECT lastName, firstName, email, address, phone, cityName FROM Users WHERE Users.uid = ?';
-        const rows = await executeDBOperation(db, sql, [uid], "all");
+        const sql = 'SELECT idUsers, lastName, firstName, email, address, phone, cityName, isBotanist FROM Users WHERE Users.uid = ?';
+        const r = (await executeDBOperation(db, sql, [uid], "all"))[0];
+        let ppU;
+        try{
+            ppU = await getProfilePicture("profilePictures",r.idUsers+"_pp.png")
+        } catch (e){
+            ppU = await getProfilePicture("profilePictures","default_pp.png")
+        }
+        let role = await getRole(r.isBotanist)
         return { 
-            body: rows,
+            body: {
+                "token": r.uid,
+                "role": role,
+                "iduser":r.idUsers,
+                "lastName": r.lastName,
+                "firstName": r.firstName,
+                "email": r.email,
+                "address": r.address,
+                "cityName": r.cityName,
+                "phone": r.phone,
+                "profilePic": ppU
+            },
             status: 200, 
             success: true 
         };
@@ -152,7 +195,7 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
 // obtenir un user selon l'email
 const getUserByEmail = async (email) => {
     try {
-        const sql = 'SELECT lastName, firstName, email, address, phone, cityName, password, uid FROM Users WHERE email = ?';
+        const sql = 'SELECT idUsers, lastName, firstName, email, address, phone, isBotanist, cityName, password, uid FROM Users WHERE email = ?';
         const user = await executeDBOperation(db, sql, [email], "get");
         return user;
     } catch (e) {
@@ -178,12 +221,15 @@ const connexion = async (email, password) => {
         } catch (e){
             ppU = await getProfilePicture("profilePictures","default_pp.png")
         }
+        let role = await getRole(u.isBotanist)
         return { 
             message: "Connexion réussit !",
             status: 200, 
             success: true, 
             user: {
                 "token":u.uid,
+                "idUser":u.idUsers,
+                "role":role,
                 "lastName":u.lastName,
                 "firstName":u.firstName,
                 "email":u.email,

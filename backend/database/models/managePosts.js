@@ -77,6 +77,8 @@ const postsOf = async (uid) => {
     }
 };
 
+// récupérer les post d'un user
+
 module.exports = {
     addPost,
     getAllPosts,

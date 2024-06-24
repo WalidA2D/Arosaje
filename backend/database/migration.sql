@@ -37,10 +37,12 @@ CREATE TABLE Posts (
     cityName VARCHAR(50) NOT NULL,
     state BOOLEAN NOT NULL DEFAULT FALSE,
     accepted BOOLEAN NOT NULL DEFAULT FALSE,
+    acceptedBy INTEGER,
     idUser INTEGER,
     idPlant INTEGER,
     FOREIGN KEY (idUser) REFERENCES Users(idUsers),
-    FOREIGN KEY (idPlant) REFERENCES Plants(idPlants)
+    FOREIGN KEY (idPlant) REFERENCES Plants(idPlants),
+    FOREIGN KEY (acceptedBy) REFERENCES Users(idUsers)
 );
 
 CREATE TABLE Plants (
