@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import Calendrier from '../profilnav/calendar';
+import UpdateProfil from '../profilnav/updateProfil';
 
 const Stack = createNativeStackNavigator();
 
@@ -37,16 +39,34 @@ function ProfScreen() {
           })}
         />
         <Stack.Screen name="Calendrier" component={Calendrier} options={{ headerBackTitleVisible: false }} />
+        <Stack.Screen name="Modification" component={UpdateProfil} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-export function ProfilScreen() {
-  const [selectedTab, setSelectedTab] = useState('Posts');
-  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', cityName: '' });
+type RootStackParamList = {
+  Profil: { updated?: boolean };
+  Modification: {
+    lastName: string;
+    firstName: string;
+    email: string;
+    address: string;
+    phone: string;
+    cityName: string;
+  };
+};
 
-  useEffect(() => {
+type ProfilScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profil'>;
+type ProfilScreenRouteProp = RouteProp<RootStackParamList, 'Profil'>;
+
+export function ProfilScreen() {
+  const navigation = useNavigation<ProfilScreenNavigationProp>();
+  const route = useRoute<ProfilScreenRouteProp>();
+  const [selectedTab, setSelectedTab] = useState('Posts');
+  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', cityName: '', email: '', address: '', phone: '' });
+
+  const fetchProfileData = () => {
     const options = {
       method: 'POST',
       headers: {
@@ -57,7 +77,7 @@ export function ProfilScreen() {
       }),
     };
 
-    fetch('http://192.168.1.24:3000/api/user/getUser', options) // Changer l'IP
+    fetch('http://192.168.1.24:3000/api/user/getUser', options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -66,13 +86,24 @@ export function ProfilScreen() {
             lastName: user.lastName,
             firstName: user.firstName,
             cityName: user.cityName,
+            email: user.email,
+            address: user.address,
+            phone: user.phone,
           });
         }
       })
       .catch(error => {
         console.error('Error fetching profile data:', error);
       });
-  }, []);
+  };
+
+  useEffect(() => {
+    fetchProfileData();
+    if (route.params?.updated) {
+      fetchProfileData();
+      navigation.setParams({ updated: false });
+    }
+  }, [route.params?.updated]);
 
   const openMap = (cityName: string) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cityName)}`;
@@ -114,7 +145,9 @@ export function ProfilScreen() {
 
       <View style={styles.fixedDetails}>
         <View style={styles.profileDetails}>
-          <Text style={styles.profileName}>{`${profileData.firstName} ${profileData.lastName}`}</Text>
+          <Text style={styles.profileName}>{`${profileData.firstName} ${profileData.lastName}`}
+            <TouchableOpacity onPress={() => navigation.navigate('Modification', profileData)}><Ionicons name="pencil" size={25} color="#668F80" /></TouchableOpacity></Text>
+          
           <TouchableOpacity onPress={() => openMap(profileData.cityName)}>
             <Text style={styles.profileRole}>{profileData.cityName}</Text>
           </TouchableOpacity>
