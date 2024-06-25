@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -28,15 +28,38 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
 
     const navigation = useNavigation<ConnexionScreenNavigationProp>();
 
-    function handleLogin() {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailRegex.test(email) && motDePasse.length > 0) {
-          setIsModalVisible(false, 'connexion');
-          navigation.navigate('actu');
-        } else {
-          Alert.alert("Échec", "Email non conforme ou mot de passe incorrect");
+    // Définir une fonction handleLogin pour gérer l'appel asynchrone
+    const handleLogin = async () => {
+        try {
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: motDePasse,
+                }),
+            };
+
+            const response = await fetch('http://localhost:3000/api/user/verifyLogin', options);
+            const data = await response.json();
+
+            if (data.success) {
+                setIsModalVisible(false, 'connexion');
+                navigation.navigate('actu');
+            } else {
+                Alert.alert("Échec", "Email ou mot de passe incorrect");
+            }
+        } catch (error) {
+            console.error('Erreur lors de la vérification de la connexion:', error);
         }
-      }
+    };
+
+    // Utiliser handleLogin dans useEffect
+    useEffect(() => {
+        handleLogin();
+    }, [email, motDePasse]);
 
     return (
         <View style={styles.container}>
@@ -78,9 +101,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
 
         <View style={styles.selectorContainer}>
 
-            <TouchableOpacity style={styles.selectorButton} onPress={() => {
-            handleLogin();
-            }}>
+            <TouchableOpacity style={styles.selectorButton} onPress={() => { handleLogin(); }}>
                 <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Connexion</Text>
             </TouchableOpacity>
 
