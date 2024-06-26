@@ -154,11 +154,11 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
     try {
 
         const profilePicFileName = `${uid}_pp.png`;
-
+        let ppU;
         try {
-            await getProfilePicture('profile_pictures', profilePicFileName);
+            ppU = await getProfilePicture('profile_pictures', profilePicFileName);
         } catch (e) {
-            await addProfilePicture('profile_pictures', profilePicFileName, imageBuffer);
+            ppU = await addProfilePicture('profile_pictures', profilePicFileName, imageBuffer);
         }
 
         const sql = 'UPDATE Users SET lastName = ?, firstName = ?, email = ?, address = ?, phone = ?, cityName = ? WHERE uid = ?';
@@ -174,12 +174,14 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
             success: true,
             user: {
                 "token":u.uid,
+                "idUser":u.idUsers,
                 "lastName":u.lastName,
                 "firstName":u.firstName,
                 "email":u.email,
                 "address":u.address,
                 "cityName":u.cityName,
-                "phone":u.phone
+                "phone":u.phone,
+                "profilePic":ppU
             } 
         };
     } catch (e) {

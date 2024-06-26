@@ -7,8 +7,8 @@ const { PORT } = require('./config/config');
 const { apiLimiter } = require('./middlewares/apiLimiter');
 
 const app = express();
-app.use(bodyParser.json());
-
+app.use(bodyParser.json({limit:'50mb'}));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 // MiddleWare pour limiter les requetes à l'API
 app.use('/api', apiLimiter);
 
