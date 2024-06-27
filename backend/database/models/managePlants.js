@@ -15,11 +15,7 @@ const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
 const addPlant = async (description, origin, requirements, type) => {
     try {
         const sql = 'INSERT INTO Plants (description, origin, requirements, type) VALUES (?, ?, ?, ?)';
-        const result = await handleDBOperation((callback) => {
-            db.run(sql, [description, origin, requirements, type], function (err) {
-                callback(err);
-            });
-        });
+        await executeDBOperation(db, sql, [description, origin, requirements, type]);
         console.log("Nouvelle plante créée , Type : ",type)
         return { 
             message: "Plante créée!!!",
@@ -47,11 +43,7 @@ const getPlantWithID = async (plantID) => {
         }
         //const sql = 'SELECT idPlants, description, origin, requirements, type, idUser FROM Plants WHERE idPlants = ?';
         const sql = 'SELECT * FROM Plants';
-        const result = await handleDBOperation((callback) => {
-            db.all(sql, [plantID], function (err, row) {
-                callback(err, row);
-            });
-        });
+        const result = await executeDBOperation(db, sql, [plantID], "all");
         if (result) {
             return { 
                 body: result,

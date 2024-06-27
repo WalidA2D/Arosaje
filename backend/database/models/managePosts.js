@@ -1,6 +1,6 @@
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
-const { handleDBOperation } = require('../../framework/DreamTeamUtils');
+const { executeDBOperation } = require('../../framework/DreamTeamUtils');
 
 const pathToDB = path.resolve(__dirname, '..', 'BASE.db');
 const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
@@ -18,17 +18,11 @@ const addPost = async (title, description, dateStart, dateEnd, address, cityName
     const sqlImage = 'INSERT INTO Images (title, url, idPlant) VALUES (?, ?, ?)';
 
     try {
-        const postResult = await handleDBOperation((callback) => {
-            db.run(sqlPost, [title, description, dateStart, dateEnd, address, cityName, token], function (err) {
-                callback(err, { lastID: this.lastID });
-            });
-        });
+        const postResult = await executeDBOperation(db, sqlPost, [title, description, dateStart, dateEnd, address, cityName, token], "all");
 
         const postID = postResult.lastID;
         for (let image of images) {
-            await handleDBOperation((callback) => {
-                db.run(sqlImage, [image.title, image.url, postID], callback);
-            });
+            await executeDBOperation(db, sqlImage, [image.title, image.url, postID])
         }
 
         console.log("Nouveau post créé , Titre : ", title);
@@ -49,9 +43,7 @@ const addPost = async (title, description, dateStart, dateEnd, address, cityName
 const getAllPosts = async () => {
     try {
         const sql = 'SELECT idPosts, title, description, publishedAt, dateStart, dateEnd, address, cityName, state, accepted, idUser, idPlant FROM Posts';
-        const rows = await handleDBOperation((callback) => {
-            db.all(sql, [], callback);
-        });
+        const rows = await executeDBOperation(db, sql, [], "all");
         return { 
             body: rows, 
             status: 200, 
@@ -66,7 +58,30 @@ const getAllPosts = async () => {
     }
 };
 
+// récupérer les post d'un user
+const postsOf = async (uid) => {
+    try {
+        const sql = 'SELECT idPosts, title, description, publishedAt, dateStart, dateEnd, address, cityName, state, accepted, idUser, idPlant FROM Posts WHERE idUser = ?';
+        const rows = await executeDBOperation(db, sql, [uid], "all");
+        return { 
+            body: rows, 
+            status: 200, 
+            success: true 
+        };
+    } catch (e) {
+        console.error('Erreur lors de la fonction getAllPosts', e);
+        return { 
+            status: 400, 
+            success: false 
+        };
+    }
+};
+
+// récupérer les post d'un user
+
+
 module.exports = {
     addPost,
-    getAllPosts
+    getAllPosts,
+    postsOf
 }
