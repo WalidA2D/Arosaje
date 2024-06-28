@@ -152,11 +152,11 @@ const getUser = async (uid) => {
 // UPDATE UN USER
 const updateUser = async (uid, lastName, firstName, email, address, phone, cityName) => {
     try {
-        const u = (await getUser(uid)).body[0]
 
         const sql = 'UPDATE Users SET lastName = ?, firstName = ?, email = ?, address = ?, phone = ?, cityName = ? WHERE uid = ?';
         await executeDBOperation(db, sql, [lastName, firstName, email, address, phone, cityName, uid]);
-        
+
+        const u = (await getUser(uid)).body
         if(u == undefined) {
             console.log("Erreur lors de la fonction updateUser : l'id modifié n'est pas retrouvé??")
         }
@@ -172,8 +172,7 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
                 "email":u.email,
                 "address":u.address,
                 "cityName":u.cityName,
-                "phone":u.phone,
-                "profilePic":ppU
+                "phone":u.phone
             } 
         };
     } catch (e) {
