@@ -152,19 +152,11 @@ const getUser = async (uid) => {
 // UPDATE UN USER
 const updateUser = async (uid, lastName, firstName, email, address, phone, cityName) => {
     try {
-
-        const profilePicFileName = `${uid}_pp.png`;
-        let ppU;
-        try {
-            ppU = await getProfilePicture('profile_pictures', profilePicFileName);
-        } catch (e) {
-            ppU = await addProfilePicture('profile_pictures', profilePicFileName, imageBuffer);
-        }
+        const u = (await getUser(uid)).body[0]
 
         const sql = 'UPDATE Users SET lastName = ?, firstName = ?, email = ?, address = ?, phone = ?, cityName = ? WHERE uid = ?';
         await executeDBOperation(db, sql, [lastName, firstName, email, address, phone, cityName, uid]);
-        let u = await getUser(uid)
-        u = u.body[0]
+        
         if(u == undefined) {
             console.log("Erreur lors de la fonction updateUser : l'id modifié n'est pas retrouvé??")
         }
@@ -172,7 +164,7 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
             message: 'Update réussit', 
             status: 200, 
             success: true,
-            user: {
+            user : {
                 "token":u.uid,
                 "idUser":u.idUsers,
                 "lastName":u.lastName,
@@ -228,7 +220,7 @@ const connexion = async (email, password) => {
             message: "Connexion réussit !",
             status: 200, 
             success: true, 
-            user: {
+            body : {
                 "token":u.uid,
                 "idUser":u.idUsers,
                 "role":role,

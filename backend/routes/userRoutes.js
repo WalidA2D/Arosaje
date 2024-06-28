@@ -32,25 +32,15 @@ router.post('/createUser', async (req, res) => {
 router.post('/updateUser', async (req, res) => {
     try {
         const r = req.body;
-        const fileName = `${idUser}_pp.png`;
-        const imageBuffer = Buffer.from(r.profilePic, 'base64');    
-        
-        let ppU;
-        try{
-            await managePP.getProfilePicture("profilePictures",r.profilePic)
-            await managePP.deleteImage("profilePictures",fileName)
-        } catch(e){
-
-        }
-
-        await managePP.addProfilePicture('profilePictures', fileName, imageBuffer);
-        const response = await manageUser.updateUser(r.token, r.lastName, r.firstName, r.email, r.address, r.phone, r.cityName, r.profilePic);
+        const response = await manageUser.updateUser(r.token, r.lastName, r.firstName, r.email, r.address, r.phone, r.cityName);
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route updateUser', e);
-        res.json({ status: 500, success: false, message: 'Erreur interne du serveur' });
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur', error:e });
     }
 });
+
+
 
 router.post('/updatePP',async(req,res)=>{
     try{
