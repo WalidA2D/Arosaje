@@ -9,7 +9,7 @@ router.post('/createPlant', async (req, res) => {
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route createPlant : \n', e);
-        res.json({ status: 500, success: false, message: 'Erreur interne du serveur', IDEr: 'EAZ132' });
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'});
     }
 });
 
@@ -19,7 +19,7 @@ router.get('/getPlantWithID', async (req, res) => {
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route getPlantWithID : \n', e);
-        res.json({ status: 500, success: false, message: 'Erreur interne du serveur', IDEr: 'VC56B' });
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'});
     }
 });
 
