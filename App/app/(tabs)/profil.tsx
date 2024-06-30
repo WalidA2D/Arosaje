@@ -4,9 +4,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Calendrier from '../profilnav/calendar';
 import UpdateProfil from '../profilnav/updateProfil';
+import StartApp from './index';
 
 const Stack = createNativeStackNavigator();
 
@@ -40,6 +42,7 @@ function ProfScreen() {
         />
         <Stack.Screen name="Calendrier" component={Calendrier} options={{ headerBackTitleVisible: false }} />
         <Stack.Screen name="Modification" component={UpdateProfil} options={{ headerBackTitleVisible: false }} />
+        <Stack.Screen name="Index" component={StartApp} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -55,6 +58,7 @@ type RootStackParamList = {
     phone: string;
     cityName: string;
   };
+  Index: undefined;
 };
 
 type ProfilScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profil'>;
@@ -96,6 +100,21 @@ export function ProfilScreen() {
         console.error('Error fetching profile data:', error);
       });
   };
+
+  const checkUserToken = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    if (!userToken) {
+      navigation.navigate('Index');
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      checkUserToken();
+    });
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     fetchProfileData();

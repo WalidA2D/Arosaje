@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import BigButtonDown from '../../components/BigButtonDown';
 import ListDash from '../../components/ListDash';
@@ -15,8 +15,7 @@ import Botaniste from '../optnav/botaniste';
 import Question from '../optnav/question';
 import Donnees from '../optnav/donnees';
 import InfoLeg from '../optnav/infoleg';
-
-//import LoginFormScreen from './loginform';
+import StartApp from './index';
 
 const Stack = createNativeStackNavigator();
 
@@ -65,6 +64,10 @@ function OptionsScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
+      <Stack.Screen name="Index" component={StartApp}
+        options={{
+          headerBackTitleVisible: false
+      }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -72,6 +75,26 @@ function OptionsScreen({ }) {
 
 function OptionsContent({ }) {
   const navigation = useNavigation<StackNavigationProp<any>>();
+
+  const checkUserToken = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    if (!userToken) {
+      navigation.navigate('Index');
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      checkUserToken();
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const handleLogout = async () => {
+  await AsyncStorage.removeItem('userToken');
+  navigation.navigate('Index');
+  };
 
   return (
     <View style={styles.container}>
@@ -91,7 +114,7 @@ function OptionsContent({ }) {
         <ListDash buttonText="Informations légales" onPress={() => navigation.navigate('Informations légales')} />
         <View style={styles.separatorDetails}/>
       </View>
-      <BigButtonDown buttonText="Déconnecter" />
+      <BigButtonDown buttonText="Déconnecter" onPress={handleLogout} />
     </View>
   );
 }

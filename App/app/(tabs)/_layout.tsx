@@ -77,13 +77,6 @@ export default function TabLayout() {
           tabBarStyle: { display: 'none' }
         }}
       />
-              <Tabs.Screen
-        name="actunav/actufiltre"
-        options={{
-          title: 'filtre',
-          tabBarButton: () => null,
-        }}
-      />
     </Tabs>
 
     

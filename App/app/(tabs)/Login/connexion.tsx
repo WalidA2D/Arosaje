@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HeaderTitle from '../../../components/HeaderTitle';
 
-// Définir les types des paramètres de navigation
 type RootStackParamList = {
     ConnexionScreen: undefined;
     actu: undefined;
   };
   
-  // Définir le type de navigation pour l'écran de profil
   type ConnexionScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
     'ConnexionScreen'
@@ -22,13 +21,12 @@ type RootStackParamList = {
 }
 
 export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenProps) {
-    const [email, onChangeEmail] = React.useState('a@a.com');
-    const [motDePasse, onChangeMotDePasse] = React.useState('123');
+    const [email, onChangeEmail] = React.useState('a@s.d');
+    const [motDePasse, onChangeMotDePasse] = React.useState('mdp');
     const [showPassword, setShowPassword] = React.useState(false);
 
     const navigation = useNavigation<ConnexionScreenNavigationProp>();
 
-    // Définir une fonction handleLogin pour gérer l'appel asynchrone
     const handleLogin = async () => {
         try {
             const options = {
@@ -42,10 +40,11 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
                 }),
             };
 
-            const response = await fetch('http://localhost:3000/api/user/verifyLogin', options);
+            const response = await fetch('http://192.168.1.101:3000/api/user/connexion', options);
             const data = await response.json();
 
             if (data.success) {
+                await AsyncStorage.setItem('userToken', data.body.token);
                 setIsModalVisible(false, 'connexion');
                 navigation.navigate('actu');
             } else {
@@ -56,10 +55,17 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
         }
     };
 
-    // Utiliser handleLogin dans useEffect
     useEffect(() => {
-        handleLogin();
-    }, [email, motDePasse]);
+        const checkToken = async () => {
+            const userToken = await AsyncStorage.getItem('userToken');
+            if (userToken) {
+                setIsModalVisible(false, 'connexion');
+                navigation.navigate('actu');
+            }
+        };
+
+        checkToken();
+    }, []);
 
     return (
         <View style={styles.container}>

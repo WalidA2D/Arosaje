@@ -1,43 +1,57 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, Button, ScrollView, TouchableOpacity, TextInput, Dimensions, FlatList, Image } from 'react-native';
-import ContentItem from '../../components/navigation/ContentItem';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Button, ScrollView, TextInput } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import ActuFiltre from '../actunav/actufiltre';
+import ContentItem from '../../components/navigation/ContentItem';
+import Filtre from '../actunav/actufiltre';
+import StartApp from './index';
 
-const Stack = createNativeStackNavigator();
+type RootStackParamList = {
+  Actualités: undefined;
+  Filtre: undefined;
+  Index: undefined;
+};
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function HomeScreen({ }) {
-  const navigation = useNavigation<StackNavigationProp<any>>();
-
   return (
     <NavigationContainer independent={true}>
-      <Stack.Navigator initialRouteName="Actualités"
-      screenOptions ={{
-        headerStyle:{
+    <Stack.Navigator
+      initialRouteName="Actualités"
+      screenOptions={{
+        headerStyle: {
           backgroundColor: '#668F80',
         },
         headerTintColor: '#fff',
-        headerTitleStyle:{
+        headerTitleStyle: {
           color: '#FFF',
           fontSize: 24,
           fontWeight: 'bold',
         },
+      }}
+    >
+    <Stack.Screen
+      name="Actualités"
+      component={HomeContent}
+      options={({ navigation }) => ({
         headerRight: () => (
           <Button
-            onPress={() =>{console.log(navigation); navigation.navigate('Filtrer')}}
+            onPress={() => navigation.navigate('Filtre')}
             title="Filtre"
             color="#fff"
           />
         ),
-      }}>
-        <Stack.Screen name="Actualités" component={HomeContent} />
-        <Stack.Screen name="Filtrer" component={ActuFiltre}
-        options={{
-          headerBackTitleVisible: false
-      }} />
+      })}
+    />
+    <Stack.Screen
+      name="Filtre"
+      component={Filtre}
+      options={{ headerBackTitleVisible: false }}
+    />
+      <Stack.Screen name="Index" component={StartApp} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -45,6 +59,22 @@ function HomeScreen({ }) {
 
 function HomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
+  const navigation = useNavigation();
+
+  const checkUserToken = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    if (!userToken) {
+      navigation.navigate('Index');
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      checkUserToken();
+    });
+
+    return unsubscribe;
+  }, []);
 
   return (
       <View style={styles.container}>
