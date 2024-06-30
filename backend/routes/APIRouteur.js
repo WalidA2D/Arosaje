@@ -14,4 +14,7 @@ router.use('/plant', plantRoutes);
 // Routes pour les posts
 router.use('/post', postRoutes);
 
+// Routes pour les images
+router.use('/pic', postRoutes);
+
 module.exports = router;

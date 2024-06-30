@@ -1,7 +1,7 @@
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
 const { executeDBOperation, encryptMethod, validateUserInputCreation } = require('../../framework/DreamTeamUtils');
-const { addProfilePicture, getProfilePicture, deleteImage } = require('./manageProfilePictures');
+const { getProfilePicture } = require('./managePictures');
 
 const pathToDB = path.resolve(__dirname, '..', 'BASE.db');
 const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
@@ -118,9 +118,9 @@ const getUser = async (uid) => {
         const r = (await executeDBOperation(db, sql, [uid], "all"))[0];
         let ppU;
         try{
-            ppU = await getProfilePicture("profilePictures",r.idUsers+"_pp.png")
+            ppU = await getProfilePicture(r.idUsers)
         } catch (e){
-            ppU = await getProfilePicture("profilePictures","default_pp.png")
+            ppU = await getProfilePicture("default_pp.png")
         }
         let role = await getRole(r.isBotanist)
         return { 
@@ -210,13 +210,13 @@ const connexion = async (email, password) => {
         }
         let ppU;
         try{
-            ppU = await getProfilePicture("profilePictures",u.idUser+"_pp.png")
+            ppU = await getProfilePicture(u.idUser)
         } catch (e){
-            ppU = await getProfilePicture("profilePictures","default_pp.png")
+            ppU = await getProfilePicture("default")
         }
         let role = await getRole(u.isBotanist)
         return { 
-            message: "Connexion réussit !",
+            message: "Connexion ok !",
             status: 200, 
             success: true, 
             body : {
@@ -233,7 +233,7 @@ const connexion = async (email, password) => {
             } 
         };
     } catch (e) {
-        console.error('Erreur lors de la fonction de connexion', e);
+        console.error('Erreur lors de la fonction de connexion : \n', e);
         return { status: 500, success: false, message: 'Erreur interne du serveur' };
     }
 };
