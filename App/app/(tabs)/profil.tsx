@@ -64,7 +64,7 @@ export function ProfilScreen() {
   const navigation = useNavigation<ProfilScreenNavigationProp>();
   const route = useRoute<ProfilScreenRouteProp>();
   const [selectedTab, setSelectedTab] = useState('Posts');
-  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', cityName: '', email: '', address: '', phone: '' });
+  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', email: '', address: '', phone: '', profilePic: '' });
 
   const fetchProfileData = () => {
     const options = {
@@ -81,14 +81,16 @@ export function ProfilScreen() {
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          const user = data.body[0];
+          const profilePicURI = `data:image/png;base64,${data.body.profilePic.body}`;
           setProfileData({
-            lastName: user.lastName,
-            firstName: user.firstName,
-            cityName: user.cityName,
-            email: user.email,
-            address: user.address,
-            phone: user.phone,
+            lastName: data.body.lastName,
+            firstName: data.body.firstName,
+            role: data.body.role,
+            cityName: data.body.cityName,
+            email: data.body.email,
+            address: data.body.address,
+            phone: data.body.phone,
+            profilePic: profilePicURI
           });
         }
       })
@@ -137,10 +139,14 @@ export function ProfilScreen() {
       <View style={styles.header}></View>
 
       <View style={styles.profileImageContainer}>
-        <Image
-          source={require('@/assets/images/pp_base.jpg')}
-          style={styles.profileImage}
-        />
+        {profileData.profilePic ? (
+          <Image
+            source={{ uri: profileData.profilePic }}
+            style={styles.profileImage}
+          />
+        ) : (
+          <Text style={styles.errorText}>Image non disponible</Text>
+        )}
       </View>
 
       <View style={styles.fixedDetails}>
@@ -149,7 +155,7 @@ export function ProfilScreen() {
             <TouchableOpacity onPress={() => navigation.navigate('Modification', profileData)}><Ionicons name="pencil" size={25} color="#668F80" /></TouchableOpacity></Text>
           
           <TouchableOpacity onPress={() => openMap(profileData.cityName)}>
-            <Text style={styles.profileRole}>{profileData.cityName}</Text>
+            <Text style={styles.profileRole}>{profileData.role} | {profileData.cityName}</Text>
           </TouchableOpacity>
         </View>
 

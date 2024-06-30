@@ -51,7 +51,7 @@ const getProfilePicture = async (idUser) => {
             body: base64Image
         }
     } catch (e) {
-        throw e;
+        console.error(e);
     }
 };
 
