@@ -59,10 +59,10 @@ const getAllPosts = async () => {
 };
 
 // récupérer les post d'un user
-const postsOf = async (uid) => {
+const postsOf = async (idU) => {
     try {
         const sql = 'SELECT idPosts, title, description, publishedAt, dateStart, dateEnd, address, cityName, state, accepted, idUser, idPlant FROM Posts WHERE idUser = ?';
-        const rows = await executeDBOperation(db, sql, [uid], "all");
+        const rows = await executeDBOperation(db, sql, [idU], "all");
         return { 
             body: rows, 
             status: 200, 
@@ -76,9 +76,6 @@ const postsOf = async (uid) => {
         };
     }
 };
-
-// récupérer les post d'un user
-
 
 module.exports = {
     addPost,

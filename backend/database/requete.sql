@@ -28,3 +28,10 @@
 
 -- INSERT INTO Posts (title, description, dateStart, dateEnd, address, cityName, idUser, idPlant, accepted, acceptedBy)
 -- VALUES ('Exposition Florale', 'Fleurs rares', '2024-12-24', '2024-12-26', 'Jardin Botanique', 'Toulouse', 38, 160, 1, 37);
+
+-- INSERT INTO Plants (description, origin, requirements, type, idUser)
+-- VALUES ('jeune polak dans le bloc','maroc','LA LOI DU PAPIER LES TALBINZZZZZZZZZER','eau',38)
+
+
+
+

@@ -1,6 +1,7 @@
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
-const { handleDBOperation } = require('../../framework/DreamTeamUtils');
+const { executeDBOperation } = require('../../framework/DreamTeamUtils');
+const { setPlantsImages } = require('./managePictures');
 
 const pathToDB = path.resolve(__dirname, '..', 'BASE.db');
 const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
@@ -12,10 +13,18 @@ const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
 });
 
 // AJOUTER UNE PLANTE
-const addPlant = async (description, origin, requirements, type) => {
+const addPlant = async (description, origin, requirements, type, token, images) => {
     try {
-        const sql = 'INSERT INTO Plants (description, origin, requirements, type) VALUES (?, ?, ?, ?)';
-        await executeDBOperation(db, sql, [description, origin, requirements, type]);
+        const sqlIdU = 'SELECT idUsers FROM Users WHERE uid = ?'
+        const idU = (await executeDBOperation(db, sqlIdU, [token]))[0];
+
+        if(!idU) return {status:404, success:false, message:"Utilisateur non trouvé"}
+
+        const sql = 'INSERT INTO Plants (description, origin, requirements, type, iduser) VALUES (?, ?, ?, ?, ?)';
+        await executeDBOperation(db, sql, [description, origin, requirements, type, idU]);
+        
+        await setPlantsImages(images, idU)
+
         console.log("Nouvelle plante créée , Type : ",type)
         return { 
             message: "Plante créée!!!",

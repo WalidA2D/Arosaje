@@ -1,16 +1,3 @@
-const path = require('path');
-const multer = require('multer')
-const storage = (folderName) => multer.diskStorage({
-    destination: (req, file, cb) => {
-        const destinationPath = path.resolve(__dirname, '..', 'database', 'images', folderName);
-        cb(null, destinationPath);
-    },
-    filename: (req, file, cb) => {
-        const fileName = req.body.fileName; // Utiliser le nom de fichier spécifié dans le corps de la requête
-        cb(null, fileName);
-    }
-});
-const upload = (folderName) => multer({ storage: storage(folderName) }).single('image');
 
 const handleDBOperation = (operation, params = []) => {
     return new Promise((resolve, reject) => {
@@ -129,45 +116,45 @@ const uploadImage = (image, fileName, folderName) => {
     });
 };
 
-const addProfilePicture = (folderName, fileName, imageBuffer) => {
-    return new Promise((resolve, reject) => {
-        const filePath = path.resolve(__dirname, '..', 'database', 'images', folderName, fileName);
-        fs.writeFile(filePath, imageBuffer, (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve({ message: 'Image ajoutée avec succès' });
-            }
-        });
-    });
-};
+// const addProfilePicture = (folderName, fileName, imageBuffer) => {
+//     return new Promise((resolve, reject) => {
+//         const filePath = path.resolve(__dirname, '..', 'database', 'images', folderName, fileName);
+//         fs.writeFile(filePath, imageBuffer, (err) => {
+//             if (err) {
+//                 reject(err);
+//             } else {
+//                 resolve({ message: 'Image ajoutée avec succès' });
+//             }
+//         });
+//     });
+// };
 
 
-const getProfilePicture = (folderName, fileName) => {
-    return new Promise((resolve, reject) => {
-        const filePath = path.resolve(__dirname, '..', 'database', 'images', folderName, fileName);
-        fs.readFile(filePath, (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(data);
-            }
-        });
-    });
-};
+// const getProfilePicture = (folderName, fileName) => {
+//     return new Promise((resolve, reject) => {
+//         const filePath = path.resolve(__dirname, '..', 'database', 'images', folderName, fileName);
+//         fs.readFile(filePath, (err, data) => {
+//             if (err) {
+//                 reject(err);
+//             } else {
+//                 resolve(data);
+//             }
+//         });
+//     });
+// };
 
-const deleteImage = (folderName, fileName) => {
-    return new Promise((resolve, reject) => {
-        const filePath = path.resolve(__dirname, '..', 'database', 'images', folderName, fileName);
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve({ message: 'Image supprimée avec succès' });
-            }
-        });
-    });
-};
+// const deleteImage = (folderName, fileName) => {
+//     return new Promise((resolve, reject) => {
+//         const filePath = path.resolve(__dirname, '..', 'database', 'images', folderName, fileName);
+//         fs.unlink(filePath, (err) => {
+//             if (err) {
+//                 reject(err);
+//             } else {
+//                 resolve({ message: 'Image supprimée avec succès' });
+//             }
+//         });
+//     });
+// };
 
 module.exports = { 
     handleDBOperation, 
@@ -175,7 +162,7 @@ module.exports = {
     validateUserInputCreation,
     uploadImage,
     executeDBOperation,
-    addProfilePicture,
-    getProfilePicture,
-    deleteImage
+    // addProfilePicture,
+    // getProfilePicture,
+    // deleteImage
 };
