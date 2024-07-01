@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
+import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -8,9 +8,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Calendrier from '../profilnav/calendar';
 import UpdateProfil from '../profilnav/updateProfil';
-import StartApp from './index';
+import Load from '../../components/Loading'
 
 const Stack = createNativeStackNavigator();
+
 
 function ProfScreen() {
   return (
@@ -42,7 +43,6 @@ function ProfScreen() {
         />
         <Stack.Screen name="Calendrier" component={Calendrier} options={{ headerBackTitleVisible: false }} />
         <Stack.Screen name="Modification" component={UpdateProfil} options={{ headerBackTitleVisible: false }} />
-        <Stack.Screen name="Index" component={StartApp} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -64,11 +64,20 @@ type RootStackParamList = {
 type ProfilScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profil'>;
 type ProfilScreenRouteProp = RouteProp<RootStackParamList, 'Profil'>;
 
+interface Post {
+  title: string;
+  description: string;
+  publishedAt: string;
+}
+
 export function ProfilScreen() {
   const navigation = useNavigation<ProfilScreenNavigationProp>();
   const route = useRoute<ProfilScreenRouteProp>();
   const [selectedTab, setSelectedTab] = useState('Posts');
-  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', cityName: '', email: '', address: '', phone: '' });
+  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', email: '', address: '', phone: '', profilePic: '' });
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true); 
+  const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
   const fetchProfileData = () => {
     const options = {
@@ -81,19 +90,28 @@ export function ProfilScreen() {
       }),
     };
 
-    fetch('http://192.168.1.24:3000/api/user/getUser', options)
+    fetch(`${apiUrl}/api/user/getUser`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          const user = data.body[0];
+          const profilePicURI = `data:image/png;base64,${data.body.profilePic.body}`;
+          const userId = data.body.iduser;  
           setProfileData({
-            lastName: user.lastName,
-            firstName: user.firstName,
-            cityName: user.cityName,
-            email: user.email,
-            address: user.address,
-            phone: user.phone,
+            lastName: data.body.lastName,
+            firstName: data.body.firstName,
+            role: data.body.role,
+            idUser: userId,
+            cityName: data.body.cityName,
+            email: data.body.email,
+            address: data.body.address,
+            phone: data.body.phone,
+            profilePic: profilePicURI
           });
+          if (userId) {
+            fetchUserPosts(userId);
+          } else {
+            console.error('User ID is undefined');
+          }
         }
       })
       .catch(error => {
@@ -101,20 +119,28 @@ export function ProfilScreen() {
       });
   };
 
-  const checkUserToken = async () => {
-    const userToken = await AsyncStorage.getItem('userToken');
-    if (!userToken) {
-      navigation.navigate('Index');
-    }
+
+  const fetchUserPosts = (idUser: string) => {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idUser }),
+    };
+
+    fetch(`${apiUrl}/api/post/postsOf`, options)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          setPosts(data.body);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching user posts:', error);
+      })
+      .finally(() => setLoading(false)); // Mettre à jour l'état de chargement ici
   };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      checkUserToken();
-    });
-
-    return unsubscribe;
-  }, []);
 
   useEffect(() => {
     fetchProfileData();
@@ -151,15 +177,25 @@ export function ProfilScreen() {
     );
   };
 
+  if (loading) {
+    return (
+      <Load></Load>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}></View>
 
       <View style={styles.profileImageContainer}>
-        <Image
-          source={require('@/assets/images/pp_base.jpg')}
-          style={styles.profileImage}
-        />
+        {profileData.profilePic ? (
+          <Image
+            source={{ uri: profileData.profilePic }}
+            style={styles.profileImage}
+          />
+        ) : (
+          <Text style={styles.errorText}>Image non disponible</Text>
+        )}
       </View>
 
       <View style={styles.fixedDetails}>
@@ -168,7 +204,7 @@ export function ProfilScreen() {
             <TouchableOpacity onPress={() => navigation.navigate('Modification', profileData)}><Ionicons name="pencil" size={25} color="#668F80" /></TouchableOpacity></Text>
           
           <TouchableOpacity onPress={() => openMap(profileData.cityName)}>
-            <Text style={styles.profileRole}>{profileData.cityName}</Text>
+            <Text style={styles.profileRole}>{profileData.role} | {profileData.cityName}</Text>
           </TouchableOpacity>
         </View>
 
@@ -192,19 +228,13 @@ export function ProfilScreen() {
         <View style={styles.body}>
           {selectedTab === 'Posts' ? (
             <View>
-              <View style={styles.post}>
-                <Text style={styles.postTitle}>Header</Text>
-                <Text style={styles.postContent}>He'll want to use your yacht, and I don't want this thing smelling like fish.</Text>
-              </View>
-              <View style={styles.post}>
-                <Text style={styles.postTitle}>Header</Text>
-                <Text style={styles.postContent}>He'll want to use your yacht, and I don't want this thing smelling like fish.</Text>
-              </View>
-              <View style={styles.post}>
-                <Text style={styles.postTitle}>Header</Text>
-                <Text style={styles.postContent}>He'll want to use your yacht, and I don't want this thing smelling like fish.</Text>
-              </View>
-              {/* Ajoutez d'autres posts ici */}
+              {posts.map((post, index) => (
+                <View key={index} style={styles.post}>
+                  <Text style={styles.postTitle}>{post.title}</Text>
+                  <Text style={styles.postContent}>{post.description}</Text>
+                  <Text style={styles.postContent}>Publié le: {post.publishedAt}</Text>
+                </View>
+              ))}
             </View>
           ) : (
             <View>
@@ -217,7 +247,6 @@ export function ProfilScreen() {
               <View style={styles.image}>
                 <Image source={require('@/assets/images/plante3.jpg')} style={styles.imageContent} />
               </View>
-              {/* Ajoutez d'autres images ici */}
             </View>
           )}
         </View>
@@ -226,7 +255,6 @@ export function ProfilScreen() {
   );
 }
 
-// Styles pour les différents composants de l'écran
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -340,11 +368,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 200,
     resizeMode: 'cover',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   loadingText: {
     fontSize: 18,

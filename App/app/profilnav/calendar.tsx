@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
-import HeaderTitle from '../../components/HeaderTitle';
 
 // Configuration des noms des jours et des mois en français
 LocaleConfig.locales['fr'] = {
