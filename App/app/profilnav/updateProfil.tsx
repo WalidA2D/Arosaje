@@ -26,6 +26,8 @@ const UpdateProfil = () => {
   const navigation = useNavigation<UpdateProfilScreenNavigationProp>();
   const route = useRoute<UpdateProfilScreenRouteProp>();
 
+  const apiUrl = process.env.EXPO_PUBLIC_API_IP;
+
   // Déstructuration des paramètres de la route
   const { lastName, firstName, email, address, phone, cityName } = route.params;
 
@@ -99,7 +101,7 @@ const UpdateProfil = () => {
       }),
     };
 
-    fetch('http://172.17.80.1:3000/api/user/updateUser', options)
+    fetch(`${apiUrl}/api/user/updateUser`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
