@@ -11,6 +11,7 @@ import Load from '../../components/Loading'
 
 const Stack = createNativeStackNavigator();
 
+
 function ProfScreen() {
   return (
     <NavigationContainer independent={true}>
@@ -74,6 +75,7 @@ export function ProfilScreen() {
   const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', email: '', address: '', phone: '', profilePic: '' });
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true); 
+  const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
   const fetchProfileData = () => {
     const options = {
@@ -86,7 +88,7 @@ export function ProfilScreen() {
       }),
     };
 
-    fetch('http://172.17.80.1:3000/api/user/getUser', options)
+    fetch(`${apiUrl}/api/user/getUser`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -124,7 +126,7 @@ export function ProfilScreen() {
       body: JSON.stringify({ idUser }),
     };
 
-    fetch('http://172.17.80.1:3000/api/post/postsOf', options)
+    fetch(`${apiUrl}/api/post/postsOf`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -364,7 +366,6 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'cover',
   },
-  
   loadingText: {
     fontSize: 18,
     fontWeight: 'bold',
