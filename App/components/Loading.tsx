@@ -2,17 +2,17 @@ import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
 const Loading = () => (
-    <View style={styles.container}>
+    <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#668F80" />
     </View>
 );
 
 const styles = StyleSheet.create({
-    container: {
+    loadingContainer: {
         flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
-        justifyContent: 'center'
-    }
+      },
 });
 
 export default Loading;

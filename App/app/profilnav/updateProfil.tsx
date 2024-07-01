@@ -99,7 +99,7 @@ const UpdateProfil = () => {
       }),
     };
 
-    fetch('http://192.168.1.24:3000/api/user/updateUser', options)
+    fetch('http://172.17.80.1:3000/api/user/updateUser', options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
