@@ -4,13 +4,14 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import HeaderTitle from '../../../components/HeaderTitle';
+import HeaderTitle from '../../components/HeaderTitle';
+import HomeScreen from '../(tabs)/actu';
 
 type RootStackParamList = {
     ConnexionScreen: undefined;
     actu: undefined;
   };
-  
+
   type ConnexionScreenNavigationProp = StackNavigationProp<
     RootStackParamList,
     'ConnexionScreen'
@@ -24,6 +25,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
     const [email, onChangeEmail] = React.useState('a@s.d');
     const [motDePasse, onChangeMotDePasse] = React.useState('mdp');
     const [showPassword, setShowPassword] = React.useState(false);
+    const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
     const navigation = useNavigation<ConnexionScreenNavigationProp>();
 
@@ -40,13 +42,13 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
                 }),
             };
 
-            const response = await fetch('http://192.168.1.101:3000/api/user/connexion', options);
+            const response = await fetch(`http://172.16.2.17:3000/api/user/connexion`, options);
             const data = await response.json();
 
             if (data.success) {
                 await AsyncStorage.setItem('userToken', data.body.token);
                 setIsModalVisible(false, 'connexion');
-                navigation.navigate('actu');
+                navigation.navigate('(tabs)');
             } else {
                 Alert.alert("Échec", "Email ou mot de passe incorrect");
             }
@@ -60,7 +62,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
             const userToken = await AsyncStorage.getItem('userToken');
             if (userToken) {
                 setIsModalVisible(false, 'connexion');
-                navigation.navigate('actu');
+                navigation.navigate('(tabs)');
             }
         };
 

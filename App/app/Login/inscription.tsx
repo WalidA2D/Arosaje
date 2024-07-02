@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { WebView } from 'react-native-webview';
 import { StyleSheet, View } from 'react-native';
-import Loading from '../../../components/Loading';
-import HeaderTitle from '../../../components/HeaderTitle';
+import Loading from '../../components/Loading';
+import HeaderTitle from '../../components/HeaderTitle';
 
 export default function InscriptionScreen() {
     const [loading, setLoading] = useState(true);

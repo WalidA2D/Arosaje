@@ -15,7 +15,6 @@ import Botaniste from '../optnav/botaniste';
 import Question from '../optnav/question';
 import Donnees from '../optnav/donnees';
 import InfoLeg from '../optnav/infoleg';
-import StartApp from './index';
 
 const Stack = createNativeStackNavigator();
 
@@ -64,10 +63,6 @@ function OptionsScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
-      <Stack.Screen name="Index" component={StartApp}
-        options={{
-          headerBackTitleVisible: false
-      }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -79,7 +74,7 @@ function OptionsContent({ }) {
   const checkUserToken = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     if (!userToken) {
-      navigation.navigate('Index');
+      navigation.navigate('index');
     }
   };
 
@@ -93,7 +88,7 @@ function OptionsContent({ }) {
 
   const handleLogout = async () => {
   await AsyncStorage.removeItem('userToken');
-  navigation.navigate('Index');
+  navigation.navigate('index');
   };
 
   return (
