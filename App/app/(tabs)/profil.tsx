@@ -78,11 +78,6 @@ export function ProfilScreen() {
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
   const fetchProfileData = () => {
-    if (!apiUrl) {
-      console.error('API URL is not defined');
-      return;
-    }
-
     const options = {
       method: 'POST',
       headers: {
@@ -123,11 +118,6 @@ export function ProfilScreen() {
   };
 
   const fetchUserPosts = (idUser: string) => {
-    if (!apiUrl) {
-      console.error('API URL is not defined');
-      return;
-    }
-
     const options = {
       method: 'POST',
       headers: {

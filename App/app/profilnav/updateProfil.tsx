@@ -11,7 +11,6 @@ type RootStackParamList = {
     token: string;
     lastName: string;
     firstName: string;
-    email: string;
     address: string;
     phone: string;
     cityName: string;
@@ -29,12 +28,11 @@ const UpdateProfil = () => {
   const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
   // Déstructuration des paramètres de la route
-  const { lastName, firstName, email, address, phone, cityName } = route.params;
+  const { lastName, firstName, address, phone, cityName } = route.params;
 
   // État local pour les champs de mise à jour du profil
   const [newLastName, setNewLastName] = useState(lastName);
   const [newFirstName, setNewFirstName] = useState(firstName);
-  const [newEmail, setNewEmail] = useState(email);
   const [newAddress, setNewAddress] = useState(address);
   const [newPhone, setNewPhone] = useState(phone);
   const [newCityName, setNewCityName] = useState(cityName);
@@ -51,11 +49,7 @@ const UpdateProfil = () => {
   const [isPhoneEditable, setIsPhoneEditable] = useState(false);
   const [isCityNameEditable, setIsCityNameEditable] = useState(false);
 
-  // Fonction de validation de l'email
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+
 
   // Fonction de validation du téléphone
   const validatePhone = (phone: string) => {
@@ -70,11 +64,6 @@ const UpdateProfil = () => {
 
     // Valider les champs
     let valid = true;
-
-    if (!validateEmail(newEmail)) {
-      setEmailError('Veuillez entrer un email valide.');
-      valid = false;
-    }
 
     if (!validatePhone(newPhone)) {
       setPhoneError('Veuillez entrer un numéro de téléphone valide (10 chiffres).');
@@ -94,7 +83,6 @@ const UpdateProfil = () => {
         token: 'OWb.RO]cReozwr^o!w#D', // token de l'utilisateur à mettre à jour
         lastName: newLastName,
         firstName: newFirstName,
-        email: newEmail,
         address: newAddress,
         cityName: newCityName,
         phone: newPhone,
@@ -148,22 +136,6 @@ const UpdateProfil = () => {
                 <Ionicons name={isFirstNameEditable ? "close" : "pencil"} size={20} color="#668F80" />
               </TouchableOpacity>
             </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email:</Text>
-            <View style={styles.row}>
-              <TextInput
-                style={[styles.input, isEmailEditable && styles.editableInput]}
-                value={newEmail}
-                editable={isEmailEditable}
-                onChangeText={(text) => { setNewEmail(text); setEmailError(''); }}
-              />
-              <TouchableOpacity onPress={() => setIsEmailEditable(!isEmailEditable)}>
-                <Ionicons name={isEmailEditable ? "close" : "pencil"} size={20} color="#668F80" />
-              </TouchableOpacity>
-            </View>
-            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
           </View>
 
           <View style={styles.inputContainer}>

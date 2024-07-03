@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, forwardRef } from 'react';
+import { useImperativeHandle, forwardRef } from 'react';
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -10,8 +10,6 @@ interface ProfileImagePopupProps {
 
 const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
   const { apiUrl, token, setProfileData } = props;
-  console.log(apiUrl)
-  console.log(token)
 
   const handleImportImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -42,7 +40,8 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
     return new Promise<string>((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        resolve(reader.result as string);
+        const base64String = reader.result as string;
+        resolve(base64String.split(',')[1]); // get only the base64 part
       };
       reader.onerror = reject;
       reader.readAsDataURL(blob);
@@ -61,7 +60,7 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
       }),
     };
   
-    fetch(`${apiUrl}/api/user/setPP`, options)
+    fetch(`${apiUrl}/api/pic/setPP`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
@@ -89,7 +88,7 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
       }),
     };
   
-    fetch(`${apiUrl}/api/user/resetPP`, options)
+    fetch(`${apiUrl}/api/pic/resetPP`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
