@@ -40,7 +40,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
                 }),
             };
 
-            const response = await fetch(`http://172.16.2.17:3000/api/user/connexion`, options);
+            const response = await fetch(`${apiUrl}/api/user/connexion`, options);
             const data = await response.json();
 
             if (data.success) {
