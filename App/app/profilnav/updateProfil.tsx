@@ -38,13 +38,11 @@ const UpdateProfil = () => {
   const [newCityName, setNewCityName] = useState(cityName);
 
   // États pour les messages d'erreur
-  const [emailError, setEmailError] = useState('');
   const [phoneError, setPhoneError] = useState('');
 
   // États pour verrouiller/déverrouiller les champs
   const [isLastNameEditable, setIsLastNameEditable] = useState(false);
   const [isFirstNameEditable, setIsFirstNameEditable] = useState(false);
-  const [isEmailEditable, setIsEmailEditable] = useState(false);
   const [isAddressEditable, setIsAddressEditable] = useState(false);
   const [isPhoneEditable, setIsPhoneEditable] = useState(false);
   const [isCityNameEditable, setIsCityNameEditable] = useState(false);
@@ -59,7 +57,6 @@ const UpdateProfil = () => {
 
   const ModifSubmit = () => {
     // Réinitialiser les messages d'erreur
-    setEmailError('');
     setPhoneError('');
 
     // Valider les champs
