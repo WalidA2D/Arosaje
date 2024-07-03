@@ -1,23 +1,63 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, TextInput, Dimensions, FlatList, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Button, ScrollView, TextInput } from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import ContentItem from '../../components/navigation/ContentItem';
-import HeaderTitle from '../../components/HeaderTitle';
+import Filtre from '../actunav/actufiltre';
 
+type RootStackParamList = {
+  Actualités: undefined;
+  Filtre: undefined;
+};
 
-export default function HomeScreen() {
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+function HomeScreen({ }) {
+  return (
+    <NavigationContainer independent={true}>
+    <Stack.Navigator
+      initialRouteName="Actualités"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#668F80',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          color: '#FFF',
+          fontSize: 24,
+          fontWeight: 'bold',
+        },
+      }}
+    >
+    <Stack.Screen
+      name="Actualités"
+      component={HomeContent}
+      options={({ navigation }) => ({
+        headerRight: () => (
+          <Button
+            onPress={() => navigation.navigate('Filtre')}
+            title="Filtre"
+            color="#fff"
+          />
+        ),
+      })}
+    />
+    <Stack.Screen
+      name="Filtre"
+      component={Filtre}
+      options={{ headerBackTitleVisible: false }}
+    />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+function HomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <>
       <View style={styles.container}>
-        <View style={styles.header}>
-        <HeaderTitle title="Accueil" />
-          <View style={styles.headerContent}>
-            <TouchableOpacity style={styles.headerButton}>
-              <Text style={styles.headerButtonText}>Filtrer</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
 
         <View style={styles.searchContainer}>
           <TextInput
@@ -52,7 +92,6 @@ export default function HomeScreen() {
           </View>
         </ScrollView>
       </View>
-    </>
   );
 }
 
@@ -60,28 +99,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFF',
-  },
-  header: {
-    height: 100,
-    backgroundColor: '#668F80',
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    paddingTop: 20,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    position: 'relative',
-  },
-  headerButton: {
-    position: 'absolute',
-    right: 10,
-    padding: 10,
-  },
-  headerButtonText: {
-    color: '#FFF',
-    fontSize: 16,
   },
   searchContainer: {
     marginTop: 10,
@@ -107,3 +124,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
 });
+
+export default HomeScreen;

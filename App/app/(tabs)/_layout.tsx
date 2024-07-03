@@ -55,31 +55,16 @@ export default function TabLayout() {
           ),
         }}
       />
-        <Tabs.Screen
-        name="Login/connexion"
-        options={{
-          title: 'Connexion',
-          tabBarButton: () => null,
-        }}
-      />
-        <Tabs.Screen
-        name="Login/inscription"
-        options={{
-          title: 'inscription',
-          tabBarButton: () => null,
-        }}
-      />
-        <Tabs.Screen
+      <Tabs.Screen
         name="index"
         options={{
-          title: 'startscreen',
+          title: 'Index',
+          tabBarStyle: {display : 'none'},
           tabBarButton: () => null,
-          tabBarStyle: { display: 'none' }
         }}
       />
     </Tabs>
 
-    
   );
 }
 

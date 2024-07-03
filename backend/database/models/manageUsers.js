@@ -116,12 +116,7 @@ const getUser = async (uid) => {
     try {
         const sql = 'SELECT idUsers, lastName, firstName, email, address, phone, cityName, isBotanist FROM Users WHERE Users.uid = ?';
         const r = (await executeDBOperation(db, sql, [uid], "all"))[0];
-        let ppU;
-        try{
-            ppU = await getProfilePicture(r.idUsers)
-        } catch (e){
-            ppU = await getProfilePicture("default_pp.png")
-        }
+        let ppU = await getProfilePicture(r.idUsers)
         let role = await getRole(r.isBotanist)
         return { 
             body: {
@@ -207,12 +202,7 @@ const connexion = async (email, password) => {
         if (encryptedPassword !== u.password) {
             return { status: 401, success: false, message: 'Mot de passe incorrect' };
         }
-        let ppU;
-        try{
-            ppU = await getProfilePicture(u.idUser)
-        } catch (e){
-            ppU = await getProfilePicture("default")
-        }
+        let ppU = await getProfilePicture(u.idUsers)
         let role = await getRole(u.isBotanist)
         return { 
             message: "Connexion ok !",

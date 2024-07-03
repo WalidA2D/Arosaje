@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ProfileImagePopup from '../profilnav/ProfileImagePopup';
 import Calendrier from '../profilnav/calendar';
@@ -76,23 +77,25 @@ export function ProfilScreen() {
   const [loading, setLoading] = useState(true); 
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
-  const fetchProfileData = () => {
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token: 'OWb.RO]cReozwr^o!w#D',
-      }),
-    };
+  const fetchProfileData = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    console.log(userToken)
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                token: userToken,
+            }),
+    }
 
     fetch(`${apiUrl}/api/user/getUser`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
           const profilePicURI = `data:image/png;base64,${data.body.profilePic.body}`;
-          const userId = data.body.iduser;  
+          const userId = data.body.iduser;
           setProfileData({
             lastName: data.body.lastName,
             firstName: data.body.firstName,

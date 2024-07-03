@@ -4,10 +4,12 @@ import { useNavigation, NavigationContainer } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MessageScreen from '../convnav/messages';
 import ChatbotScreen from '../convnav/bot'; 
 import Histoire from '../convnav/botnav/histoire';
+import StartApp from './index';
 
 type RootStackParamList = {
   Conversations: undefined;

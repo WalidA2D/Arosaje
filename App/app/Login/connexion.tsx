@@ -1,37 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import HeaderTitle from '../../../components/HeaderTitle';
+import HeaderTitle from '../../components/HeaderTitle';
 
-// Définir les types des paramètres de navigation
-type RootStackParamList = {
-    ConnexionScreen: undefined;
-    actu: undefined;
-  };
-  
-  // Définir le type de navigation pour l'écran de profil
-  type ConnexionScreenNavigationProp = StackNavigationProp<
-    RootStackParamList,
-    'ConnexionScreen'
-  >;
+  interface ConnexionScreenProps {
+    setIsModalVisible: (isVisible: boolean, type: string) => void;
+}
 
-export default function ConnexionScreen() {
-    const [email, onChangeEmail] = React.useState('a@a.com');
-    const [motDePasse, onChangeMotDePasse] = React.useState('123');
+export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenProps) {
+    const [email, onChangeEmail] = React.useState('a@s.d');
+    const [motDePasse, onChangeMotDePasse] = React.useState('mdp');
     const [showPassword, setShowPassword] = React.useState(false);
+    const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
-    const navigation = useNavigation<ConnexionScreenNavigationProp>();
+    const navigation = useNavigation();
 
-    function handleLogin() {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex simple pour validation d'email
-        if (emailRegex.test(email) && motDePasse.length > 0) {
-          navigation.navigate('actu');
-        } else {
-          Alert.alert("Échec", "Email non conforme ou mot de passe incorrect");
+    const handleLogin = async () => {
+        try {
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: motDePasse,
+                }),
+            };
+
+            const response = await fetch(`${apiUrl}/api/user/connexion`, options);
+            const data = await response.json();
+
+            if (data.success) {
+                await AsyncStorage.setItem('userToken', data.body.token);
+                setIsModalVisible(false, 'connexion');
+                navigation.navigate('(tabs)');
+            } else {
+                Alert.alert("Échec", "Email ou mot de passe incorrect");
+            }
+        } catch (error) {
+            console.error('Erreur lors de la vérification de la connexion:', error);
         }
-      }
+    };
+
+    useEffect(() => {
+        const checkToken = async () => {
+            const userToken = await AsyncStorage.getItem('userToken');
+            if (userToken) {
+                setIsModalVisible(false, 'connexion');
+                navigation.navigate('(tabs)');
+            }
+        };
+
+        checkToken();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -73,9 +98,7 @@ export default function ConnexionScreen() {
 
         <View style={styles.selectorContainer}>
 
-            <TouchableOpacity style={styles.selectorButton} onPress={() => {
-            handleLogin();
-            }}>
+            <TouchableOpacity style={styles.selectorButton} onPress={() => { handleLogin(); }}>
                 <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Connexion</Text>
             </TouchableOpacity>
 

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import BigButtonDown from '../../components/BigButtonDown';
 import ListDash from '../../components/ListDash';
@@ -14,6 +15,7 @@ import PubDesc from '../pubnav/pubdesc';
 import PubLoca from '../pubnav/publoca';
 import PubEspece from '../pubnav/pubespece';
 import PubEntretien from '../pubnav/pubentretien';
+import StartApp from './index';
 
 const Stack = createNativeStackNavigator();
 
@@ -62,6 +64,7 @@ function PublierScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
+      <Stack.Screen name="Index" component={StartApp} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
