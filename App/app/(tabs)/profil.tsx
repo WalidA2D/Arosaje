@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import ProfileImagePopup from '../profilnav/ProfileImagePopup';
 import Calendrier from '../profilnav/calendar';
 import UpdateProfil from '../profilnav/updateProfil';
-import Load from '../../components/Loading'
+import Load from '../../components/Loading';
 
 const Stack = createNativeStackNavigator();
-
 
 function ProfScreen() {
   return (
@@ -75,7 +75,7 @@ export function ProfilScreen() {
   const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', email: '', address: '', phone: '', profilePic: '' });
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true); 
-  const apiUrl = process.env.EXPO_PUBLIC_API_IP;
+  const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
   const fetchProfileData = () => {
     const options = {
@@ -136,7 +136,7 @@ export function ProfilScreen() {
       .catch(error => {
         console.error('Error fetching user posts:', error);
       })
-      .finally(() => setLoading(false)); // Mettre à jour l'état de chargement ici
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -174,6 +174,8 @@ export function ProfilScreen() {
     );
   };
 
+  const popupRef = useRef<any>(null);
+
   if (loading) {
     return (
       <Load></Load>
@@ -182,14 +184,17 @@ export function ProfilScreen() {
 
   return (
     <View style={styles.container}>
+      <ProfileImagePopup ref={popupRef} apiUrl={apiUrl} token="OWb.RO]cReozwr^o!w#D" setProfileData={setProfileData} />
       <View style={styles.header}></View>
 
       <View style={styles.profileImageContainer}>
         {profileData.profilePic ? (
-          <Image
-            source={{ uri: profileData.profilePic }}
-            style={styles.profileImage}
-          />
+          <TouchableOpacity onPress={() => popupRef.current.showPopup()}>
+            <Image
+              source={{ uri: profileData.profilePic }}
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
         ) : (
           <Text style={styles.errorText}>Image non disponible</Text>
         )}
