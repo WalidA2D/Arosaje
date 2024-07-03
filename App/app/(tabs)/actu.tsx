@@ -63,9 +63,7 @@ function HomeContent() {
 
   const checkUserToken = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
-    if (!userToken) {
-      navigation.navigate('Index');
-    }
+    console.log(userToken)
   };
 
   useEffect(() => {

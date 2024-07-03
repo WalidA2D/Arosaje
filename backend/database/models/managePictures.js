@@ -41,9 +41,16 @@ const addPicture = async (folderName, fileName, base64Data) => {
 
 const getProfilePicture = async (idUser) => {
     try {
+        const defaultPicPath = path.resolve(__dirname, '..', 'images', "profilePictures", `default_pp.${extPic}`)
         const fileName = idUser + "_pp." + extPic
         const filePath = path.resolve(__dirname, '..', 'images', "profilePictures", fileName);
-        const data = await fs.readFile(filePath);
+
+        let data;
+        try{
+            data = await fs.readFile(filePath);
+        } catch (e) {
+            data = await fs.readFile(defaultPicPath)
+        }
         const base64Image = data.toString('base64'); //conversion en base64
         return {
             status: 200,

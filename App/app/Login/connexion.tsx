@@ -5,11 +5,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HeaderTitle from '../../components/HeaderTitle';
-import HomeScreen from '../(tabs)/actu';
 
 type RootStackParamList = {
     ConnexionScreen: undefined;
-    actu: undefined;
   };
 
   type ConnexionScreenNavigationProp = StackNavigationProp<
