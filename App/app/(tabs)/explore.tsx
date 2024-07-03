@@ -16,7 +16,6 @@ type RootStackParamList = {
   Message: { userName: string; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }> };
   Chatbot: undefined;
   Histoire: undefined;
-  Index: undefined;
 };
 
 type ExploreScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Conversations'>;
@@ -44,7 +43,6 @@ function ConvScreen() {
         <Stack.Screen name="Message" component={MessageScreen} options={{ headerBackTitleVisible: false }} />
         <Stack.Screen name="Chatbot" component={ChatbotScreen} options={{ headerBackTitleVisible: false }} />
         <Stack.Screen name="Histoire" component={Histoire} options={{ headerBackTitleVisible: false }} />
-        <Stack.Screen name="Index" component={StartApp} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -155,21 +153,6 @@ export function ExploreScreen() {
     setIsSelecting(false);
     setSelectedUsers([]);
   };
-
-  const checkUserToken = async () => {
-    const userToken = await AsyncStorage.getItem('userToken');
-    if (!userToken) {
-      navigation.navigate('Index');
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      checkUserToken();
-    });
-
-    return unsubscribe;
-  }, []);
 
   return (
     <View style={styles.container}>

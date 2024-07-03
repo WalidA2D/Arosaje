@@ -2,16 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Button, ScrollView, TextInput } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import ContentItem from '../../components/navigation/ContentItem';
 import Filtre from '../actunav/actufiltre';
-import StartApp from './index';
 
 type RootStackParamList = {
   Actualités: undefined;
   Filtre: undefined;
-  Index: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -51,7 +48,6 @@ function HomeScreen({ }) {
       component={Filtre}
       options={{ headerBackTitleVisible: false }}
     />
-      <Stack.Screen name="Index" component={StartApp} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -59,20 +55,6 @@ function HomeScreen({ }) {
 
 function HomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
-  const navigation = useNavigation();
-
-  const checkUserToken = async () => {
-    const userToken = await AsyncStorage.getItem('userToken');
-    console.log(userToken)
-  };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      checkUserToken();
-    });
-
-    return unsubscribe;
-  }, []);
 
   return (
       <View style={styles.container}>

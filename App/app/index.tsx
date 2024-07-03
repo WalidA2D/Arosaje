@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Modal, Button } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Image, Modal } from 'react-native';
 import { HelloWave } from '../components/HelloWave';
 
 import ConnexionScreen from './Login/connexion';

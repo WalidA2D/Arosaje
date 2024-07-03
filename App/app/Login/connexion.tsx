@@ -6,15 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import HeaderTitle from '../../components/HeaderTitle';
 
-type RootStackParamList = {
-    ConnexionScreen: undefined;
-  };
-
-  type ConnexionScreenNavigationProp = StackNavigationProp<
-    RootStackParamList,
-    'ConnexionScreen'
-  >;
-
   interface ConnexionScreenProps {
     setIsModalVisible: (isVisible: boolean, type: string) => void;
 }
@@ -25,7 +16,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
     const [showPassword, setShowPassword] = React.useState(false);
     const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
-    const navigation = useNavigation<ConnexionScreenNavigationProp>();
+    const navigation = useNavigation();
 
     const handleLogin = async () => {
         try {

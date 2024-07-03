@@ -74,7 +74,7 @@ function OptionsContent({ }) {
   const checkUserToken = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     if (!userToken) {
-      navigation.navigate('index');
+      navigation.navigate('index', { screen: 'index' });
     }
   };
 
@@ -88,7 +88,7 @@ function OptionsContent({ }) {
 
   const handleLogout = async () => {
   await AsyncStorage.removeItem('userToken');
-  navigation.navigate('index');
+  navigation.navigate('index', { screen: 'index' });
   };
 
   return (

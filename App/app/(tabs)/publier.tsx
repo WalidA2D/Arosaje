@@ -73,21 +73,6 @@ function PublierScreen({ }) {
 function PublierContent() {
   const navigation = useNavigation<StackNavigationProp<any>>();
 
-  const checkUserToken = async () => {
-    const userToken = await AsyncStorage.getItem('userToken');
-    if (!userToken) {
-      navigation.navigate('Index');
-    }
-  };
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      checkUserToken();
-    });
-
-    return unsubscribe;
-  }, []);
-
   return (
     <View style={styles.container}>
 

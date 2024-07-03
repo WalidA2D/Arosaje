@@ -28,7 +28,7 @@ export default function RootLayout() {
     console.log(userToken);
 
     if (!userToken) {
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+      return <Stack.Screen name="index" options={{ headerShown: false }} />;
     }
   };
 
