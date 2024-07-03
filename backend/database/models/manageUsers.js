@@ -150,11 +150,11 @@ const getUser = async (uid) => {
 };
 
 // UPDATE UN USER
-const updateUser = async (uid, lastName, firstName, email, address, phone, cityName) => {
+const updateUser = async (uid, lastName, firstName, address, phone, cityName) => {
     try {
 
-        const sql = 'UPDATE Users SET lastName = ?, firstName = ?, email = ?, address = ?, phone = ?, cityName = ? WHERE uid = ?';
-        await executeDBOperation(db, sql, [lastName, firstName, email, address, phone, cityName, uid]);
+        const sql = 'UPDATE Users SET lastName = ?, firstName = ?, address = ?, phone = ?, cityName = ? WHERE uid = ?';
+        await executeDBOperation(db, sql, [lastName, firstName, address, phone, cityName, uid], "all");
 
         const u = (await getUser(uid)).body
         if(u == undefined) {
@@ -169,7 +169,6 @@ const updateUser = async (uid, lastName, firstName, email, address, phone, cityN
                 "idUser":u.idUsers,
                 "lastName":u.lastName,
                 "firstName":u.firstName,
-                "email":u.email,
                 "address":u.address,
                 "cityName":u.cityName,
                 "phone":u.phone

@@ -52,7 +52,6 @@ type RootStackParamList = {
   Modification: {
     lastName: string;
     firstName: string;
-    email: string;
     address: string;
     phone: string;
     cityName: string;
@@ -72,7 +71,7 @@ export function ProfilScreen() {
   const navigation = useNavigation<ProfilScreenNavigationProp>();
   const route = useRoute<ProfilScreenRouteProp>();
   const [selectedTab, setSelectedTab] = useState('Posts');
-  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', email: '', address: '', phone: '', profilePic: '' });
+  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', address: '', phone: '', profilePic: '' });
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true); 
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
@@ -100,7 +99,6 @@ export function ProfilScreen() {
             role: data.body.role,
             idUser: userId,
             cityName: data.body.cityName,
-            email: data.body.email,
             address: data.body.address,
             phone: data.body.phone,
             profilePic: profilePicURI
