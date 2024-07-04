@@ -79,7 +79,6 @@ export function ProfilScreen() {
 
   const fetchProfileData = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
-    console.log(userToken)
         const options = {
             method: 'POST',
             headers: {
@@ -185,7 +184,7 @@ export function ProfilScreen() {
 
   return (
     <View style={styles.container}>
-      <ProfileImagePopup ref={popupRef} apiUrl={apiUrl} token="OWb.RO]cReozwr^o!w#D" setProfileData={setProfileData} />
+      <ProfileImagePopup ref={popupRef} apiUrl={apiUrl} setProfileData={setProfileData} />
       <View style={styles.header}></View>
 
       <View style={styles.profileImageContainer}>

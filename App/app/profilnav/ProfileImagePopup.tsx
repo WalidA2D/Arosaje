@@ -1,15 +1,16 @@
 import { useImperativeHandle, forwardRef } from 'react';
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ProfileImagePopupProps {
   apiUrl: string;
-  token: string;
   setProfileData: (data: any) => void;
 }
 
 const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
-  const { apiUrl, token, setProfileData } = props;
+
+  const { apiUrl, setProfileData } = props;
 
   const handleImportImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -48,14 +49,15 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
     });
   };
 
-  const updateProfilePicture = (base64Image: string) => {
+  const updateProfilePicture = async (base64Image: string) => {
+    const userToken = await AsyncStorage.getItem('userToken');
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        token,
+        token: userToken,
         file: base64Image,
       }),
     };
@@ -77,14 +79,15 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
       });
   };
   
-  const handleResetProfilePic = () => {
+  const handleResetProfilePic = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        token,
+        token : userToken,
       }),
     };
   
@@ -94,10 +97,10 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
         if (data.success) {
           setProfileData((prevState: any) => ({
             ...prevState,
-            profilePic: data.body.defaultPic,
+            profilePic: `data:image/png;base64,${data.body.body}`,
           }));
         } else {
-          console.error('Failed to reset profile picture:', data.message);
+          console.error('Failed to reset profile picture');
         }
       })
       .catch(error => {

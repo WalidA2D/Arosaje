@@ -119,7 +119,7 @@ const resetPP = async(token) => {
 
         const ppU = await getProfilePicture("default")
 
-        return  { message:"PP bien réinitialisée", status: 400, success: false, body : ppU }
+        return  { message:"PP bien réinitialisée", status: 200, success: true, body : ppU }
     } catch (e){
         console.error("Erreur lors de la fonction resetPP : \n",e)
         return { 

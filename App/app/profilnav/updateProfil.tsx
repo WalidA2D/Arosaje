@@ -3,6 +3,7 @@ import { View, Text, TextInput, StyleSheet, Alert, ScrollView, TouchableOpacity 
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Définition des types pour les paramètres de navigation
 type RootStackParamList = {
@@ -55,7 +56,7 @@ const UpdateProfil = () => {
     return phoneRegex.test(phone);
   };
 
-  const ModifSubmit = () => {
+  const ModifSubmit = async () => {
     // Réinitialiser les messages d'erreur
     setPhoneError('');
 
@@ -70,7 +71,7 @@ const UpdateProfil = () => {
     if (!valid) {
       return;
     }
-
+    const userToken = await AsyncStorage.getItem('userToken');
     const options = {
       method: 'POST',
       headers: {
