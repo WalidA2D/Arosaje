@@ -10,8 +10,8 @@ import HeaderTitle from '../../components/HeaderTitle';
 }
 
 export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenProps) {
-    const [email, onChangeEmail] = React.useState('a@s.d');
-    const [motDePasse, onChangeMotDePasse] = React.useState('mdp');
+    const [email, onChangeEmail] = React.useState('w@mail.com');
+    const [motDePasse, onChangeMotDePasse] = React.useState('azerty');
     const [showPassword, setShowPassword] = React.useState(false);
     const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 

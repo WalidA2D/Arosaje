@@ -34,11 +34,12 @@ router.get('/getPosts', async (req, res) => {
 
 router.post('/postsOf', async (req, res) => {
     try {
-        const response = await managePosts.postsOf(req.body.idUser);
+        const { idUser, page } = req.body;
+        const response = await managePosts.postsOf(idUser, page);
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route postsOf : \n', e);
-        res.json({ status: 500, success: false, message: 'Erreur interne du serveur'});
+        res.json({ status: 500, success: false, message: 'Erreur interne du serveur' });
     }
 });
 
