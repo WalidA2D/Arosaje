@@ -1,8 +1,9 @@
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 
 export default function NotFoundScreen() {
   return (
     <View style={styles.container}>
+      <Text>Erreur 404</Text>
     </View>
   );
 }

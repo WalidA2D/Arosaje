@@ -149,9 +149,7 @@ const setPlantsImages = async(images, idU, idP) => {
             success: false 
         }
     }
-};
-
-const setPostImages = async(images,)
+}
 
 module.exports = { 
     addPicture,
