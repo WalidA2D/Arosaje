@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Modal } from 'react-native';
 
 import BigButtonDown from '../../components/BigButtonDown';
 import ListDash from '../../components/ListDash';
@@ -15,6 +16,8 @@ import Botaniste from '../optnav/botaniste';
 import Question from '../optnav/question';
 import Donnees from '../optnav/donnees';
 import InfoLeg from '../optnav/infoleg';
+
+import Restart from './index'
 
 const Stack = createNativeStackNavigator();
 
@@ -70,11 +73,20 @@ function OptionsScreen({ }) {
 
 function OptionsContent({ }) {
   const navigation = useNavigation<StackNavigationProp<any>>();
+  const [modalType, setModalType] = useState('');
+
+  const setModalVisible = (isVisible: boolean, modalType: string) => {
+    if (isVisible) {
+      setModalType(modalType);
+    } else {
+      setModalType('');
+    }
+  };
 
   const checkUserToken = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     if (!userToken) {
-      navigation.navigate('index', { screen: 'index' });
+      setModalVisible(true, 'index')
     }
   };
 
@@ -88,7 +100,7 @@ function OptionsContent({ }) {
 
   const handleLogout = async () => {
   await AsyncStorage.removeItem('userToken');
-  navigation.navigate('index', { screen: 'index' });
+  setModalVisible(true, 'index')
   };
 
   return (
@@ -110,6 +122,13 @@ function OptionsContent({ }) {
         <View style={styles.separatorDetails}/>
       </View>
       <BigButtonDown buttonText="Déconnecter" onPress={handleLogout} />
+      <Modal
+          visible={modalType === 'index'}
+          animationType="slide"
+          transparent={true}
+        >
+          <Restart setIsModalVisible={(isVisible, type) => setModalVisible(isVisible, type)}/>
+        </Modal>
     </View>
   );
 }

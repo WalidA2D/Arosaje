@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Modal } from 'react-native';
-import { HelloWave } from '../components/HelloWave';
 
 import ConnexionScreen from './Login/connexion';
 import InscriptionScreen from './Login/inscription';
@@ -18,8 +17,7 @@ export default function StartApp() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>LOGO</Text>
-      <HelloWave />
+      <Image source={require('../assets/images/Arosaje.png')} style={[styles.logo, {width: 170, height: 170,}]}/>
       <View style={styles.fixedDetailsBtn}>
         <View style={styles.selectorContainer}>
           <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true, 'connexion')}>
