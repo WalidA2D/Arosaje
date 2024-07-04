@@ -129,19 +129,19 @@ const resetPP = async(token) => {
     }
 }
 
-const setPlantsImages = async (images, idU) => {
+const setPlantsImages = async(images, idU, idP) => {
     try {
-        let i = 0;
+        let i = 0
+        let folderPath = path.resolve(__dirname,"..","images","plants",idP)
+        await fs.mkdir(folderPath);
         for (let image of images) {
-            const sql = 'INSERT INTO Plants (description, origin, requirements, type, idUser) VALUES (?, ?, ?, ?, ?)';
-            await executeDBOperation(db, sql, [description, origin, requirements, type, idU]);
+            let plantName = `${idU}_${idP}_${i}`
+            const sqlAddPlantImage = 'INSERT INTO Images (title,url,idPlant) VALUES (?,?,?)'
+            await executeDBOperation(db, sqlAddPlantImage, [, folderPath, idP]);
 
-            const sqlAddPath = 'INSERT INTO Images (title,url,idPlant) VALUES (?,?,?)'
-            await executeDBOperation(db, sql, [type, origin, requirements, type, idU]);
-
-            await addPicture("plants", `${idU}_plant`, image);
+            await addPicture(`plants\\${idP}`, `plantName.${extPic}`, image);
         }
-        return { message: 'Toutes les images ont été ajoutées avec succès', success: true };
+        return { message: 'Toutes les images ont été ajoutées avec succès', status:200, success: true };
     } catch (e) {
         console.error("Erreur lors de la fonction setPostImages : \n", e);
         return { 
@@ -150,6 +150,8 @@ const setPlantsImages = async (images, idU) => {
         }
     }
 };
+
+const setPostImages = async(images,)
 
 module.exports = { 
     addPicture,

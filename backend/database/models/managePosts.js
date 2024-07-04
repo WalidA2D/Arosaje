@@ -40,12 +40,13 @@ const addPost = async (title, description, dateStart, dateEnd, address, cityName
 };
 
 // LIRE TOUS LES POSTS
-const getAllPosts = async () => {
+const getAllPosts = async (rStart, rStop) => {
     try {
-        const sql = 'SELECT idPosts, title, description, publishedAt, dateStart, dateEnd, address, cityName, state, accepted, idUser, idPlant FROM Posts';
-        const rows = await executeDBOperation(db, sql, [], "all");
+        if(!rStart || !rStop) return { message: "" }
+        const sql = 'SELECT idPosts, title, description, publishedAt, dateStart, dateEnd, address, cityName, state, accepted, idUser, idPlant FROM Posts ORDER BY publishedAt DESC LIMIT ? OFFSET ?';
+        const rows = await executeDBOperation(db, sql, [rStart, rStop], "all");
         return { 
-            body: rows, 
+            body: rows,
             status: 200, 
             success: true 
         };

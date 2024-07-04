@@ -19,7 +19,7 @@ app.use('/api', apiRouter);
 app.use(express.static(path.resolve(__dirname, '..', 'Web', 'Public')));
 app.use('/page', express.static(path.resolve(__dirname, '..', "Web","page")))
 app.use('/asset', express.static(path.resolve(__dirname, '..', "Web","asset")))
-app.get('/', (req, res) => {
+app.get('/', (res) => {
   res.sendFile('index.html', { root: path.resolve(__dirname, '..', '..', 'Web', 'Public') });
 });
 
