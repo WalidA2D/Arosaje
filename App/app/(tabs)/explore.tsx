@@ -9,11 +9,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MessageScreen from '../convnav/messages';
 import ChatbotScreen from '../convnav/bot'; 
 import Histoire from '../convnav/botnav/histoire';
-import StartApp from './index';
+import Profil from '../convnav/profilconsulte';
 
 type RootStackParamList = {
   Conversations: undefined;
   Message: { userName: string; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }> };
+  Profil: { userName: string };
   Chatbot: undefined;
   Histoire: undefined;
 };
@@ -43,6 +44,7 @@ function ConvScreen() {
         <Stack.Screen name="Message" component={MessageScreen} options={{ headerBackTitleVisible: false }} />
         <Stack.Screen name="Chatbot" component={ChatbotScreen} options={{ headerBackTitleVisible: false }} />
         <Stack.Screen name="Histoire" component={Histoire} options={{ headerBackTitleVisible: false }} />
+        <Stack.Screen name="Profil" component={Profil} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -183,6 +185,13 @@ export function ExploreScreen() {
             <View style={styles.chatItem}>
               <Image source={user.userName === 'Chatbot' ? user.avatar : { uri: user.avatar }} style={styles.avatar} />
               <Text style={styles.chatName}>{user.userName}</Text>
+              {user.userName !== 'Chatbot' && (
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Profil', { userName: user.userName })}
+                >
+                  <Icon name="user" size={20} color="#668F80" style={{ marginLeft: 10 }} />
+                </TouchableOpacity>
+              )}
             </View>
           </TouchableOpacity>
         ))}

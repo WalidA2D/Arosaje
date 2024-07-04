@@ -9,6 +9,7 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 type RootStackParamList = {
   explore: undefined;
   message: { userName: string; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string, image?: string }> };
+  Profil: { userName: string };
 };
 
 type MessageScreenNavigationProp = StackNavigationProp<RootStackParamList, 'message'>;
@@ -192,10 +193,12 @@ export default function MessageScreen() {
             <Icon name="search" size={20} color="#668F80" style={styles.searchIcon} />
           </View>
         )}
-        <View style={styles.chatHeader}>
-          <Image source={{ uri: 'https://picsum.photos/620/300' }} style={styles.avatar} />
-          <Text style={styles.chatName}>{userName}</Text>
-        </View>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil', { userName })}>
+          <View style={styles.chatHeader}>
+            <Image source={{ uri: 'https://picsum.photos/620/300' }} style={styles.avatar} />
+            <Text style={styles.chatName}>{userName}</Text>
+          </View>
+        </TouchableOpacity>
         <ScrollView
           style={styles.messagesContainer}
           ref={scrollViewRef}

@@ -1,66 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import ProfileImagePopup from '../profilnav/ProfileImagePopup';
-import Calendrier from '../profilnav/calendar';
-import UpdateProfil from '../profilnav/updateProfil';
 import Load from '../../components/Loading';
 
-const Stack = createNativeStackNavigator();
-
-function ProfScreen() {
-  return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator
-        initialRouteName="Profil"
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#668F80',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            color: '#FFF',
-            fontSize: 24,
-            fontWeight: 'bold',
-          },
-        }}
-      >
-        <Stack.Screen 
-          name="Profil" 
-          component={ProfilScreen} 
-          options={({ navigation }) => ({
-            headerRight: () => (
-              <TouchableOpacity onPress={() => navigation.navigate('Calendrier')} style={{ marginRight: 10 }}>
-                <Ionicons name="today" size={24} color="#fff" />
-              </TouchableOpacity>
-            ),
-          })}
-        />
-        <Stack.Screen name="Calendrier" component={Calendrier} options={{ headerBackTitleVisible: false }} />
-        <Stack.Screen name="Modification" component={UpdateProfil} options={{ headerBackTitleVisible: false }} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-
 type RootStackParamList = {
-  Profil: { updated?: boolean };
-  Modification: {
-    lastName: string;
-    firstName: string;
-    address: string;
-    phone: string;
-    cityName: string;
-  };
+  ProfileConsult: { userName: string };
 };
 
-type ProfilScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profil'>;
-type ProfilScreenRouteProp = RouteProp<RootStackParamList, 'Profil'>;
+type ProfileConsultScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ProfileConsult'>;
+type ProfileConsultScreenRouteProp = RouteProp<RootStackParamList, 'ProfileConsult'>;
 
 interface Post {
   title: string;
@@ -68,84 +18,34 @@ interface Post {
   publishedAt: string;
 }
 
-export function ProfilScreen() {
-  const navigation = useNavigation<ProfilScreenNavigationProp>();
-  const route = useRoute<ProfilScreenRouteProp>();
+export default function ProfileConsultView() {
+  const navigation = useNavigation<ProfileConsultScreenNavigationProp>();
+  const route = useRoute<ProfileConsultScreenRouteProp>();
+  const { userName } = route.params;
   const [selectedTab, setSelectedTab] = useState('Posts');
-  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', address: '', phone: '', profilePic: '' });
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true); 
-  const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
-
-  const fetchProfileData = async () => {
-    const userToken = await AsyncStorage.getItem('userToken');
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                token: userToken,
-            }),
-    }
-
-    fetch(`${apiUrl}/api/user/getUser`, options)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const profilePicURI = `data:image/png;base64,${data.body.profilePic.body}`;
-          const userId = data.body.iduser;
-          setProfileData({
-            lastName: data.body.lastName,
-            firstName: data.body.firstName,
-            role: data.body.role,
-            idUser: userId,
-            cityName: data.body.cityName,
-            address: data.body.address,
-            phone: data.body.phone,
-            profilePic: profilePicURI
-          });
-          if (userId) {
-            fetchUserPosts(userId);
-          } else {
-            console.error('User ID is undefined');
-          }
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching profile data:', error);
-      });
-  };
-
-  const fetchUserPosts = (idUser: string) => {
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ idUser }),
-    };
-
-    fetch(`${apiUrl}/api/post/postsOf`, options)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          setPosts(data.body);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching user posts:', error);
-      })
-      .finally(() => setLoading(false));
-  };
+  const [profileData, setProfileData] = useState({
+    lastName: 'Doe',
+    firstName: 'John',
+    role: 'Admin',
+    cityName: 'Paris',
+    idUser: '12345',
+    address: '123 Street',
+    phone: '123-456-7890',
+    profilePic: 'https://picsum.photos/120'
+  });
+  const [posts, setPosts] = useState<Post[]>([
+    { title: 'Post 1', description: 'Description for Post 1', publishedAt: '2023-06-25' },
+    { title: 'Post 2', description: 'Description for Post 2', publishedAt: '2023-06-24' },
+    { title: 'Post 3', description: 'Description for Post 3', publishedAt: '2023-06-23' },
+  ]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProfileData();
-    if (route.params?.updated) {
-      fetchProfileData();
-      navigation.setParams({ updated: false });
-    }
-  }, [route.params?.updated]);
+    // Simulate API call delay
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
 
   const openMap = (cityName: string) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cityName)}`;
@@ -174,36 +74,30 @@ export function ProfilScreen() {
     );
   };
 
-  const popupRef = useRef<any>(null);
-
   if (loading) {
     return (
-      <Load></Load>
+        <Load></Load>
     );
   }
 
   return (
     <View style={styles.container}>
-      <ProfileImagePopup ref={popupRef} apiUrl={apiUrl} setProfileData={setProfileData} />
       <View style={styles.header}></View>
 
       <View style={styles.profileImageContainer}>
         {profileData.profilePic ? (
-          <TouchableOpacity onPress={() => popupRef.current.showPopup()}>
-            <Image
-              source={{ uri: profileData.profilePic }}
-              style={styles.profileImage}
-            />
-          </TouchableOpacity>
+          <Image
+            source={{ uri: profileData.profilePic }}
+            style={styles.profileImage}
+          />
         ) : (
-          <Load></Load>
+          <Text style={styles.errorText}>Image non disponible</Text>
         )}
       </View>
 
       <View style={styles.fixedDetails}>
         <View style={styles.profileDetails}>
-          <Text style={styles.profileName}>{`${profileData.firstName} ${profileData.lastName}`}
-            <TouchableOpacity onPress={() => navigation.navigate('Modification', profileData)}><Ionicons name="pencil" size={25} color="#668F80" /></TouchableOpacity></Text>
+          <Text style={styles.profileName}>{`${profileData.firstName} ${profileData.lastName}`}</Text>
           
           <TouchableOpacity onPress={() => openMap(profileData.cityName)}>
             <Text style={styles.profileRole}>{profileData.role} | {profileData.cityName}</Text>
@@ -371,14 +265,14 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: 'cover',
   },
-  loadingText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  errorContainer: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   errorText: {
     fontSize: 24,
@@ -386,5 +280,3 @@ const styles = StyleSheet.create({
     color: 'red',
   },
 });
-
-export default ProfScreen;
