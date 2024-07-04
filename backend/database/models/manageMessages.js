@@ -1,19 +1,19 @@
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
 const { executeDBOperation } = require('../../framework/DreamTeamUtils');
-const { setPlantsImages } = require('./managePictures');
+const managePic = require('./managePictures');
 
 const pathToDB = path.resolve(__dirname, '..', 'BASE.db');
 const db = new sqlite.Database(pathToDB, sqlite.OPEN_READWRITE, (err) => {
     if (err) {
-        return console.error('Erreur managePlants.js lors de la connexion à la BDD : \n', err);
+        return console.error('Erreur manageMessages.js lors de la connexion à la BDD : \n', err);
     } else {
-        console.log('Connecté au serveur SQL : managePlants.js');
+        console.log('Connecté au serveur SQL : manageMessages.js');
     }
 });
 
-// AJOUTER UNE PLANTE
-const addPlant = async (description, origin, requirements, type, token, images) => {
+// AJOUTER UNE CONVERSATION
+const addConv = async (description, origin, requirements, type, token, images) => {
     try {
         const sqlIdU = 'SELECT idUsers FROM Users WHERE uid = ?'
         const idU = (await executeDBOperation(db, sqlIdU, [token], 'all'))[0];
@@ -79,6 +79,6 @@ const getPlantWithID = async (plantID) => {
 };
 
 module.exports = {
-    addPlant,
+    addConv,
     getPlantWithID
 }

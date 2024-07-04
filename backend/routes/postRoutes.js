@@ -22,7 +22,9 @@ router.post('/createPost', upload.array('images'), async (req, res) => {
 
 router.get('/getPosts', async (req, res) => {
     try {
-        const response = await managePosts.getAllPosts();
+        let rStart = 0;
+        let rStop = 5;
+        const response = await managePosts.getAllPosts(rStart, rStop);
         res.json(response);
     } catch (e) {
         console.error('Erreur lors de la route getPosts : \n', e);
