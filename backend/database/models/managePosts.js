@@ -60,17 +60,22 @@ const getAllPosts = async (rStart, rStop) => {
 };
 
 // récupérer les post d'un user
-const postsOf = async (idU) => {
+const postsOf = async (idU, page) => {
+    const postsPerPage = 20; // Nombre de posts à récupérer par page
+    const offset = (page - 1) * postsPerPage; // Calcul de l'offset pour la pagination
     try {
-        const sql = 'SELECT idPosts, title, description, publishedAt, dateStart, dateEnd, address, cityName, state, accepted, idUser, idPlant FROM Posts WHERE idUser = ?';
-        const rows = await executeDBOperation(db, sql, [idU], "all");
+        const sql = `SELECT idPosts, title, description, publishedAt, dateStart, dateEnd, address, cityName, state, accepted, idUser, idPlant 
+                     FROM Posts 
+                     WHERE idUser = ? 
+                     LIMIT ? OFFSET ?`;
+        const rows = await executeDBOperation(db, sql, [idU, postsPerPage, offset], "all");
         return { 
             body: rows, 
             status: 200, 
             success: true 
         };
     } catch (e) {
-        console.error('Erreur lors de la fonction getAllPosts', e);
+        console.error('Erreur lors de la fonction postsOf', e);
         return { 
             status: 400, 
             success: false 

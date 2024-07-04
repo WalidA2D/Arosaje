@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, Image, View, Text, FlatList, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -63,6 +63,7 @@ type ProfilScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profi
 type ProfilScreenRouteProp = RouteProp<RootStackParamList, 'Profil'>;
 
 interface Post {
+  idPosts: number;
   title: string;
   description: string;
   publishedAt: string;
@@ -75,19 +76,22 @@ export function ProfilScreen() {
   const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', address: '', phone: '', profilePic: '' });
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true); 
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMorePosts, setHasMorePosts] = useState(true);
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
   const fetchProfileData = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                token: userToken,
-            }),
-    }
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: userToken,
+      }),
+    };
 
     fetch(`${apiUrl}/api/user/getUser`, options)
       .then(response => response.json())
@@ -106,7 +110,7 @@ export function ProfilScreen() {
             profilePic: profilePicURI
           });
           if (userId) {
-            fetchUserPosts(userId);
+            fetchUserPosts(userId, 1);
           } else {
             console.error('User ID is undefined');
           }
@@ -117,26 +121,34 @@ export function ProfilScreen() {
       });
   };
 
-  const fetchUserPosts = (idUser: string) => {
+  const fetchUserPosts = async (idUser: string, page: number) => {
+    setLoadingMore(true);
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ idUser }),
+      body: JSON.stringify({ idUser, page }),
     };
 
-    fetch(`${apiUrl}/api/post/postsOf`, options)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          setPosts(data.body);
+    try {
+      const response = await fetch(`${apiUrl}/api/post/postsOf`, options);
+      const data = await response.json();
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Ajouter un délai artificiel de 1 seconde
+
+      if (data.success) {
+        if (data.body.length === 0) {
+          setHasMorePosts(false); // No more posts to load
+        } else {
+          setPosts(prevPosts => [...prevPosts, ...data.body]);
         }
-      })
-      .catch(error => {
-        console.error('Error fetching user posts:', error);
-      })
-      .finally(() => setLoading(false));
+      }
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
   };
 
   useEffect(() => {
@@ -173,6 +185,28 @@ export function ProfilScreen() {
       { cancelable: false }
     );
   };
+
+  const fetchNextPage = () => {
+    if (!loadingMore && hasMorePosts) {
+      setPage(prevPage => {
+        const newPage = prevPage + 1;
+        fetchUserPosts(profileData.idUser, newPage);
+        return newPage;
+      });
+    }
+  };
+
+  const renderItem = ({ item }: { item: Post }) => (
+    <View style={styles.post}>
+      <Text style={styles.postTitle}>{item.title}</Text>
+      <Text style={styles.postContent}>{item.description}</Text>
+      <Text style={styles.postContent}>Publié le: {item.publishedAt}</Text>
+    </View>
+  );
+
+  const ListEndLoader = () => (
+    loadingMore ? <ActivityIndicator size="large" color="#668F80" /> : null
+  );
 
   const popupRef = useRef<any>(null);
 
@@ -226,33 +260,22 @@ export function ProfilScreen() {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View style={styles.body}>
-          {selectedTab === 'Posts' ? (
-            <View>
-              {posts.map((post, index) => (
-                <View key={index} style={styles.post}>
-                  <Text style={styles.postTitle}>{post.title}</Text>
-                  <Text style={styles.postContent}>{post.description}</Text>
-                  <Text style={styles.postContent}>Publié le: {post.publishedAt}</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            <View>
-              <View style={styles.image}>
-                <Image source={require('@/assets/images/plante1.jpg')} style={styles.imageContent} />
-              </View>
-              <View style={styles.image}>
-                <Image source={require('@/assets/images/plante2.jpg')} style={styles.imageContent} />
-              </View>
-              <View style={styles.image}>
-                <Image source={require('@/assets/images/plante3.jpg')} style={styles.imageContent} />
-              </View>
-            </View>
-          )}
+      {selectedTab === 'Posts' ? (
+        <FlatList
+          data={posts}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.idPosts.toString()}
+          onEndReached={fetchNextPage}
+          onEndReachedThreshold={0.8}
+          ListFooterComponent={ListEndLoader}
+        />
+      ) : (
+        <View style={styles.imagesContainer}>
+          <Image source={require('@/assets/images/plante1.jpg')} style={styles.imageContent} />
+          <Image source={require('@/assets/images/plante2.jpg')} style={styles.imageContent} />
+          <Image source={require('@/assets/images/plante3.jpg')} style={styles.imageContent} />
         </View>
-      </ScrollView>
+      )}
     </View>
   );
 }
@@ -318,9 +341,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'gray',
   },
-  scrollViewContent: {
-    paddingTop: 20,
-  },
   body: {
     flex: 1,
     width: '100%',
@@ -354,6 +374,7 @@ const styles = StyleSheet.create({
   },
   post: {
     marginBottom: 20,
+    paddingHorizontal: 10, 
   },
   postTitle: {
     fontSize: 16,
@@ -384,6 +405,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: 'red',
+  },
+  imagesContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
   },
 });
 
