@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@types/express-validator": "^3.0.0",
+    "@types/multer": "^1.4.11",
+    "express": "^4.19.2",
+    "express-validator": "^7.1.0",
+    "firebase": "^10.12.3",
+    "firebase-admin": "^12.2.0",
+    "multer": "^1.4.5-lts.1",
+    "typeorm": "^0.3.20"
+  }
+}
