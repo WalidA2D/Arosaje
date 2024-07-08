@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test de l'API</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    form label {
+      display: block;
+      margin-bottom: 10px;
+    }
+    form input, form button {
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 100%;
+    }
+    form input[type="file"] {
+      border: none;
+      padding: 0;
+    }
+    #response {
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>Tester l'API</h1>
+
+  <form id="addUserForm">
+    <h2>Ajouter un utilisateur</h2>
+    <label for="lastName">Nom:</label>
+    <input type="text" id="lastName" name="lastName" required>
+    <label for="firstName">Prénom:</label>
+    <input type="text" id="firstName" name="firstName" required>
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <label for="address">Adresse:</label>
+    <input type="text" id="address" name="address" required>
+    <label for="phone">Téléphone:</label>
+    <input type="text" id="phone" name="phone" required>
+    <label for="cityName">Ville:</label>
+    <input type="text" id="cityName" name="cityName" required>
+    <label for="password">Mot de passe:</label>
+    <input type="password" id="password" name="password" required>
+    <button type="submit">Ajouter un utilisateur</button>
+  </form>
+
+  <form id="getUserForm">
+    <h2>Obtenir un utilisateur</h2>
+    <label for="userId">ID Utilisateur:</label>
+    <input type="number" id="userId" name="userId" required>
+    <button type="submit">Obtenir les détails de l'utilisateur</button>
+  </form>
+
+  <form id="addProfilePictureForm">
+    <h2>Ajouter une photo de profil</h2>
+    <label for="profilePictureUserId">ID Utilisateur:</label>
+    <input type="number" id="profilePictureUserId" name="profilePictureUserId" required>
+    <label for="profilePicture">Photo de profil:</label>
+    <input type="file" id="profilePicture" name="profilePicture" required>
+    <button type="submit">Ajouter une photo de profil</button>
+  </form>
+
+  <form id="getProfilePictureForm">
+    <h2>Obtenir une photo de profil</h2>
+    <label for="getProfilePictureUserId">ID Utilisateur:</label>
+    <input type="number" id="getProfilePictureUserId" name="getProfilePictureUserId" required>
+    <button type="submit">Obtenir la photo de profil</button>
+  </form>
+
+  <div id="response"></div>
+
+  <script>
+    document.getElementById('addUserForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const lastName = document.getElementById('lastName').value;
+      const firstName = document.getElementById('firstName').value;
+      const email = document.getElementById('email').value;
+      const address = document.getElementById('address').value;
+      const phone = document.getElementById('phone').value;
+      const cityName = document.getElementById('cityName').value;
+      const password = document.getElementById('password').value;
+
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ lastName, firstName, email, address, phone, cityName, password }),
+      });
+
+      const data = await response.json();
+      document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+    });
+
+    document.getElementById('getUserForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const userId = document.getElementById('userId').value;
+
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'GET',
+      });
+
+      const data = await response.json();
+      document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+    });
+
+    document.getElementById('addProfilePictureForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const userId = document.getElementById('profilePictureUserId').value;
+      const fileInput = document.getElementById('profilePicture');
+      const formData = new FormData();
+      formData.append('file', fileInput.files[0]);
+      
+      const response = await fetch(`/api/profilePictures/${userId}`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+    });
+
+    document.getElementById('getProfilePictureForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const userId = document.getElementById('getProfilePictureUserId').value;
+
+      const response = await fetch(`/api/profilePictures/${userId}`, {
+        method: 'GET',
+      });
+
+      const data = await response.json();
+      document.getElementById('response').innerText = JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>
