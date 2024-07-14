@@ -1,13 +1,43 @@
-import { Router } from 'express';
-import { addUser, getUser, getUsers, validateUser, deleteUser, updateUserToBotanist } from '../controllers/userController';
+import express from 'express';
+import UserValidator from '../validator/userValidator';
+import Middleware from '../middleware';
+import userController from '../controller/userController';
 
-const router = Router();
+const router = express.Router();
 
-router.post('/add', addUser);
-router.get('/', getUsers);
-router.get('/:id', getUser);
-router.post('/login', validateUser);
-router.delete('/:id', deleteUser);
-router.patch('/:id/botanist', updateUserToBotanist);
+router.post(
+	'/create',
+	UserValidator.checkCreate(),
+	Middleware.handleValidationError,
+	userController.create
+);
+
+router.get(
+	'/read',
+	UserValidator.checkRead(),
+	Middleware.handleValidationError,
+	userController.readPagination
+);
+
+router.get(
+	'/read/:id',
+	UserValidator.checkIdParam(),
+	Middleware.handleValidationError,
+	userController.readByID
+);
+
+// router.put(
+// 	'/update/:id',
+// 	UserValidator.checkIdParam(),
+// 	Middleware.handleValidationError,
+// 	userController.update
+// );
+
+router.delete(
+	'/delete/:id',
+	UserValidator.checkIdParam(),
+	Middleware.handleValidationError,
+	userController.delete
+);
 
 export default router;

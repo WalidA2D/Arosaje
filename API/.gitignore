@@ -1,2 +1,11 @@
 node_modules/
-database.db
+.gitignore
+
+# Dossier build de l'API
+dist/
+
+# Database & SQLite
+**.db
+**.sqlite
+**.sql
+**.database

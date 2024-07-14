@@ -1,19 +1,29 @@
 {
+  "name": "api_arosaje",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "build": "tsc",
+    "start": "node dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "@types/express-validator": "^3.0.0",
-    "@types/multer": "^1.4.11",
+    "@types/express": "^4.17.21",
+    "@types/sqlite3": "^3.1.11",
+    "@types/uuid": "^10.0.0",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-validator": "^7.1.0",
-    "firebase": "^10.12.3",
-    "firebase-admin": "^12.2.0",
-    "isbinaryfile": "^5.0.2",
-    "multer": "^1.4.5-lts.1",
-    "ts-node": "^10.9.2",
-    "typeorm": "^0.3.20",
-    "typescript": "^5.5.3"
-  },
-  "scripts": {
-    "check-binary-files": "ts-node src/interfaces/types/checkBinaryFiles.ts",
-    "start:dev": "ts-node src/index.ts"
+    "sequelize": "^6.37.3",
+    "sqlite3": "^5.1.7",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.3",
+    "uuid": "^10.0.0",
+    "firebase": "^9.6.1",
+    "multer": "^1.4.4"
   }
 }
