@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -15,7 +15,6 @@ import PubDesc from '../pubnav/pubdesc';
 import PubLoca from '../pubnav/publoca';
 import PubEspece from '../pubnav/pubespece';
 import PubEntretien from '../pubnav/pubentretien';
-import StartApp from './index';
 
 const Stack = createNativeStackNavigator();
 
@@ -64,7 +63,6 @@ function PublierScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
-      <Stack.Screen name="Index" component={StartApp} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -72,27 +70,38 @@ function PublierScreen({ }) {
 
 function PublierContent() {
   const navigation = useNavigation<StackNavigationProp<any>>();
+  const [sectionsCompleted, setSectionsCompleted] = useState({
+    Titre: false,
+    Date: false,
+    Photo: false,
+    Description: false,
+    Localisation: false,
+    Espece: false,
+    Entretien: false,
+  });
 
   return (
     <View style={styles.container}>
 
     <View style={styles.fixedDetails}>
-      <ListDash buttonText="Titre" onPress={() => navigation.navigate('Titre')} />
+      <ListDash buttonText="Titre" completed={sectionsCompleted.Titre} onPress={() => navigation.navigate('Titre')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Date(s)" onPress={() => navigation.navigate('Date(s)')} />
+      <ListDash buttonText="Date(s)" completed={sectionsCompleted.Date} onPress={() => navigation.navigate('Date(s)')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Photo(s)" onPress={() => navigation.navigate('Photo(s)')} />
+      <ListDash buttonText="Photo(s)" completed={sectionsCompleted.Photo} onPress={() => navigation.navigate('Photo(s)')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Description" onPress={() => navigation.navigate('Description')} />
+      <ListDash buttonText="Description" completed={sectionsCompleted.Description} onPress={() => navigation.navigate('Description')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Localisation" onPress={() => navigation.navigate('Localisation')} />
+      <ListDash buttonText="Localisation" completed={sectionsCompleted.Localisation} onPress={() => navigation.navigate('Localisation')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Espèce(s)" onPress={() => navigation.navigate('Espèce(s)')} />
+      <ListDash buttonText="Espèce(s)" completed={sectionsCompleted.Espece} onPress={() => navigation.navigate('Espèce(s)')} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
+      <ListDash buttonText="Exigence d'entretien (optionel)" completed={sectionsCompleted.Entretien} onPress={() => navigation.navigate('Entretien')} />
       <View style={styles.separatorDetails}/>
     </View>
-    <BigButtonDown buttonText="Valider" />
+    <BigButtonDown buttonText="Valider" onPress={() => {
+      // Logic to validate form and update completion status
+    }} />
   </View>
   );
 }
