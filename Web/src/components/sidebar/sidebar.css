@@ -1,0 +1,14 @@
+.sidebar{
+    flex: 3;
+    height: calc(100vh - 50px);
+    background-color: var(--viridian);
+    max-width: 300px;
+}
+
+.sidebarWrapper {
+    padding: 20px;
+}
+
+.sidebarListItem:hover  {
+    background-color: red;
+}

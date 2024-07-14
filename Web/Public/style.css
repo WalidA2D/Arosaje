@@ -1,0 +1,12 @@
+* {
+    margin: 0;
+    font-family: "Roboto Flex", sans-serif;
+}
+
+:root {
+    --viridian: #668F80;
+    --olivine: #A0AF84;
+    --khaki: #C3B59F;
+    --paynes-gray: #4A6670;
+  }
+  
