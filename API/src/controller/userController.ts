@@ -8,10 +8,14 @@ class UserController {
 	async create(req: Request, res: Response) {
 		const uid = uuidv4();
 		try {
+			const email = await UserInstance.findOne({where: {email : req.body.email}})
+			if(email != null){
+				return res.status(417).json({msg: "Email déjà existant", status:417});
+			}
 			const record = await UserInstance.create({ ...req.body, uid });
-			return res.status(200).json({ record, msg: "Creation user ok" });
+			return res.status(200).json({ record, msg: "Création utilisateur ok" });
 		} catch (e) {
-			return res.status(417).json({ msg: "Création fail", status: 500, route: "/create", e });
+			return res.status(417).json({ msg: "Création utilisateur échouée", status: 417, route: "/create", e });
 		}
 	}
 
@@ -21,18 +25,18 @@ class UserController {
 			const offset = req.query.offset as number | undefined;
 
 			const records = await UserInstance.findAll({ where: {}, limit, offset });
-			return res.json(records);
+			return res.status(200).json({ users : records });
 		} catch (e) {
-			return res.json({ msg: "Lecture fail", status: 500, route: "/read" });
+			return res.status(500).json({ msg: "Lecture fail", status: 500, route: "/read" });
 		}
 	}
 	async readByID(req: Request, res: Response) {
 		try {
 			const { id } = req.params;
 			const record = await UserInstance.findOne({ where: { idUsers : id } });
-			return res.json(record);
+			return res.status(200).json(record);
 		} catch (e) {
-			return res.json({ msg: "Lecture byId fail", status: 500, route: "/read/:id" });
+			return res.status(500).json({ msg: "Lecture byId fail", status: 500, route: "/read/:id" });
 		}
 	}
 	// async update(req: Request, res: Response) {
@@ -62,13 +66,13 @@ class UserController {
 			const record = await UserInstance.findOne({ where: { idUsers : id } });
 
 			if (!record) {
-				return res.json({ msg: "Can not find existing record" });
+				return res.status(500).json({ status : 500, msg: "Can not find existing record" });
 			}
 
 			const deletedRecord = await record.destroy();
-			return res.json({ record: deletedRecord });
+			return res.status(200).json({ record: deletedRecord });
 		} catch (e) {
-			return res.json({
+			return res.status(200).json({
 				msg: "fail to read",
 				status: 500,
 				route: "/delete/:id",
