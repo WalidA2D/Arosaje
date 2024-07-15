@@ -1,12 +1,28 @@
 .sidebar{
     flex: 3;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 50px); /* la side bar prend toute la hauteur -50px qui correspond a la hauteur de la topbar */
     background-color: var(--viridian);
     max-width: 300px;
 }
 
 .sidebarWrapper {
     padding: 20px;
+}
+
+.sidebarList {
+    display : flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebarListItem {
+    display: flex;
+    text-align: center;
+}
+
+.sidebarListItem a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .sidebarListItem:hover  {
