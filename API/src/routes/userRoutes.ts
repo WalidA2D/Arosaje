@@ -36,6 +36,7 @@ router.get(
 router.delete(
 	'/delete/:id',
 	UserValidator.checkIdParam(),
+	Middleware.authMiddleware({roles : ["admin"]}),
 	Middleware.handleValidationError,
 	userController.delete
 );
