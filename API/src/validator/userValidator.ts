@@ -40,6 +40,12 @@ class UserValidator {
 				.withMessage('La valeur est vide')
 		];
     }
+	checkLogin(){
+        return [
+            // query('email').isEmail().withMessage('Email invalide'),
+            // query('password').isLength({ min: 6 }).withMessage('Le mot de passe doit comporter au moins 6 caractères')
+        ]
+	}
 }
 
 export default new UserValidator();

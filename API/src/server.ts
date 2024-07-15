@@ -8,10 +8,11 @@ dotenv.config()
 const app = express();
 
 app.use(express.json());
+// app.use(express.urlencoded({extended:true}))
 
 app.use("/user", userRouter);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5070;
 
 db.sync().then(() => {
     console.log("Connecté à la database");
