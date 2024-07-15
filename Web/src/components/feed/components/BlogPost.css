@@ -1,0 +1,96 @@
+/* BlogPost.css */
+
+:root {
+  --olivine: #A0AF84; /* Couleur olivine */
+  --paynes-gray: #4A6670; /* Couleur paynes-gray */
+  --viridian: #668F80; /* Couleur viridian */
+}
+
+.blogContainer {
+  background-color: #fff; /* Fond blanc */
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 0; /* Marge supérieure nulle */
+  margin-bottom: 0; /* Marge inférieure nulle */
+  width: 50%; /* Largeur à 50% de son conteneur parent */
+  max-width: 600px; /* Largeur maximale du conteneur */
+  margin-left: auto; /* Centrage horizontal du contenu */
+  margin-right: auto; /* Centrage horizontal du contenu */
+}
+
+.blogImg {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  overflow: hidden; /* Pour cadrer l'image dans le conteneur arrondi */
+  max-height: 400px; /* Hauteur maximale de l'image */
+  width: 100%; /* Ajustement de la largeur de l'image */
+}
+
+.blogImg img {
+  width: 100%;
+  display: block;
+  object-fit: cover; /* Ajustement de la taille de l'image */
+}
+
+.blogTitle {
+  font-size: 1.8rem; /* Taille de police du titre */
+  margin-top: 20px; /* Marge supérieure du titre */
+  margin-bottom: 10px; /* Marge inférieure du titre */
+  color: var(--paynes-gray); /* Couleur paynes-gray pour le titre */
+  text-align: left; /* Alignement du texte à gauche */
+  cursor: default; /* Curseur par défaut */
+}
+
+.blogDescription {
+  color: var(--paynes-gray); /* Couleur paynes-gray pour la description */
+  margin-left: 0; /* Alignement à gauche de la description */
+  margin-bottom: 20px; /* Marge inférieure de la description */
+  border-top: 1px solid var(--viridian); /* Délimitation haute de la description */
+  padding-top: 10px; /* Espace au-dessus de la délimitation */
+  padding-bottom: 15px; /* Espace en dessous de la délimitation */
+}
+
+.blogIcons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--viridian); /* Couleur viridian pour les icônes */
+  
+  margin-top: 15px; /* Marge supérieure des icônes */
+}
+
+.blogIcons svg {
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.3s ease; /* Animation de transition pour le changement de couleur */
+}
+
+.deleteIcon {
+  color: rgb(170, 17, 17);
+}
+.blogIcons svg:hover {
+  color: var(--olivine); /* Couleur olivine au survol des icônes */
+}
+
+.readMoreLink {
+  color: var(--olivine); /* Couleur olivine pour le lien "Lire plus" */
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block; /* Réglage pour s'aligner correctement avec le texte */
+  margin-top: 15px; /* Marge supérieure du lien "Lire plus" */
+  transition: color 0.3s ease; /* Animation sur la couleur */
+}
+
+.readMoreLink:hover {
+  color: var(--viridian); /* Changement de couleur au survol */
+  text-decoration: underline;
+}
+
+.commentsSection {
+  margin-top: 10px; /* Marge supérieure de la section des commentaires */
+  padding: 10px; /* Padding interne de la section des commentaires */
+  background-color: #f5f5f5; /* Couleur de fond pour la section des commentaires */
+  border-radius: 8px; /* Bordure arrondie pour la section des commentaires */
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1); /* Ombre légère pour la section des commentaires */
+}
