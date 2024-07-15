@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const PubTitre = ({ navigation }) => {
+const PubTitre = ({ navigation }: { navigation: any }) => {
   const [titre, setTitre] = useState('');
   const [titreCompleted, setTitreCompleted] = useState(false);
   const [isEditing, setIsEditing] = useState(true);
