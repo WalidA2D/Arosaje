@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
 import { UserInstance } from "../models/User";
+import { PostInstance } from "../models/Post"
 
 class UserController {
 	async create(req: Request, res: Response) {
@@ -33,10 +34,33 @@ class UserController {
 	async readByID(req: Request, res: Response) {
 		try {
 			const { id } = req.params;
-			const record = await UserInstance.findOne({ where: { idUsers : id } });
-			return res.status(200).json(record);
+			const record = await UserInstance.findOne(
+				{ where: { idUsers : id },
+				// include: [{
+				// 	model: PostInstance,
+				// 	as: 'posts',
+				// 	attributes: ['idPosts', 'title', 'content', 'imageUrl', 'createdAt', 'updatedAt', 'userId']
+				// }] 
+				}
+			);
+			
+			if(record){
+				const { idUsers, lastName, firstName, cityName, photo } = record.dataValues
+				const postsOfUser = await PostInstance.findAll({where : {idUser : idUsers}})
+				return res.status(200).json({
+					idUser : idUsers,
+					lastName,
+					firstName,
+					cityName,
+					photoURI : photo,
+					posts : postsOfUser
+				});
+			} else {
+				return res.status(404).json({msg:"Utilisateur introuvable"})
+			}
 		} catch (e) {
-			return res.status(500).json({ msg: "Lecture byId fail", status: 500, route: "/read/:id" });
+			console.error(e)
+			return res.status(500).json({ msg: "Lecture byId fail", status: 500, e, route: "/read/:id" });
 		}
 	}
 	// async update(req: Request, res: Response) {
