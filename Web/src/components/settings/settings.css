@@ -1,4 +1,4 @@
-.feed{
+.setting {
     flex: 6;
     display: flex;
     flex-direction: column;
@@ -6,8 +6,4 @@
     gap: 30px;
     overflow-y: auto;
     height: calc(100vh - 100px);
-}
-
-.space1em {
-    margin: 1em;
 }
