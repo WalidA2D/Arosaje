@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { UserInstance } from '../models/user';
+// import jwt from 'jsonwebtoken';
+import { UserInstance } from '../models/User';
 
 function authMiddleware(options?: { roles?: string[] }) {
     return async (req: Request, res: Response, next: NextFunction) => {

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import { v4 as uuidv4 } from "uuid";
 
-import { UserInstance } from "../models/user";
+import { UserInstance } from "../models/User";
 
 class UserController {
 	async create(req: Request, res: Response) {
@@ -13,7 +13,7 @@ class UserController {
 				return res.status(417).json({msg: "Email déjà existant", status:417});
 			}
 			const record = await UserInstance.create({ ...req.body, uid });
-			return res.status(200).json({ record, msg: "Création utilisateur ok" });
+			return res.status(201).json({ record, msg: "Création utilisateur ok" });
 		} catch (e) {
 			return res.status(417).json({ msg: "Création utilisateur échouée", status: 417, route: "/create", e });
 		}
