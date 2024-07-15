@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const PubTitre = () => {
+const PubTitre = ({ navigation }) => {
   const [titre, setTitre] = useState('');
   const [titreCompleted, setTitreCompleted] = useState(false);
   const [isEditing, setIsEditing] = useState(true);
@@ -37,11 +37,25 @@ const PubTitre = () => {
       setTitreCompleted(true);
       setIsEditing(false);
       saveTitre();
+      navigation.setParams({ titre: titre });
+      navigation.goBack();
+    }
+  };
+
+  const clearTitre = async () => {
+    try {
+      await AsyncStorage.removeItem('savedTitre');
+      setTitre('');
+      setTitreCompleted(false);
+      setIsEditing(true);
+    } catch (error) {
+      console.error('Erreur lors de la suppression du titre sauvegardé:', error);
     }
   };
 
   return (
     <View style={styles.container}>
+      {titreCompleted ? <Text style={styles.text}>Titre : {titre}</Text> : null}
       {isEditing && (
         <TextInput
           style={styles.input}
@@ -54,7 +68,9 @@ const PubTitre = () => {
         title="Valider"
         onPress={handleValidation}
       />
-      {titreCompleted ? <Text style={styles.text}>Titre : {titre}</Text> : null}
+      <TouchableOpacity onPress={clearTitre}>
+        <Text style={styles.clearButton}>Vider Titre</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -77,6 +93,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginTop: 20,
+  },
+  clearButton: {
+    fontSize: 16,
+    color: 'red',
     marginTop: 20,
   },
 });

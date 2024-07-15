@@ -4,6 +4,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import BigButtonDown from '../../components/BigButtonDown';
 import ListDash from '../../components/ListDash';
@@ -70,38 +71,43 @@ function PublierScreen({ }) {
 
 function PublierContent() {
   const navigation = useNavigation<StackNavigationProp<any>>();
-  const [sectionsCompleted, setSectionsCompleted] = useState({
-    Titre: false,
-    Date: false,
-    Photo: false,
-    Description: false,
-    Localisation: false,
-    Espece: false,
-    Entretien: false,
-  });
+  const isValid = false;
 
   return (
     <View style={styles.container}>
 
     <View style={styles.fixedDetails}>
-      <ListDash buttonText="Titre" completed={sectionsCompleted.Titre} onPress={() => navigation.navigate('Titre')} />
+      <ListDash buttonText="Titre" onPress={() => navigation.navigate('Titre')} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Date(s)" completed={sectionsCompleted.Date} onPress={() => navigation.navigate('Date(s)')} />
+      <ListDash buttonText="Date(s)" onPress={() => navigation.navigate('Date(s)')} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Photo(s)" completed={sectionsCompleted.Photo} onPress={() => navigation.navigate('Photo(s)')} />
+      <ListDash buttonText="Photo(s)" onPress={() => navigation.navigate('Photo(s)')} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Description" completed={sectionsCompleted.Description} onPress={() => navigation.navigate('Description')} />
+      <ListDash buttonText="Description" onPress={() => navigation.navigate('Description')} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Localisation" completed={sectionsCompleted.Localisation} onPress={() => navigation.navigate('Localisation')} />
+      <ListDash buttonText="Localisation" onPress={() => navigation.navigate('Localisation')} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Espèce(s)" completed={sectionsCompleted.Espece} onPress={() => navigation.navigate('Espèce(s)')} />
+      <ListDash buttonText="Espèce(s)" onPress={() => navigation.navigate('Espèce(s)')} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
       <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Exigence d'entretien (optionel)" completed={sectionsCompleted.Entretien} onPress={() => navigation.navigate('Entretien')} />
+      <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#828282"} />
       <View style={styles.separatorDetails}/>
     </View>
-    <BigButtonDown buttonText="Valider" onPress={() => {
-      // Logic to validate form and update completion status
-    }} />
+    <View style={styles.fixedDetailsBtn}>
+    <View style={styles.selectorContainer}>
+    <TouchableOpacity style={[styles.selectorButton, { backgroundColor: isValid ? '#668F80' : '#828282' }]} disabled={!isValid}>
+        <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
+             Valider
+        </Text>
+      </TouchableOpacity>
+      </View>
+    </View>
   </View>
   );
 }
@@ -153,7 +159,29 @@ const styles = StyleSheet.create({
   },
   selectorOptionsText: {
     fontSize : 14,
-  }
+  },
+  fixedDetailsBtn: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    },
+selectorContainer: {
+  flexDirection: 'row',
+  marginBottom: 20,
+  backgroundColor: '#E0E0E0',
+  borderRadius: 25,
+  overflow: 'hidden',
+  width: '90%',
+  alignItems: 'center',
+},
+selectorButton: {
+  flex: 1,
+  paddingVertical: 20,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
 });
 
 export default PublierScreen;
