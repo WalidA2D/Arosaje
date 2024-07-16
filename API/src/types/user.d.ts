@@ -5,5 +5,6 @@ declare module '../models/user' {
         role: string;
         isBotanist: boolean;
         isAdmin: boolean;
+        password: string;
     }
 }
