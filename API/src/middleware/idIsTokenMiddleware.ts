@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserInstance } from '../models/user';
+import { UserInstance } from '../models/User';
 
 function idIsToken() {
     return async(req:Request, res:Response, next:NextFunction)=>{
