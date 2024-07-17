@@ -27,9 +27,8 @@ router.get(
 );
 
 router.put(
-	'/update/:id',
+	'/update',
 	UserValidator.checkIdParam(),
-	Middleware.idIsToken,
 	userController.update
 );
 

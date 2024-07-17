@@ -1,7 +1,10 @@
 import express from "express";
-import userRouter from "./routes/userRoutes";
+
 import db from "./config/database.config";
 import dotenv from 'dotenv'
+
+import userRouter from "./routes/userRoutes";
+import postRouter from "./routes/postRoutes";
 
 dotenv.config()
 
@@ -11,6 +14,7 @@ app.use(express.json());
 // app.use(express.urlencoded({extended:true}))
 
 app.use("/user", userRouter);
+app.use("/post", postRouter);
 
 const port = process.env.PORT || 5070;
 

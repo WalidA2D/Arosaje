@@ -46,29 +46,28 @@ class UserController {
 
 	async update(req: Request, res: Response) {
 		try {
-			const { token } = req.params;
+			const token = req.headers.authorization?.split(' ')[0];
 			const record = await UserInstance.findOne({ where: { uid:token } });
 			if (!record) {
-				return res.json({ msg: "Cible non trouvée" });
+				return res.status(404).json({ msg: "Cible non trouvée" });
 			}
 			const { lastName, firstName, email, address, phone, cityName, password } = req.body
 			const encryptedPassword = await encryptMethod(password);
 			const updatedRecord = await record.update({
-					lastName, 
+					lastName,
 					firstName,
 					email,
-					address, 
-					phone, 
-					cityName, 
+					address,
+					phone,
+					cityName,
 					password: encryptedPassword
-			});
+				});
 			return res.json({ msg:"Modificaiton réussie",record: updatedRecord });
 		} catch (e) {
-			return res.json({
+			return res.status(500).json({
 				msg: "Modification impossible",
-				status: 500,
 				route: "/update/:id",
-
+				err:e
 			});
 		}
 	}

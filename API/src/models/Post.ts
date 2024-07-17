@@ -12,9 +12,12 @@ interface PostAttributes {
   cityName: string;
   state: boolean;
   accepted: boolean;
-  acceptedBy: number;
+  acceptedBy: number | null;
   idUser: number;
-  idPlant: number;
+  plantDescription: string;
+  plantOrigin: string;
+  plantRequirements: string;
+  plantType: string;
 }
 
 export interface PostCreationAttributes extends Optional<PostAttributes, 'idPosts'> {}
@@ -33,9 +36,12 @@ PostInstance.init(
     cityName: { type: DataTypes.STRING, allowNull: false },
     state: { type: DataTypes.BOOLEAN, allowNull: false },
     accepted: { type: DataTypes.BOOLEAN, allowNull: false },
-    acceptedBy: { type: DataTypes.INTEGER, allowNull: false },
+    acceptedBy: { type: DataTypes.INTEGER, allowNull: true }, // `null` allowed as acceptedBy can be NULL
     idUser: { type: DataTypes.INTEGER, allowNull: false },
-    idPlant: { type: DataTypes.INTEGER, allowNull: false }
+    plantDescription: { type: DataTypes.STRING, allowNull: false },
+    plantOrigin: { type: DataTypes.STRING, allowNull: false },
+    plantRequirements: { type: DataTypes.STRING, allowNull: false },
+    plantType: { type: DataTypes.STRING, allowNull: false }
   },
   { sequelize: db, tableName: 'Posts', timestamps: false }
 );
