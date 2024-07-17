@@ -1,8 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-const PubTitre = ({ navigation }: { navigation: any }) => {
+type RootStackParamList = {
+  Titre: { titre: '' };
+  Publier: { titreValid?: boolean, titre: string };
+};
+
+type UpdateTitreNavigationProp = StackNavigationProp<RootStackParamList, 'Titre'>;
+type UpdateTitreRouteProp = RouteProp<RootStackParamList, 'Titre'>;
+
+
+const PubTitre = () => {
+  const navigation = useNavigation<UpdateTitreNavigationProp>();
+  const route = useRoute<UpdateTitreRouteProp>();
   const [titre, setTitre] = useState('');
   const [titreCompleted, setTitreCompleted] = useState(false);
   const [isEditing, setIsEditing] = useState(true);
@@ -37,8 +50,9 @@ const PubTitre = ({ navigation }: { navigation: any }) => {
       setTitreCompleted(true);
       setIsEditing(false);
       saveTitre();
-      navigation.setParams({ titre: titre });
-      navigation.goBack();
+      navigation.navigate('Publier', { titreValid: true, titre: titre });
+    } else {
+      navigation.navigate('Publier', { titreValid: false, titre: '' });
     }
   };
 

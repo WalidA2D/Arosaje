@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +18,14 @@ import PubEspece from '../pubnav/pubespece';
 import PubEntretien from '../pubnav/pubentretien';
 
 const Stack = createNativeStackNavigator();
+
+type RootStackParamList = {
+  Titre: { titre: string };
+  Publier: { titreValid?: boolean, titre: string };
+};
+
+type UpdatePublierNavigationProp = StackNavigationProp<RootStackParamList, 'Publier'>;
+type UpdatePublierRouteProp = RouteProp<RootStackParamList, 'Publier'>;
 
 function PublierScreen({ }) {
 
@@ -70,33 +78,46 @@ function PublierScreen({ }) {
 }
 
 function PublierContent() {
-  const navigation = useNavigation<StackNavigationProp<any>>();
-  const isValid = false;
+  const navigation = useNavigation<UpdatePublierNavigationProp>();
+  const route = useRoute<UpdatePublierRouteProp>();
+  const [isValid] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (route.params?.titreValid) {
+        navigation.setParams({titreValid: true});
+      } else {
+        navigation.setParams({ titreValid: false });
+      }
+    });
+
+    return unsubscribe;
+  }, [route.params?.titreValid]);
 
   return (
     <View style={styles.container}>
 
     <View style={styles.fixedDetails}>
-      <ListDash buttonText="Titre" onPress={() => navigation.navigate('Titre')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
+      <ListDash buttonText={`Titre : ${route.params?.titre || ''}`} onPress={() => navigation.navigate('Titre', { titre: route.params?.titre || '' })} />
+      <Ionicons name={route.params?.titreValid ? 'checkmark-circle' : 'close-circle'} size={24} color={route.params?.titreValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
       <View style={styles.separatorDetails}/>
       <ListDash buttonText="Date(s)" onPress={() => navigation.navigate('Date(s)')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
       <View style={styles.separatorDetails}/>
       <ListDash buttonText="Photo(s)" onPress={() => navigation.navigate('Photo(s)')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
       <View style={styles.separatorDetails}/>
       <ListDash buttonText="Description" onPress={() => navigation.navigate('Description')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
       <View style={styles.separatorDetails}/>
       <ListDash buttonText="Localisation" onPress={() => navigation.navigate('Localisation')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
       <View style={styles.separatorDetails}/>
       <ListDash buttonText="Espèce(s)" onPress={() => navigation.navigate('Espèce(s)')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
       <View style={styles.separatorDetails}/>
       <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#828282"} />
+      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#828282"} style={styles.iconValid} />
       <View style={styles.separatorDetails}/>
     </View>
     <View style={styles.fixedDetailsBtn}>
@@ -167,21 +188,24 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
     },
-selectorContainer: {
-  flexDirection: 'row',
-  marginBottom: 20,
-  backgroundColor: '#E0E0E0',
-  borderRadius: 25,
-  overflow: 'hidden',
-  width: '90%',
-  alignItems: 'center',
-},
-selectorButton: {
-  flex: 1,
-  paddingVertical: 20,
-  justifyContent: 'center',
-  alignItems: 'center',
-},
+  selectorContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 25,
+    overflow: 'hidden',
+    width: '90%',
+    alignItems: 'center',
+  },
+  selectorButton: {
+    flex: 1,
+    paddingVertical: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconValid: {
+    paddingHorizontal: 10,
+  }
 });
 
 export default PublierScreen;
