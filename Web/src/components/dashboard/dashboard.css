@@ -1,0 +1,50 @@
+.dashboardContainer {
+    flex: 6;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    overflow-y: auto;
+    height: calc(100vh - 100px);
+}
+
+.dashboardContainer {
+    margin: auto;
+    margin-left: 15%;
+}
+
+.gridContainerTop {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5%;
+}
+
+.gridContainerBottom {
+    display: flex;
+    flex-direction: row;
+}
+
+.grid1 {
+    width: 300px;
+    height: 300px;
+    background-color: red;
+    margin-right: 5%;
+}
+
+.grid2 {
+    width: 300px;
+    height: 300px;
+    background-color: blue;
+}
+
+.grid3 {
+    width: 300px;
+    height: 300px;
+    margin-right: 5%;
+    background-color: purple;
+}
+
+.grid4 {
+    width: 300px;
+    height: 300px;
+    background-color: green;
+}
