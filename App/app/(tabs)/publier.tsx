@@ -6,7 +6,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import BigButtonDown from '../../components/BigButtonDown';
 import ListDash from '../../components/ListDash';
 
 import PubTitre from '../pubnav/pubtitre';
@@ -20,8 +19,14 @@ import PubEntretien from '../pubnav/pubentretien';
 const Stack = createNativeStackNavigator();
 
 type RootStackParamList = {
-  Titre: { titre: string };
-  Publier: { titreValid?: boolean, titre: string };
+  Titre: { titre: '' };
+  Publier: {
+    titreValid?: boolean,
+    titre: string,
+    dateValid?: boolean,
+    selectedStartDate: string,
+    selectedEndDate: string };
+  Date : { selectedStartDate: '', selectedEndDate: ''}
 };
 
 type UpdatePublierNavigationProp = StackNavigationProp<RootStackParamList, 'Publier'>;
@@ -48,7 +53,7 @@ function PublierScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
-        <Stack.Screen name="Date(s)" component={PubDate}
+        <Stack.Screen name="Date" component={PubDate}
         options={{
           headerBackTitleVisible: false
       }} />
@@ -80,56 +85,111 @@ function PublierScreen({ }) {
 function PublierContent() {
   const navigation = useNavigation<UpdatePublierNavigationProp>();
   const route = useRoute<UpdatePublierRouteProp>();
-  const [isValid] = useState(false);
+  const [isValid, setIsValid] = useState(false);
+  const [titre, setTitre] = useState('');
+  const [selectedStartDate, setSelectedStartDate] = useState('');
+  const [selectedEndDate, setSelectedEndDate] = useState('');
+  const [titreValid, setTitreValid] = useState(false);
+  const [dateValid, setDateValid] = useState(false);
 
   useEffect(() => {
+    const loadData = async () => {
+      const storedTitre = await AsyncStorage.getItem('titre');
+      const storedStartDate = await AsyncStorage.getItem('selectedStartDate');
+      const storedEndDate = await AsyncStorage.getItem('selectedEndDate');
+      const storedTitreValid = await AsyncStorage.getItem('titreValid');
+      const storedDateValid = await AsyncStorage.getItem('dateValid');
+
+      if (storedTitre) setTitre(storedTitre);
+      if (storedStartDate) setSelectedStartDate(storedStartDate);
+      if (storedEndDate) setSelectedEndDate(storedEndDate);
+      if (storedTitreValid) setTitreValid(storedTitreValid === 'true');
+      if (storedDateValid) setDateValid(storedDateValid === 'true');
+    };
+
+    loadData();
+
     const unsubscribe = navigation.addListener('focus', () => {
-      if (route.params?.titreValid) {
-        navigation.setParams({titreValid: true});
-      } else {
-        navigation.setParams({ titreValid: false });
-      }
+      const { titreValid, dateValid } = route.params || {};
+      setIsValid(!!titreValid && !!dateValid);
     });
 
     return unsubscribe;
-  }, [route.params?.titreValid]);
+  }, [navigation, route.params]);
+
+  useEffect(() => {
+    if (route.params?.titre) {
+      setTitre(route.params.titre);
+      AsyncStorage.setItem('titre', route.params.titre);
+    }
+    if (route.params?.selectedStartDate) {
+      setSelectedStartDate(route.params.selectedStartDate);
+      AsyncStorage.setItem('selectedStartDate', route.params.selectedStartDate);
+    }
+    if (route.params?.selectedEndDate) {
+      setSelectedEndDate(route.params.selectedEndDate);
+      AsyncStorage.setItem('selectedEndDate', route.params.selectedEndDate);
+    }
+    if (route.params?.titreValid !== undefined) {
+      setTitreValid(route.params.titreValid);
+      AsyncStorage.setItem('titreValid', route.params.titreValid.toString());
+      if (!route.params.titreValid) {
+        setTitre('');
+        AsyncStorage.removeItem('titre');
+      }
+    }
+    if (route.params?.dateValid !== undefined) {
+      setDateValid(route.params.dateValid);
+      AsyncStorage.setItem('dateValid', route.params.dateValid.toString());
+      if (!route.params.dateValid) {
+        setSelectedStartDate('');
+        setSelectedEndDate('');
+        AsyncStorage.removeItem('selectedStartDate');
+        AsyncStorage.removeItem('selectedEndDate');
+      }
+    }
+  }, [route.params]);
+
+  const formatDate = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  };
 
   return (
     <View style={styles.container}>
-
-    <View style={styles.fixedDetails}>
-      <ListDash buttonText={`Titre : ${route.params?.titre || ''}`} onPress={() => navigation.navigate('Titre', { titre: route.params?.titre || '' })} />
-      <Ionicons name={route.params?.titreValid ? 'checkmark-circle' : 'close-circle'} size={24} color={route.params?.titreValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Date(s)" onPress={() => navigation.navigate('Date(s)')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Photo(s)" onPress={() => navigation.navigate('Photo(s)')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Description" onPress={() => navigation.navigate('Description')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Localisation" onPress={() => navigation.navigate('Localisation')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Espèce(s)" onPress={() => navigation.navigate('Espèce(s)')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
-      <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#828282"} style={styles.iconValid} />
-      <View style={styles.separatorDetails}/>
-    </View>
-    <View style={styles.fixedDetailsBtn}>
-    <View style={styles.selectorContainer}>
-    <TouchableOpacity style={[styles.selectorButton, { backgroundColor: isValid ? '#668F80' : '#828282' }]} disabled={!isValid}>
-        <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
-             Valider
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.fixedDetails}>
+        <ListDash buttonText={`Titre : ${titre}`} onPress={() => navigation.navigate('Titre', { titre })} />
+        <Ionicons name={titreValid ? 'checkmark-circle' : 'close-circle'} size={24} color={titreValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails}/>
+        <ListDash buttonText={`Date(s) : ${selectedStartDate ? formatDate(selectedStartDate) : ''} - ${selectedEndDate ? formatDate(selectedEndDate) : ''}`} onPress={() => navigation.navigate('Date', { selectedStartDate, selectedEndDate })} />
+        <Ionicons name={dateValid ? 'checkmark-circle' : 'close-circle'} size={24} color={dateValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails}/>
+        <ListDash buttonText="Photo(s)" onPress={() => navigation.navigate('Photo(s)')} />
+        <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails}/>
+        <ListDash buttonText="Description" onPress={() => navigation.navigate('Description')} />
+        <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails}/>
+        <ListDash buttonText="Localisation" onPress={() => navigation.navigate('Localisation')} />
+        <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails}/>
+        <ListDash buttonText="Espèce(s)" onPress={() => navigation.navigate('Espèce(s)')} />
+        <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails}/>
+        <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
+        <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#828282"} style={styles.iconValid} />
+        <View style={styles.separatorDetails}/>
+      </View>
+      <View style={styles.fixedDetailsBtn}>
+        <View style={styles.selectorContainer}>
+          <TouchableOpacity style={[styles.selectorButton, { backgroundColor: isValid ? '#668F80' : '#828282' }]} disabled={!isValid}>
+            <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
+              Valider
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
-  </View>
   );
 }
 

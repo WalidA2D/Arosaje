@@ -1,148 +1,106 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
+
+import BigButtonDown from '../../components/BigButtonDown';
 
 type RootStackParamList = {
-  Titre: { titre: '' };
-  Publier: { titreValid?: boolean, titre: string };
-  Date: { dateValid?: boolean, date: undefined};
+  Publier: {
+    dateValid?: boolean,
+    selectedStartDate: string,
+    selectedEndDate: string };
+  Date : { selectedStartDate: '', selectedEndDate: ''}
 };
 
 type UpdateDateNavigationProp = StackNavigationProp<RootStackParamList, 'Date'>;
 type UpdateDateRouteProp = RouteProp<RootStackParamList, 'Date'>;
 
-LocaleConfig.locales['fr'] = {
-  monthNames: [
-    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
-  ],
-  monthNamesShort: [
-    'Janv.', 'Févr.', 'Mars', 'Avr.', 'Mai', 'Juin.',
-    'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.',
-  ],
-  dayNames: [
-    'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi',
-  ],
-  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
-  today: "Aujourd'hui",
-};
-LocaleConfig.defaultLocale = 'fr';
-
-interface MarkedDates {
-  [key: string]: {
-    startingDay?: boolean;
-    endingDay?: boolean;
-    color?: string;
-    textColor?: string;
-  };
-}
-
 export default function PubDate() {
   const navigation = useNavigation<UpdateDateNavigationProp>();
   const route = useRoute<UpdateDateRouteProp>();
-  const [selectedDates, setSelectedDates] = useState<MarkedDates>({});
-  const [currentDate, setCurrentDate] = useState('');
-  const [dateCompleted, setDateCompleted] = useState(false);
-  const [isEditing, setIsEditing] = useState(true);
+  const [selectedStartDate, setSelectedStartDate] = useState('');
+  const [selectedEndDate, setSelectedEndDate] = useState('');
 
-  useEffect(() => {
-    const today = new Date();
-    const initialDate = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-01`;
-    setCurrentDate(initialDate);
-  }, []);
+  const today = new Date().toISOString().split('T')[0];
 
-  const onEventPress = (event: Event) => {
-    let newSelectedDates: MarkedDates = {};
+  const onDayPress = (day: { dateString: string }) => {
+    if (new Date(day.dateString) < new Date(today)) {
+      return; // Ne pas permettre la sélection de dates avant aujourd'hui
+    }
 
-    event.dates.forEach((date, index) => {
-      if (index === 0) {
-        newSelectedDates[date] = { startingDay: true, color: '#9DB58B', textColor: 'white' };
-      } else if (index === event.dates.length - 1) {
-        newSelectedDates[date] = { endingDay: true, color: '#9DB58B', textColor: 'white' };
+    if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+      setSelectedStartDate(day.dateString);
+      setSelectedEndDate('');
+    } else if (new Date(day.dateString) >= new Date(selectedStartDate)) {
+      if (day.dateString === selectedStartDate) {
+        setSelectedEndDate(''); // Si la date de début et de fin sont les mêmes, réinitialiser la date de fin
       } else {
-        newSelectedDates[date] = { color: '#9DB58B', textColor: 'white' };
+        setSelectedEndDate(day.dateString);
       }
-    });
-
-    setSelectedDates(newSelectedDates);
-    setCurrentDate(event.dates[0]);
+    } else {
+      setSelectedStartDate(day.dateString);
+      setSelectedEndDate('');
+    }
   };
 
-  const getEventColor = (index: number) => {
-    const colors = ['#668F80', '#D8C3A5', '#EAE7DC', '#8E8D8A'];
-    return colors[index % colors.length];
+  const markedDates: { [key: string]: any } = {};
+
+  if (selectedStartDate) {
+    markedDates[selectedStartDate] = { startingDay: true, endingDay: !selectedEndDate, color: '#668F80', textColor: 'white' };
+  }
+  if (selectedEndDate && selectedEndDate !== selectedStartDate) {
+    markedDates[selectedEndDate] = { endingDay: true, color: '#668F80', textColor: 'white' };
+  }
+  if (selectedStartDate && selectedEndDate && selectedEndDate !== selectedStartDate) {
+    let currentDate = new Date(selectedStartDate);
+    while (currentDate <= new Date(selectedEndDate)) {
+      const dateString = currentDate.toISOString().split('T')[0];
+      if (dateString !== selectedStartDate && dateString !== selectedEndDate) {
+        markedDates[dateString] = { color: '#668F80', textColor: 'white' };
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  }
+
+  const handleValidation = () => {
+    if (selectedStartDate.trim() !== '' && selectedEndDate.trim() !== '') {
+      navigation.navigate('Publier', { dateValid: true, selectedStartDate, selectedEndDate });
+    } else {
+      navigation.navigate('Publier', { dateValid: false, selectedStartDate: '', selectedEndDate: '' });
+    }
   };
 
-    return (
-      <View style={styles.container}>
-          {currentDate && (
-          <Calendar
-            key={currentDate} // Ajout de la clé pour forcer la mise à jour du composant
-            current={currentDate}
-            style={styles.calendar}
-            theme={{
-              backgroundColor: '#668F80',
-              calendarBackground: '#FFFFFF',
-              textSectionTitleColor: '#000000',
-              selectedDayBackgroundColor: '#668F80',
-              selectedDayTextColor: '#ffffff',
-              todayTextColor: '#668F80',
-              dayTextColor: '#2d4150',
-              textDisabledColor: '#d9e1e8',
-              dotColor: '#00adf5',
-              selectedDotColor: '#ffffff',
-              arrowColor: '#668F80',
-              monthTextColor: '#000000',
-              indicatorColor: 'blue',
-              textDayFontFamily: 'monospace',
-              textMonthFontFamily: 'monospace',
-              textDayHeaderFontFamily: 'monospace',
-              textDayFontWeight: '300',
-              textMonthFontWeight: 'bold',
-              textDayFontSize: 14,
-              textMonthFontSize: 18,
-              textDayHeaderFontSize: 14,
-            }}
-            markingType={'period'}
-            markedDates={selectedDates}
-            onMonthChange={(month) => setCurrentDate(`${month.year}-${month.month.toString().padStart(2, '0')}-01`)}
-          />
-        )}
-        </View>
-    );
+  const formatDate = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
   };
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: '#f0f0f0',
-    },
-    input: {
-      height: 40,
-      width: '80%',
-      borderColor: 'gray',
-      borderWidth: 1,
-      marginBottom: 10,
-      paddingHorizontal: 10,
-    },
-    text: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      marginTop: 20,
-    },
-    clearButton: {
-      fontSize: 16,
-      color: 'red',
-      marginTop: 20,
-    },
-    calendar: {
-      borderRadius: 8,
-      overflow: 'hidden',
-      marginBottom: 10,
-    },
-  });
+  return (
+    <View style={styles.container}>
+      <Calendar
+        onDayPress={onDayPress}
+        markedDates={markedDates}
+        markingType={'period'}
+        minDate={today} // Empêcher la sélection de dates avant aujourd'hui
+      />
+      <Text style={styles.selectedDateText}>Début : {selectedStartDate ? formatDate(selectedStartDate) : ''}</Text>
+      <Text style={styles.selectedDateText}>Fin : {selectedEndDate ? formatDate(selectedEndDate) : (selectedStartDate ? formatDate(selectedStartDate) : '')}</Text>
+      <BigButtonDown buttonText="Choisir" onPress={handleValidation} />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFF',
+  },
+  selectedDateText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 10
+  },
+});

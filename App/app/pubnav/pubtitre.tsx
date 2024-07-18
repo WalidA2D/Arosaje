@@ -4,6 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
+import BigButtonDown from '../../components/BigButtonDown';
+
 type RootStackParamList = {
   Titre: { titre: '' };
   Publier: { titreValid?: boolean, titre: string };
@@ -78,13 +80,10 @@ const PubTitre = () => {
           onChangeText={text => setTitre(text)}
         />
       )}
-      <Button
-        title="Valider"
-        onPress={handleValidation}
-      />
       <TouchableOpacity onPress={clearTitre}>
-        <Text style={styles.clearButton}>Vider Titre</Text>
+        <Text style={styles.clearButton}>Vider le titre</Text>
       </TouchableOpacity>
+      <BigButtonDown buttonText="Valider" onPress={handleValidation} />
     </View>
   );
 };
