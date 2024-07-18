@@ -14,7 +14,6 @@ interface PostAttributes {
   accepted: boolean;
   acceptedBy: number | null;
   idUser: number;
-  plantDescription: string;
   plantOrigin: string;
   plantRequirements: string;
   plantType: string;
@@ -35,10 +34,9 @@ PostInstance.init(
     address: { type: DataTypes.STRING, allowNull: false },
     cityName: { type: DataTypes.STRING, allowNull: false },
     state: { type: DataTypes.BOOLEAN, allowNull: false },
-    accepted: { type: DataTypes.BOOLEAN, allowNull: false },
-    acceptedBy: { type: DataTypes.INTEGER, allowNull: true }, // `null` allowed as acceptedBy can be NULL
+    accepted: { type: DataTypes.BOOLEAN, allowNull: true },
+    acceptedBy: { type: DataTypes.INTEGER, allowNull: true }, 
     idUser: { type: DataTypes.INTEGER, allowNull: false },
-    plantDescription: { type: DataTypes.STRING, allowNull: false },
     plantOrigin: { type: DataTypes.STRING, allowNull: false },
     plantRequirements: { type: DataTypes.STRING, allowNull: false },
     plantType: { type: DataTypes.STRING, allowNull: false }

@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, query, param } from 'express-validator';
 
 class PostValidator {
   checkCreate() {
@@ -44,11 +44,13 @@ class PostValidator {
         .notEmpty()
         .withMessage('L\'état est requis'),
       body('accepted')
+        .optional()
         .isBoolean()
         .withMessage('Accepté doit être un booléen')
         .notEmpty()
         .withMessage('Accepté est requis'),
       body('acceptedBy')
+        .optional()
         .isInt()
         .withMessage('Accepté par doit être un entier')
         .notEmpty()
@@ -58,11 +60,40 @@ class PostValidator {
         .withMessage('L\'identifiant de l\'utilisateur doit être un entier')
         .notEmpty()
         .withMessage('L\'identifiant de l\'utilisateur est requis'),
-      body('idPlant')
-        .isInt()
-        .withMessage('L\'identifiant de la plante doit être un entier')
+      body('plantOrigin')
+        .isString()
+        .withMessage('L\'origine de la plante doit être une chaîne de caractères')
         .notEmpty()
-        .withMessage('L\'identifiant de la plante est requis')
+        .withMessage('L\'origine de la plante est requise'),
+      body('plantRequirements')
+        .isString()
+        .withMessage('Les besoins de la plante doivent être une chaîne de caractères')
+        .notEmpty()
+        .withMessage('Les besoins de la plante sont requis'),
+      body('plantType')
+        .isString()
+        .withMessage('Le type de plante doit être une chaîne de caractères')
+        .notEmpty()
+        .withMessage('Le type de plante est requis')
+    ];
+  }
+  checkRead() {
+		return [
+			query('limit')
+				.optional()
+				.isInt({ min: 1, max: 10 })
+				.withMessage('La limite doit être entre : 1 à 10'),
+			query('offset')
+				.optional()
+				.isNumeric()
+				.withMessage('La valeur doit être un numéro'),
+		];
+	}
+  checkReadByUser() {
+    return [
+      param('id')
+        .isNumeric()
+        .withMessage("L'id doit être un numéro")
     ];
   }
 }

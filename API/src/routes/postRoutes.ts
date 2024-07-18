@@ -13,4 +13,25 @@ router.post(
 	PostController.create
 );
 
+router.get(
+	'/read',
+	postValidator.checkRead(),
+	Middleware.handleValidationError,
+	PostController.readPagination
+);
+
+router.get(
+	'/read/:id',
+	postValidator.checkReadByUser(),
+	Middleware.handleValidationError,
+	PostController.readByUser
+);
+
+router.delete(
+	'/delete/:id',
+	postValidator.checkReadByUser(),
+	Middleware.handleValidationError,
+	PostController.delete
+);
+
 export default router;
