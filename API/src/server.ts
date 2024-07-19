@@ -5,6 +5,7 @@ import dotenv from 'dotenv'
 
 import userRouter from "./routes/userRoutes";
 import postRouter from "./routes/postRoutes";
+import imageRouter from "./routes/imageRoutes";
 
 dotenv.config()
 
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use("/user", userRouter);
 app.use("/post", postRouter);
+app.use("/img", imageRouter)
 
 const port = process.env.PORT || 5070;
 
