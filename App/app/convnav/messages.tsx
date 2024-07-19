@@ -1,14 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform, Keyboard, Modal } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import * as ImagePicker from 'expo-image-picker';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import io from 'socket.io-client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { v4 as uuidv4 } from 'uuid';
+
+const socket = io('http://172.17.80.1:4000');
 
 type RootStackParamList = {
   explore: undefined;
-  message: { userName: string; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string, image?: string }> };
+  message: { userName: string; initialMessages: Array<{ id: string; text: string; sender: string; timestamp: string, image?: string }> };
   Profil: { userName: string };
 };
 
@@ -48,6 +53,7 @@ export default function MessageScreen() {
 
   const initialMessages = initialMessagesRaw.map(message => ({
     ...message,
+    id: message.id || uuidv4(),
     timestamp: new Date(message.timestamp)
   }));
 
@@ -56,15 +62,72 @@ export default function MessageScreen() {
   const [messages, setMessages] = useState(initialMessages);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
-  const [selectedMessages, setSelectedMessages] = useState<number[]>([]);
+  const [selectedMessages, setSelectedMessages] = useState<string[]>([]);
   const [hasSentMessage, setHasSentMessage] = useState<boolean>(false);
   const [isImageViewerVisible, setIsImageViewerVisible] = useState<boolean>(false);
   const [imageToView, setImageToView] = useState<{ url: string }[]>([]);
   const scrollViewRef = useRef<ScrollView>(null);
   const inputRef = useRef<TextInput>(null);
+  const currentUserId = socket.id;
+
+  useEffect(() => {
+    const conversationId = userName;
+    socket.emit('joinConversation', conversationId);
+    console.log(`Joining conversation: ${conversationId}`);
+
+    loadMessages(conversationId);
+
+    socket.on('receiveMessage', (message) => {
+      if (message.senderId !== currentUserId) {
+        const newMessage = { id: uuidv4(), text: message.text, sender: 'left', timestamp: new Date(), senderId: message.senderId, image: message.image };
+        console.log('Received message:', newMessage);
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages, newMessage];
+          saveMessages(conversationId, updatedMessages);
+          return updatedMessages;
+        });
+        setTimeout(() => {
+          scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
+    });
+
+    return () => {
+      socket.off('receiveMessage');
+      socket.emit('leaveConversation', conversationId);
+      console.log(`Leaving conversation: ${conversationId}`);
+    };
+  }, [userName]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  }, [messages]);
+
+  const saveMessages = async (conversationId: string, messages: any[]) => {
+    try {
+      await AsyncStorage.setItem(`messages_${conversationId}`, JSON.stringify(messages));
+      console.log(`Messages saved for conversation ${conversationId}`);
+    } catch (error) {
+      console.error("Failed to save messages:", error);
+    }
+  };
+
+  const loadMessages = async (conversationId: string) => {
+    try {
+      const savedMessages = await AsyncStorage.getItem(`messages_${conversationId}`);
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+        console.log(`Messages loaded for conversation ${conversationId}`);
+      }
+    } catch (error) {
+      console.error("Failed to load messages:", error);
+    }
+  };
 
   const filteredMessages = messages
-    .filter(message => message.text.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(message => message.text?.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
   useEffect(() => {
@@ -80,12 +143,17 @@ export default function MessageScreen() {
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       const newMessageData = {
-        id: messages.length + 1,
+        id: uuidv4(),
         text: newMessage,
         sender: 'right',
         timestamp: new Date(),
+        senderId: currentUserId,
       };
-      setMessages([...messages, newMessageData]);
+      console.log('Sending message:', newMessageData);
+      const updatedMessages = [...messages, newMessageData];
+      setMessages(updatedMessages);
+      socket.emit('sendMessage', { conversationId: userName, message: newMessageData });
+      saveMessages(userName, updatedMessages);
       setNewMessage('');
       setHasSentMessage(true);
       setTimeout(() => {
@@ -96,68 +164,81 @@ export default function MessageScreen() {
 
   const handleSendImage = (uri: string) => {
     const newMessageData = {
-      id: messages.length + 1,
+      id: uuidv4(),
       text: '',
       image: uri,
       sender: 'right',
       timestamp: new Date(),
+      senderId: currentUserId,
     };
-    setMessages([...messages, newMessageData]);
+    console.log('Sending image message:', newMessageData);
+    const updatedMessages = [...messages, newMessageData];
+    setMessages(updatedMessages);
+    socket.emit('sendMessage', { conversationId: userName, message: newMessageData });
+    saveMessages(userName, updatedMessages);
     setHasSentMessage(true);
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
   };
 
-  const handleLongPressMessage = (id: number) => {
+  const handleLongPressMessage = (id: string) => {
     setIsSelecting(true);
     setSelectedMessages([id]);
+    console.log('Long pressed message with id:', id);
   };
 
-  const handleSelectMessage = (id: number) => {
+  const handleSelectMessage = (id: string) => {
     setSelectedMessages(prevSelectedMessages =>
       prevSelectedMessages.includes(id)
         ? prevSelectedMessages.filter(messageId => messageId !== id)
         : [...prevSelectedMessages, id]
     );
+    console.log('Selected message with id:', id);
   };
 
   const handleDeleteMessages = () => {
-    setMessages(prevMessages =>
-      prevMessages.filter(message => !selectedMessages.includes(message.id))
-    );
+    const updatedMessages = messages.filter(message => !selectedMessages.includes(message.id));
+    setMessages(updatedMessages);
+    saveMessages(userName, updatedMessages);
     setIsSelecting(false);
     setSelectedMessages([]);
+    console.log('Deleted selected messages');
   };
 
   const handleCancelSelection = () => {
     setIsSelecting(false);
     setSelectedMessages([]);
+    console.log('Cancelled selection');
   };
 
   const openImagePicker = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert('Permission to access camera roll is required!');
+      return;
+    }
 
-    if (!result.canceled && result.assets && result.assets[0]?.uri) {
-      handleSendImage(result.assets[0].uri);
+    const pickerResult = await ImagePicker.launchImageLibraryAsync();
+    if (!pickerResult.canceled) {
+      handleSendImage(pickerResult.assets[0].uri);
+      console.log('Image picked:', pickerResult.assets[0].uri);
     }
   };
 
-  const handleImagePress = (uri?: string) => {
+  const handleImagePress = (uri: string | undefined) => {
     if (uri) {
       setImageToView([{ url: uri }]);
       setIsImageViewerVisible(true);
+      console.log('Image pressed:', uri);
     }
   };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 100);
     });
 
     return () => {
@@ -171,14 +252,7 @@ export default function MessageScreen() {
     }
   }, [selectedMessages]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      const interval = setInterval(() => {
-        setMessages(prevMessages => [...prevMessages]);
-      }, 40000); // Mettre à jour toutes les 40 secondes
-      return () => clearInterval(interval);
-    }, [])
-  );
+  const hasUserMessages = messages.some(message => message.sender === 'right');
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={90}>
@@ -238,7 +312,7 @@ export default function MessageScreen() {
             </TouchableOpacity>
           </View>
         )}
-        {!hasSentMessage && (
+        {!hasUserMessages && (
           <View style={styles.warningContainer}>
             <Text style={styles.warningText}>Ne divulguez pas vos informations personnelles</Text>
           </View>
@@ -384,33 +458,21 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
   },
-  messageText: {
-    color: '#333',
-  },
-  messageTextRight: {
-    color: '#FFF',
-  },
   messageImage: {
     width: 200,
     height: 200,
     borderRadius: 10,
   },
+  messageText: {
+    color: '#000',
+  },
+  messageTextRight: {
+    color: '#FFF',
+  },
   timestamp: {
-    fontSize: 10,
-    color: 'gray',
+    fontSize: 12,
+    color: '#666',
     marginTop: 5,
-  },
-  warningContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    backgroundColor: '#FFF0F0',
-    borderTopColor: '#FF0000',
-    borderTopWidth: 1,
-  },
-  warningText: {
-    color: '#FF0000',
-    textAlign: 'center',
-    fontWeight: 'bold',
   },
   footer: {
     flexDirection: 'row',
@@ -419,21 +481,33 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderTopColor: '#E8E8E8',
     borderTopWidth: 1,
-    backgroundColor: '#FFF',
   },
   input: {
     flex: 1,
-    padding: 10,
+    height: 40,
     backgroundColor: '#F0F0F0',
     borderRadius: 20,
-    marginRight: 10,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
   },
   sendButton: {
     backgroundColor: '#668F80',
     borderRadius: 20,
     padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   attachmentButton: {
-    marginRight: 10,
+    padding: 10,
+  },
+  warningContainer: {
+    backgroundColor: '#FFF3CD',
+    padding: 10,
+    borderRadius: 10,
+    margin: 10,
+  },
+  warningText: {
+    color: '#856404',
+    fontSize: 14,
   },
 });

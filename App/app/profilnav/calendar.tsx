@@ -168,7 +168,7 @@ export default function CalendarScreen() {
             }}
             markingType={'period'}
             markedDates={selectedDates}
-            onMonthChange={(month) => setCurrentDate(`${month.year}-${month.month.toString().padStart(2, '0')}-01`)}
+            onMonthChange={(month: { year: any; month: { toString: () => string; }; }) => setCurrentDate(`${month.year}-${month.month.toString().padStart(2, '0')}-01`)}
           />
         )}
       <ScrollView contentContainerStyle={styles.scrollViewContent}>

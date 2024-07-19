@@ -7,7 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import MessageScreen from '../convnav/messages';
-import ChatbotScreen from '../convnav/bot'; 
+import ChatbotScreen from '../convnav/bot';
 import Histoire from '../convnav/botnav/histoire';
 import Profil from '../convnav/profilconsulte';
 
@@ -52,14 +52,14 @@ function ConvScreen() {
 
 type User = {
   userName: string;
-  avatar: any; 
+  avatar: any;
   initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }>;
 };
 
 const initialUsers: User[] = [
   {
     userName: 'Chatbot',
-    avatar: require('../../assets/images/bot.png'), 
+    avatar: require('../../assets/images/bot.png'),
     initialMessages: [
       { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
     ],
@@ -67,18 +67,12 @@ const initialUsers: User[] = [
   {
     userName: 'Jean Dupuis',
     avatar: 'https://picsum.photos/620/300',
-    initialMessages: [
-      { id: 1, text: 'Bonjour Jean!', sender: 'left', timestamp: new Date().toISOString() },
-      { id: 2, text: 'Salut, comment ça va?', sender: 'right', timestamp: new Date().toISOString() },
-    ],
+    initialMessages: [],
   },
   {
     userName: 'Marie Curie',
     avatar: 'https://picsum.photos/620/300',
-    initialMessages: [
-      { id: 1, text: 'Bonjour Marie!', sender: 'left', timestamp: new Date().toISOString() },
-      { id: 2, text: 'Salut, ça va bien?', sender: 'right', timestamp: new Date().toISOString() },
-    ],
+    initialMessages: [],
   },
   // Add more users here
 ];
@@ -90,6 +84,28 @@ export function ExploreScreen() {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadMessagesForUsers = async () => {
+      const updatedUsers = await Promise.all(users.map(async (user) => {
+        const messages = await loadMessages(user.userName);
+        return { ...user, initialMessages: messages.length ? messages : user.initialMessages };
+      }));
+      setUsers(updatedUsers);
+    };
+
+    loadMessagesForUsers();
+  }, []);
+
+  const loadMessages = async (userName: string) => {
+    try {
+      const savedMessages = await AsyncStorage.getItem(`messages_${userName}`);
+      return savedMessages ? JSON.parse(savedMessages) : [];
+    } catch (error) {
+      console.error("Failed to load messages:", error);
+      return [];
+    }
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -215,13 +231,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFF',
   },
-  header: {
-    backgroundColor: '#668F80',
-    padding: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 50,
-  },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -247,7 +256,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E8E8E8',
     borderBottomWidth: 1,
     paddingHorizontal: 10,
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
   },
   chatItem: {
     flexDirection: 'row',
