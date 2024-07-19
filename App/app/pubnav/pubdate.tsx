@@ -48,10 +48,10 @@ export default function PubDate() {
   const markedDates: { [key: string]: any } = {};
 
   if (selectedStartDate) {
-    markedDates[selectedStartDate] = { startingDay: true, endingDay: !selectedEndDate, color: '#668F80', textColor: 'white' };
+    markedDates[selectedStartDate] = { startingDay: true, endingDay: !selectedEndDate, color: '#9DB58B', textColor: 'white' };
   }
   if (selectedEndDate && selectedEndDate !== selectedStartDate) {
-    markedDates[selectedEndDate] = { endingDay: true, color: '#668F80', textColor: 'white' };
+    markedDates[selectedEndDate] = { endingDay: true, color: '#9DB58B', textColor: 'white' };
   }
   if (selectedStartDate && selectedEndDate && selectedEndDate !== selectedStartDate) {
     let currentDate = new Date(selectedStartDate);
@@ -84,6 +84,9 @@ export default function PubDate() {
         markedDates={markedDates}
         markingType={'period'}
         minDate={today} // Empêcher la sélection de dates avant aujourd'hui
+        theme={{
+          arrowColor: '#668F80',
+        }}
       />
       <Text style={styles.selectedDateText}>Début : {selectedStartDate ? formatDate(selectedStartDate) : ''}</Text>
       <Text style={styles.selectedDateText}>Fin : {selectedEndDate ? formatDate(selectedEndDate) : (selectedStartDate ? formatDate(selectedStartDate) : '')}</Text>

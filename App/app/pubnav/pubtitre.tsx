@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Button } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -13,7 +13,6 @@ type RootStackParamList = {
 
 type UpdateTitreNavigationProp = StackNavigationProp<RootStackParamList, 'Titre'>;
 type UpdateTitreRouteProp = RouteProp<RootStackParamList, 'Titre'>;
-
 
 const PubTitre = () => {
   const navigation = useNavigation<UpdateTitreNavigationProp>();
@@ -69,22 +68,36 @@ const PubTitre = () => {
     }
   };
 
+  const editTitre = () => {
+    setIsEditing(true);
+  };
+
   return (
-    <View style={styles.container}>
-      {titreCompleted ? <Text style={styles.text}>Titre : {titre}</Text> : null}
-      {isEditing && (
-        <TextInput
-          style={styles.input}
-          placeholder="Entrez le titre"
-          value={titre}
-          onChangeText={text => setTitre(text)}
-        />
-      )}
-      <TouchableOpacity onPress={clearTitre}>
-        <Text style={styles.clearButton}>Vider le titre</Text>
-      </TouchableOpacity>
-      <BigButtonDown buttonText="Valider" onPress={handleValidation} />
-    </View>
+      <View style={styles.container}>
+        {titreCompleted ? <Text style={styles.text}>Titre : {titre}</Text> : null}
+        {isEditing && (
+          <>
+            <TextInput
+              style={styles.input}
+              placeholder="Entrez le titre"
+              value={titre}
+              onChangeText={text => setTitre(text)}
+              textAlignVertical="top"
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
+            />
+          </>
+        )}
+        {!isEditing && (
+          <TouchableOpacity onPress={editTitre}>
+            <Text style={styles.editButton}>Modifier le titre</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={clearTitre}>
+          <Text style={styles.clearButton}>Vider le titre</Text>
+        </TouchableOpacity>
+        <BigButtonDown buttonText="Valider" onPress={handleValidation} />
+      </View>
   );
 };
 
@@ -102,10 +115,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 10,
     paddingHorizontal: 10,
+    borderRadius: 10,
   },
   text: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginTop: 20,
+  },
+  editButton: {
+    fontSize: 16,
+    color: 'blue',
     marginTop: 20,
   },
   clearButton: {
