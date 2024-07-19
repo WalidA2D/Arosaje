@@ -1,15 +1,14 @@
 import "./deleteBotaniste.css"
 
-export default function DeleteBotaniste({ closeModalDelete }) {
+export default function DeleteBotaniste({ closeModal }) {
   const handleDelete = () => {
-    closeModalDelete();
+    closeModal();
   };
 
   return (
     <div>
-
       <button onClick={handleDelete}>Supprimer</button>
-      <button onClick={closeModalDelete}>Fermer</button>
+      <button onClick={handleDelete}>Fermer</button>
     </div>
   );
 }

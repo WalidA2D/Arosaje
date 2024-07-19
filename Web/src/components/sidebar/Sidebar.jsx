@@ -75,7 +75,7 @@ export default function Sidebar() {
         onRequestClose={closeModalDelete}
         contentLabel="Supprimer un botaniste"
       >
-        <DeleteBotaniste/>
+        <DeleteBotaniste closeModal={closeModalDelete}/>
       </Modal>
     </div>
   );
