@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional } from "sequelize";
+import { DataTypes, Model, Optional } from 'sequelize';
 import db from '../config/database.config';
 
 interface PostAttributes {
@@ -28,7 +28,7 @@ PostInstance.init(
     idPosts: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     title: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.STRING, allowNull: false },
-    publishedAt: { type: DataTypes.DATE, allowNull: false },
+    publishedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     dateStart: { type: DataTypes.DATE, allowNull: false },
     dateEnd: { type: DataTypes.DATE, allowNull: false },
     address: { type: DataTypes.STRING, allowNull: false },
