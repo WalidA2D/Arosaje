@@ -26,18 +26,25 @@ router.get(
 	userController.readByID
 );
 
-// router.put(
-// 	'/update/:id',
-// 	UserValidator.checkIdParam(),
-// 	Middleware.handleValidationError,
-// 	userController.update
-// );
+router.put(
+	'/update',
+	UserValidator.checkIdParam(),
+	userController.update
+);
 
 router.delete(
 	'/delete/:id',
 	UserValidator.checkIdParam(),
+	Middleware.authMiddleware({roles : ["admin"]}),
 	Middleware.handleValidationError,
 	userController.delete
+);
+
+router.post(
+    '/login',
+    UserValidator.checkLogin(),
+    Middleware.handleValidationError,
+    userController.connexion
 );
 
 export default router;

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
+
 import authMiddleware from './authMiddleware';
 
 const Middleware = {
