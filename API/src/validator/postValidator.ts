@@ -14,6 +14,7 @@ class PostValidator {
         .notEmpty()
         .withMessage('La description est requise'),
       body('publishedAt')
+        .optional()
         .matches(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)
         .withMessage('La date de publication doit être au format YYYY-MM-DD HH:mm:ss')
         .notEmpty()
@@ -56,10 +57,8 @@ class PostValidator {
         .notEmpty()
         .withMessage('Accepté par est requis'),
       body('idUser')
-        .isInt()
-        .withMessage('L\'identifiant de l\'utilisateur doit être un entier')
-        .notEmpty()
-        .withMessage('L\'identifiant de l\'utilisateur est requis'),
+        .isEmpty()
+        .withMessage('L\'identifiant de l\'utilisateur ne peut pas être ajouté par un tier'),
       body('plantOrigin')
         .isString()
         .withMessage('L\'origine de la plante doit être une chaîne de caractères')

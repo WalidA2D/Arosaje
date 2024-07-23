@@ -13,12 +13,6 @@ class UserValidator {
                     .notEmpty()
                     .isEmail()
                     .withMessage('Email invalide'),
-			// body('??')
-			// 	.optional()
-			// 	.isBoolean()
-			// 	.withMessage('The value should be boolean')
-			// 	.isIn([0, false])
-			// 	.withMessage('The value should be 0 or false'),
 		];
 	}
 	checkRead() { //avec pagination

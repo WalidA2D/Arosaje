@@ -1,7 +1,6 @@
 import express from 'express';
 import commentValidator from '../validator/commentValidator';
 import Middleware from '../middleware';
-import CommentController from '../controller/commentController'
 import commentController from '../controller/commentController';
 
 const router = express.Router();
@@ -11,7 +10,7 @@ router.post(
     commentValidator.checkCreate(),
     Middleware.handleValidationError,
     Middleware.authMiddleware({roles : ["botaniste"]}),
-    CommentController.create
+    commentController.create
 )
 
 router.get(
@@ -21,9 +20,16 @@ router.get(
 	commentController.readPagination
 );
 
+router.get(
+	'/read/:id',
+	commentValidator.checkReadByPost(),
+	Middleware.handleValidationError,
+	commentController.readByPost
+);
+
 router.delete(
 	'/delete/:id',
-	commentValidator.checkReadByUser(),
+	commentValidator.checkReadByPost(),
 	Middleware.handleValidationError,
 	commentController.delete
 );

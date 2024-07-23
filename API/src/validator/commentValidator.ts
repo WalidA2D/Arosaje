@@ -21,7 +21,6 @@ class CommentValidator {
                 .withMessage("L'IdPost doit etre un entier")
         ];
     }
-
     checkRead() {
         return [
             query('limit')
@@ -34,27 +33,11 @@ class CommentValidator {
                 .withMessage('La valeur doit être un numéro'),
         ];
     }
-
-    checkReadById() {
-        return [
-            param('id')
-                .isNumeric()
-                .withMessage("L'id doit être un numéro")
-        ];
-    }
-
-    checkReadByUser() {
-        return [
-            param('idUser')
-                .isNumeric()
-                .withMessage("L'id de l'utilisateur doit être un numéro")
-        ];
-    }
-
     checkReadByPost() {
         return [
-            param('idPost')
-                .isNumeric()
+            param('id')
+                .notEmpty().withMessage('Id du post doit être fourni')
+                .isInt()
                 .withMessage("L'id du post doit être un numéro")
         ];
     }
