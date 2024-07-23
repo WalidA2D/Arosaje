@@ -29,11 +29,14 @@ type RootStackParamList = {
     description: string,
     locValid?: boolean,
     localisation: string,
+    espValid?: boolean,
+    espece: string,
   };
   Titre: { titre: '' };
   Date: { selectedStartDate: '', selectedEndDate: ''}
   Description: { description: '' };
   Localisation: { localisation: '' };
+  Espece: { espece: '' };
 };
 
 type UpdatePublierNavigationProp = StackNavigationProp<RootStackParamList, 'Publier'>;
@@ -102,6 +105,8 @@ function PublierContent() {
   const [descValid, setDescValid] = useState(false);
   const [locValid, setLocValid] = useState(false);
   const [localisation, setLocalisation] = useState('');
+  const [espValid, setEspValid] = useState(false);
+  const [espece, setEspece] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
@@ -113,22 +118,26 @@ function PublierContent() {
       const storedDateValid = await AsyncStorage.getItem('dateValid');
       const storedDescValid = await AsyncStorage.getItem('descValid');
       const storedLocValid = await AsyncStorage.getItem('locValid');
+      const storedEspValid = await AsyncStorage.getItem('espValid');
+      const storedEspece = await AsyncStorage.getItem('espece');
 
       if (storedTitre) setTitre(storedTitre);
       if (storedStartDate) setSelectedStartDate(storedStartDate);
       if (storedEndDate) setSelectedEndDate(storedEndDate);
       if (storedDescription) setDescription(storedDescription);
+      if (storedEspece) setEspece(storedEspece);
       if (storedTitreValid) setTitreValid(storedTitreValid === 'true');
       if (storedDateValid) setDateValid(storedDateValid === 'true');
       if (storedDescValid) setDescValid(storedDescValid === 'true');
       if (storedLocValid) setLocValid(storedLocValid === 'true');
+      if (storedEspValid) setEspValid(storedEspValid === 'true');
     };
 
     loadData();
 
     const unsubscribe = navigation.addListener('focus', () => {
-      const { titreValid, dateValid, descValid, locValid } = route.params || {};
-      setIsValid(!!titreValid && !!dateValid && !!descValid && !!locValid);
+      const { titreValid, dateValid, descValid, locValid, espValid } = route.params || {};
+      setIsValid(!!titreValid && !!dateValid && !!descValid && !!locValid && !!espValid);
     });
 
     return unsubscribe;
@@ -154,6 +163,10 @@ function PublierContent() {
     if (route.params?.localisation) {
       setLocalisation(route.params.localisation);
       AsyncStorage.setItem('localisation', route.params.localisation);
+    }
+    if (route.params?.espece) {
+      setEspece(route.params.espece);
+      AsyncStorage.setItem('espece', route.params.espece);
     }
     if (route.params?.titreValid !== undefined) {
       setTitreValid(route.params.titreValid);
@@ -189,6 +202,14 @@ function PublierContent() {
         AsyncStorage.removeItem('localisation');
       }
     }
+    if (route.params?.espValid !== undefined) {
+      setEspValid(route.params.espValid);
+      AsyncStorage.setItem('espValid', route.params.espValid.toString());
+      if (!route.params.espValid) {
+        setEspece('');
+        AsyncStorage.removeItem('espece');
+      }
+    }
   }, [route.params]);
 
   const formatDate = (dateString: string) => {
@@ -214,8 +235,8 @@ function PublierContent() {
         <ListDash buttonText={`Localisation : ${localisation}`} onPress={() => navigation.navigate('Localisation', { localisation })} />
         <Ionicons name={locValid ? 'checkmark-circle' : 'close-circle'} size={24} color={locValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
-        <ListDash buttonText="Espèce(s)" onPress={() => navigation.navigate('Espèce(s)')} />
-        <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <ListDash buttonText={`Espèce : ${espece}`} onPress={() => navigation.navigate('Espèce(s)')} />
+        <Ionicons name={espValid ? 'checkmark-circle' : 'close-circle'} size={24} color={espValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
         <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
         <Ionicons name={isValid ? 'checkmark-circle' : 'close-circle'} size={24} color={isValid ? "#668F80" : "#828282"} style={styles.iconValid} />

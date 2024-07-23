@@ -58,7 +58,7 @@ export default function PubDate() {
     while (currentDate <= new Date(selectedEndDate)) {
       const dateString = currentDate.toISOString().split('T')[0];
       if (dateString !== selectedStartDate && dateString !== selectedEndDate) {
-        markedDates[dateString] = { color: '#668F80', textColor: 'white' };
+        markedDates[dateString] = { color: '#9DB58B', textColor: 'white' };
       }
       currentDate.setDate(currentDate.getDate() + 1);
     }
