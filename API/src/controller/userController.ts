@@ -17,18 +17,19 @@ class UserController {
 			const record = await UserInstance.create({ ...req.body, uid });
 			return res.status(201).json({ record, msg: "Création utilisateur ok" });
 		} catch (e) {
-			return res.status(417).json({ msg: "Création utilisateur échouée", status: 417, route: "/create", e });
+			console.error(e)
+			return res.status(417).json({ msg: "Création utilisateur échouée", status: 417, route: "/create" });
 		}
 	}
 
 	async readPagination(req: Request, res: Response) {
 		try {
-			const limit = (req.query.limit as number | undefined) || 10;
-			const offset = req.query.offset as number | undefined;
-
-			const records = await UserInstance.findAll({ where: {}, limit, offset });
+			const amont = (req.query.amont as number | undefined) || 10;
+			const saut = req.query.saut as number | undefined;
+			const records = await UserInstance.findAll({ where: {}, limit: amont, offset: saut });
 			return res.status(200).json({ users : records });
 		} catch (e) {
+			console.error(e)
 			return res.status(500).json({ msg: "Lecture fail", status: 500, route: "/read" });
 		}
 	}
@@ -40,7 +41,7 @@ class UserController {
 			return res.status(200).json({record});
 		} catch (e) {
 			console.error(e)
-			return res.status(500).json({ msg: "Lecture byId fail", status: 500, e, route: "/read/:id" });
+			return res.status(500).json({ msg: "Lecture byId fail", status: 500, route: "/read/:id" });
 		}
 	}
 
@@ -64,11 +65,8 @@ class UserController {
 				});
 			return res.json({ msg:"Modificaiton réussie",record: updatedRecord });
 		} catch (e) {
-			return res.status(500).json({
-				msg: "Modification impossible",
-				route: "/update/:id",
-				err:e
-			});
+            console.error(e)
+			return res.status(500).json({ msg: "Modification impossible", route: "/update/:id" });
 		}
 	}
 
@@ -84,11 +82,8 @@ class UserController {
 			const deletedRecord = await record.destroy();
 			return res.status(200).json({ record: deletedRecord });
 		} catch (e) {
-			return res.status(200).json({
-				msg: "fail to read",
-				status: 500,
-				route: "/delete/:id",
-			});
+            console.error(e)
+			return res.status(200).json({ msg: "fail to read", status: 500, route: "/delete/:id" });
 		}
 	}
 	
@@ -105,6 +100,7 @@ class UserController {
             }
             return res.status(200).json({ msg: "Connexion réussie", user });
         } catch (e) {
+            console.error(e)
             return res.status(500).json({ msg: "Erreur lors de la connexion", status: 500, route: "/login" });
         }
     }

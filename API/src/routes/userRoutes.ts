@@ -1,7 +1,7 @@
 import express from 'express';
 import UserValidator from '../validator/userValidator';
 import Middleware from '../middleware';
-import userController from '../controller/userController';
+import UserController from '../controller/userController';
 
 const router = express.Router();
 
@@ -9,27 +9,28 @@ router.post(
 	'/create',
 	UserValidator.checkCreate(),
 	Middleware.handleValidationError,
-	userController.create
+	UserController.create
 );
 
 router.get(
 	'/read',
 	UserValidator.checkRead(),
 	Middleware.handleValidationError,
-	userController.readPagination
+	UserController.readPagination
 );
 
 router.get(
 	'/read/:id',
 	UserValidator.checkIdParam(),
 	Middleware.handleValidationError,
-	userController.readByID
+	UserController.readByID
 );
 
 router.put(
-	'/update',
+	'/update/:id',
 	UserValidator.checkIdParam(),
-	userController.update
+	Middleware.handleValidationError,
+	UserController.update
 );
 
 router.delete(
@@ -37,14 +38,14 @@ router.delete(
 	UserValidator.checkIdParam(),
 	Middleware.authMiddleware({roles : ["admin"]}),
 	Middleware.handleValidationError,
-	userController.delete
+	UserController.delete
 );
 
 router.post(
     '/login',
     UserValidator.checkLogin(),
     Middleware.handleValidationError,
-    userController.connexion
+    UserController.connexion
 );
 
 export default router;
