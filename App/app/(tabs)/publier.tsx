@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Image, View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { NavigationContainer, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-import BigButtonDown from '../../components/BigButtonDown';
 import ListDash from '../../components/ListDash';
 
 import PubTitre from '../pubnav/pubtitre';
@@ -15,9 +15,35 @@ import PubDesc from '../pubnav/pubdesc';
 import PubLoca from '../pubnav/publoca';
 import PubEspece from '../pubnav/pubespece';
 import PubEntretien from '../pubnav/pubentretien';
-import StartApp from './index';
 
 const Stack = createNativeStackNavigator();
+
+type RootStackParamList = {
+  Publier: {
+    titreValid?: boolean,
+    titre: string,
+    dateValid?: boolean,
+    selectedStartDate: string,
+    selectedEndDate: string
+    descValid?: boolean,
+    description: string,
+    locValid?: boolean,
+    localisation: string,
+    espValid?: boolean,
+    espece: string,
+    photoValid?: boolean,
+    photo: string,
+  };
+  Titre: { titre: '' };
+  Date: { selectedStartDate: '', selectedEndDate: ''}
+  Description: { description: '' };
+  Localisation: { localisation: '' };
+  Espece: { espece: '' };
+  Photo: { photo: '' };
+};
+
+type UpdatePublierNavigationProp = StackNavigationProp<RootStackParamList, 'Publier'>;
+type UpdatePublierRouteProp = RouteProp<RootStackParamList, 'Publier'>;
 
 function PublierScreen({ }) {
 
@@ -40,11 +66,11 @@ function PublierScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
-        <Stack.Screen name="Date(s)" component={PubDate}
+        <Stack.Screen name="Date" component={PubDate}
         options={{
           headerBackTitleVisible: false
       }} />
-        <Stack.Screen name="Photo(s)" component={PubPhoto}
+        <Stack.Screen name="Photo" component={PubPhoto}
         options={{
           headerBackTitleVisible: false
       }} />
@@ -56,7 +82,7 @@ function PublierScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
-        <Stack.Screen name="Espèce(s)" component={PubEspece}
+        <Stack.Screen name="Espece" component={PubEspece}
         options={{
           headerBackTitleVisible: false
       }} />
@@ -64,36 +90,308 @@ function PublierScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
-      <Stack.Screen name="Index" component={StartApp} options={{ headerBackTitleVisible: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
 function PublierContent() {
-  const navigation = useNavigation<StackNavigationProp<any>>();
+  const navigation = useNavigation<UpdatePublierNavigationProp>();
+  const route = useRoute<UpdatePublierRouteProp>();
+  const [isValid, setIsValid] = useState(false);
+  const [titre, setTitre] = useState('');
+  const [selectedStartDate, setSelectedStartDate] = useState('');
+  const [selectedEndDate, setSelectedEndDate] = useState('');
+  const [description, setDescription] = useState('');
+  const [titreValid, setTitreValid] = useState(false);
+  const [dateValid, setDateValid] = useState(false);
+  const [descValid, setDescValid] = useState(false);
+  const [locValid, setLocValid] = useState(false);
+  const [localisation, setLocalisation] = useState('');
+  const [espValid, setEspValid] = useState(false);
+  const [espece, setEspece] = useState('');
+  const [photoValid, setPhotoValid] = useState(false);
+  const [photo, setPhoto] = useState('');
+
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const handleSend = async () => {
+    const postData = {
+      title: titre,
+      description: description,
+      publishedAt: new Date().toISOString(),
+      dateStart: selectedStartDate,
+      dateEnd: selectedEndDate,
+      address: localisation,
+      cityName: localisation,
+      state: localisation,
+      accepted: false,
+      acceptedBy: 1,
+      idUser: 1,
+      idPlant: 1
+    };
+
+    try {
+      const response = await fetch('https://your-api-endpoint.com/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (response.ok) {
+        Alert.alert('Succès', 'Le post a été envoyé avec succès');
+        setModalVisible(false);
+        resetForm();
+      } else {
+        Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du post');
+      }
+    } catch (error) {
+      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du post');
+    }
+  };
+
+  const resetForm = () => {
+    setTitre('');
+    setDescription('');
+    setSelectedStartDate('');
+    setSelectedEndDate('');
+    setLocalisation('');
+    setEspece('');
+    setPhoto('');
+    setTitreValid(false);
+    setDateValid(false);
+    setDescValid(false);
+    setLocValid(false);
+    setEspValid(false);
+    setPhotoValid(false);
+    setIsValid(false);
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      const storedTitre = await AsyncStorage.getItem('titre');
+      const storedStartDate = await AsyncStorage.getItem('selectedStartDate');
+      const storedEndDate = await AsyncStorage.getItem('selectedEndDate');
+      const storedDescription = await AsyncStorage.getItem('description');
+      const storedTitreValid = await AsyncStorage.getItem('titreValid');
+      const storedDateValid = await AsyncStorage.getItem('dateValid');
+      const storedDescValid = await AsyncStorage.getItem('descValid');
+      const storedLocValid = await AsyncStorage.getItem('locValid');
+      const storedEspValid = await AsyncStorage.getItem('espValid');
+      const storedEspece = await AsyncStorage.getItem('espece');
+      const storedphotoValid = await AsyncStorage.getItem('photoValid');
+      const storedphoto = await AsyncStorage.getItem('photo');
+
+      console.log('Loaded Data:', {
+        storedTitreValid,
+        storedDateValid,
+        storedDescValid,
+        storedLocValid,
+        storedEspValid,
+        storedphotoValid,
+      });
+
+      if (storedTitre) setTitre(storedTitre);
+      if (storedStartDate) setSelectedStartDate(storedStartDate);
+      if (storedEndDate) setSelectedEndDate(storedEndDate);
+      if (storedDescription) setDescription(storedDescription);
+      if (storedEspece) setEspece(storedEspece);
+      if (storedTitreValid) setTitreValid(storedTitreValid === 'true');
+      if (storedDateValid) setDateValid(storedDateValid === 'true');
+      if (storedDescValid) setDescValid(storedDescValid === 'true');
+      if (storedLocValid) setLocValid(storedLocValid === 'true');
+      if (storedEspValid) setEspValid(storedEspValid === 'true');
+      if (storedphotoValid) setPhotoValid(storedphotoValid === 'true');
+      if (storedphoto) setPhoto(storedphoto);
+    };
+
+    loadData();
+
+    const unsubscribe = navigation.addListener('focus', () => {
+      const { titreValid, dateValid, descValid, locValid, espValid, photoValid } = route.params || {};
+      console.log('Params:', { titreValid, dateValid, descValid, locValid, espValid, photoValid });
+      setIsValid(
+        (titreValid !== undefined ? titreValid : false) &&
+        (dateValid !== undefined ? dateValid : false) &&
+        (descValid !== undefined ? descValid : false) &&
+        (locValid !== undefined ? locValid : false) &&
+        (espValid !== undefined ? espValid : false) &&
+        (photoValid !== undefined ? photoValid : false)
+      );
+    });
+
+    return unsubscribe;
+  }, [navigation, route.params]);
+
+  useEffect(() => {
+    if (route.params?.titre) {
+      setTitre(route.params.titre);
+      AsyncStorage.setItem('titre', route.params.titre);
+    }
+    if (route.params?.selectedStartDate) {
+      setSelectedStartDate(route.params.selectedStartDate);
+      AsyncStorage.setItem('selectedStartDate', route.params.selectedStartDate);
+    }
+    if (route.params?.selectedEndDate) {
+      setSelectedEndDate(route.params.selectedEndDate);
+      AsyncStorage.setItem('selectedEndDate', route.params.selectedEndDate);
+    }
+    if (route.params?.description) {
+      setDescription(route.params.description);
+      AsyncStorage.setItem('description', route.params.description);
+    }
+    if (route.params?.localisation) {
+      setLocalisation(route.params.localisation);
+      AsyncStorage.setItem('localisation', route.params.localisation);
+    }
+    if (route.params?.espece) {
+      setEspece(route.params.espece);
+      AsyncStorage.setItem('espece', route.params.espece);
+    }
+    if (route.params?.photo) {
+      setPhoto(route.params.photo);
+      AsyncStorage.setItem('photo', route.params.photo);
+    }
+    if (route.params?.titreValid !== undefined) {
+      setTitreValid(route.params.titreValid);
+      AsyncStorage.setItem('titreValid', route.params.titreValid.toString());
+      if (!route.params.titreValid) {
+        setTitre('');
+        AsyncStorage.removeItem('titre');
+      }
+    }
+    if (route.params?.dateValid !== undefined) {
+      setDateValid(route.params.dateValid);
+      AsyncStorage.setItem('dateValid', route.params.dateValid.toString());
+      if (!route.params.dateValid) {
+        setSelectedStartDate('');
+        setSelectedEndDate('');
+        AsyncStorage.removeItem('selectedStartDate');
+        AsyncStorage.removeItem('selectedEndDate');
+      }
+    }
+    if (route.params?.descValid !== undefined) {
+      setDescValid(route.params.descValid);
+      AsyncStorage.setItem('descValid', route.params.descValid.toString());
+      if (!route.params.descValid) {
+        setDescription('');
+        AsyncStorage.removeItem('description');
+      }
+    }
+    if (route.params?.locValid !== undefined) {
+      setLocValid(route.params.locValid);
+      AsyncStorage.setItem('locValid', route.params.locValid.toString());
+      if (!route.params.locValid) {
+        setLocalisation('');
+        AsyncStorage.removeItem('localisation');
+      }
+    }
+    if (route.params?.espValid !== undefined) {
+      setEspValid(route.params.espValid);
+      AsyncStorage.setItem('espValid', route.params.espValid.toString());
+      if (!route.params.espValid) {
+        setEspece('');
+        AsyncStorage.removeItem('espece');
+      }
+    }
+    if (route.params?.photoValid !== undefined) {
+      setPhotoValid(route.params.photoValid);
+      AsyncStorage.setItem('photoValid', route.params.photoValid.toString());
+      if (!route.params.photoValid) {
+        setPhoto('');
+        AsyncStorage.removeItem('photo');
+      }
+    }
+  }, [route.params]);
+
+  useEffect(() => {
+    const params = route.params || {};
+    console.log('Params:', params);
+
+    if (params.titreValid !== undefined) setTitreValid(params.titreValid);
+    if (params.dateValid !== undefined) setDateValid(params.dateValid);
+    if (params.descValid !== undefined) setDescValid(params.descValid);
+    if (params.locValid !== undefined) setLocValid(params.locValid);
+    if (params.espValid !== undefined) setEspValid(params.espValid);
+    if (params.photoValid !== undefined) setPhotoValid(params.photoValid);
+  }, [route.params]);
+
+  useEffect(() => {
+    setIsValid(titreValid && dateValid && descValid && locValid && espValid && photoValid);
+  }, [titreValid, dateValid, descValid, locValid, espValid, photoValid]);
+
+  const formatDate = (dateString: string) => {
+    const [year, month, day] = dateString.split('-');
+    return `${day}/${month}/${year}`;
+  };
 
   return (
     <View style={styles.container}>
-
-    <View style={styles.fixedDetails}>
-      <ListDash buttonText="Titre" onPress={() => navigation.navigate('Titre')} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Date(s)" onPress={() => navigation.navigate('Date(s)')} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Photo(s)" onPress={() => navigation.navigate('Photo(s)')} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Description" onPress={() => navigation.navigate('Description')} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Localisation" onPress={() => navigation.navigate('Localisation')} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Espèce(s)" onPress={() => navigation.navigate('Espèce(s)')} />
-      <View style={styles.separatorDetails}/>
-      <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
-      <View style={styles.separatorDetails}/>
+      <View style={styles.fixedDetails}>
+        <ListDash buttonText={`Titre : ${titre}`} onPress={() => navigation.navigate('Titre', { titre: "" })} />
+        <Ionicons name={titreValid ? 'checkmark-circle' : 'close-circle'} size={24} color={titreValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails} />
+        <ListDash buttonText={`Date(s) : ${selectedStartDate ? formatDate(selectedStartDate) : ''} - ${selectedEndDate ? formatDate(selectedEndDate) : ''}`} onPress={() => navigation.navigate('Date', { selectedStartDate: "", selectedEndDate: "" })} />
+        <Ionicons name={dateValid ? 'checkmark-circle' : 'close-circle'} size={24} color={dateValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails} />
+        <ListDash buttonText={`Photo : ${photo ? '{...}' : ''}`} onPress={() => navigation.navigate('Photo', { photo: "" })} />
+        <Ionicons name={photoValid ? 'checkmark-circle' : 'close-circle'} size={24} color={photoValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails} />
+        <ListDash buttonText={`Description : ${description ? '{...}' : ''}`} onPress={() => navigation.navigate('Description', { description: "" })} />
+        <Ionicons name={descValid ? 'checkmark-circle' : 'close-circle'} size={24} color={descValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails} />
+        <ListDash buttonText={`Localisation : ${localisation}`} onPress={() => navigation.navigate('Localisation', { localisation: "" })} />
+        <Ionicons name={locValid ? 'checkmark-circle' : 'close-circle'} size={24} color={locValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails} />
+        <ListDash buttonText={`Espèce : ${espece}`} onPress={() => navigation.navigate('Espece', { espece: "" })} />
+        <Ionicons name={espValid ? 'checkmark-circle' : 'close-circle'} size={24} color={espValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
+        <View style={styles.separatorDetails} />
+        <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
+        <Ionicons name={'close-circle'} size={24} color={"#828282"} style={styles.iconValid} />
+        <View style={styles.separatorDetails} />
+      </View>
+      <View style={styles.fixedDetailsBtn}>
+        <View style={styles.selectorContainer}>
+          <TouchableOpacity style={[styles.selectorButton, { backgroundColor: isValid ? '#668F80' : '#828282' }]} disabled={!isValid} onPress={() => setModalVisible(true)}>
+            <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
+              Valider
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Modal
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <View style={styles.modalView}>
+        <View style={styles.modalViewBg}>
+        <Text style={styles.modalTitre}>Confirmation</Text>
+          <Text style={styles.modalText}>Vérifiez attentivement les informations que vous envoyez. La saisie de fausses informations peut entraîner des conséquences indésirables.</Text>
+          <View style={styles.fixedDetailsBtnModal}>
+            <View style={styles.selectorContainer}>
+              <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => handleSend()}>
+                <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
+                  Envoyer
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.selectorContainer}>
+              <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
+                <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
+                  Modifier
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        </View>
+      </Modal>
     </View>
-    <BigButtonDown buttonText="Valider" />
-  </View>
   );
 }
 
@@ -136,15 +434,70 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8E8E8',
     width: '95%',
     marginVertical: 5,
-    alignSelf : 'center',
+    alignSelf: 'center',
   },
   selectorOptions: {
-    padding : 10,
-    color : '#BDBDBD',
+    padding: 10,
+    color: '#BDBDBD',
   },
   selectorOptionsText: {
     fontSize : 14,
-  }
+  },
+  fixedDetailsBtn: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  selectorContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 25,
+    overflow: 'hidden',
+    width: '90%',
+    alignItems: 'center',
+  },
+  selectorButton: {
+    flex: 1,
+    paddingVertical: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconValid: {
+    paddingHorizontal: 10,
+  },
+  modalView: {
+    backgroundColor: '#668F80',
+    padding: 35,
+    justifyContent: 'center',
+    flex: 1,
+    alignItems: 'center',
+  },
+  modalViewBg: {
+    backgroundColor: '#fff',
+    padding: 35,
+    borderRadius: 10,
+    justifyContent: 'center',
+  },
+  fixedDetailsBtnModal: {
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  modalTitre: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
+  modalText: {
+    marginBottom: 14,
+    textAlign: 'center',
+  },
 });
 
 export default PublierScreen;

@@ -19,9 +19,11 @@ const BigButtonDown = ({ buttonText, onPress }: { buttonText: string, onPress?: 
 
 const styles = StyleSheet.create({
     fixedDetailsBtn: {
-        paddingTop : screenHeight / 5,
-        marginTop: screenHeight / 15,
-        alignItems: 'center',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      alignItems: 'center',
       },
   selectorContainer: {
     flexDirection: 'row',
