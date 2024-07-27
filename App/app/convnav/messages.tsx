@@ -9,7 +9,7 @@ import io from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { v4 as uuidv4 } from 'uuid';
 
-const socket = io('http://172.17.80.1:4000');
+const socket = io('http://192.168.1.24:4000');
 
 type RootStackParamList = {
   explore: undefined;
