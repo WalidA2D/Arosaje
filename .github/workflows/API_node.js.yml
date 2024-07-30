@@ -1,4 +1,4 @@
-name: BACKEND CI/CD Pipeline
+name: API CI/CD Pipeline
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
         working-directory: backend
         run: |
           # Démarrer le serveur en arrière-plan et capturer le PID
-          nohup node index > server.log 2>&1 &
+          nohup node dist/index.js > server.log 2>&1 &
           echo $! > server.pid
           sleep 5  # Attendre que le serveur démarre complètement
 
@@ -48,3 +48,8 @@ jobs:
           else
             echo "Aucun PID trouvé pour le serveur"
           fi
+
+      - name: --------- CONSTRUCTION DU PROJET ---------
+        working-directory: backend
+        run: npm run build
+        continue-on-error: true
