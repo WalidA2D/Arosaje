@@ -1,0 +1,35 @@
+name: APP CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x, 20.x]
+
+    steps:
+      - name: ------------ RECUPERATION DU CODE DU REPO ------------
+        uses: actions/checkout@v2
+
+      - name: ------------ SET UP NODE JS SUR LES VERSION 16.x, 18.x, 20.x ------------
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: ------------ INSTALLATION DES DEPENDANCES (APP) ------------
+        working-directory: App
+        run: npm install
+
+      - name: EXECUTION TESTS JEST (APP)
+        working-directory: App
+        run: npm test
+
+      - name: ------------ BUILD DU PROJET (APP) ------------
+        working-directory: App
+        run: npm run build
