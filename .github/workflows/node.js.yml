@@ -35,4 +35,4 @@ jobs:
 
       - name: ------------ BUILD DU PROJET (APP) ------------
         working-directory: App
-        run: npm run build
+        run: npx expo start
