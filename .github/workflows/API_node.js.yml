@@ -1,0 +1,50 @@
+name: BACKEND CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: --------- CHECKOUT DU CODE ---------
+        uses: actions/checkout@v2
+
+      - name: --------- CONFIGURATION DE NODE.JS ---------
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.x'
+
+      - name: --------- INSTALLATION DES DEPENDANCES ---------
+        working-directory: backend
+        run: npm install
+
+      - name: --------- DEMARRAGE DU SERVEUR ---------
+        working-directory: backend
+        run: |
+          # Démarrer le serveur en arrière-plan et capturer le PID
+          nohup node index > server.log 2>&1 &
+          echo $! > server.pid
+          sleep 5  # Attendre que le serveur démarre complètement
+
+      - name: --------- EXECUTION DES TESTS ---------
+        working-directory: backend
+        run: npm test
+
+      - name: --------- ARRÊTER LE SERVEUR ---------
+        if: always()
+        run: |
+          # Lire le PID depuis le fichier et arrêter le serveur
+          if [ -f backend/server.pid ]; then
+            SERVER_PID=$(cat backend/server.pid)
+            echo "Arrêt du serveur avec PID $SERVER_PID"
+            kill -9 $SERVER_PID || true
+          else
+            echo "Aucun PID trouvé pour le serveur"
+          fi
