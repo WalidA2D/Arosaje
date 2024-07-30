@@ -29,7 +29,7 @@ jobs:
         working-directory: backend
         run: |
           # Démarrer le serveur en arrière-plan et capturer le PID
-          nohup node dist/index.js > server.log 2>&1 &
+          nohup node index > server.log 2>&1 &
           echo $! > server.pid
           sleep 5  # Attendre que le serveur démarre complètement
 
