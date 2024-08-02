@@ -5,6 +5,8 @@ import { v4 as uuidv4 } from "uuid";
 import { UserInstance } from "../models/User";
 import { encryptMethod } from "../helpers/encryptMethod";
 
+const defaultPP = 'https://firebasestorage.googleapis.com/v0/b/api-arosa-je.appspot.com/o/profilepictures%2Fdefault_pp.png?alt=media&token=2415598b-9c6f-45a1-a9ad-c555cec6c3c6'
+
 class UserController {
 	async create(req: Request, res: Response) {
 		const uid = uuidv4();
@@ -14,7 +16,7 @@ class UserController {
 				return res.status(417).json({msg: "Email déjà existant", status:417});
 			}
 			req.body.password = await encryptMethod(req.body.password);
-			const record = await UserInstance.create({ ...req.body, uid });
+			const record = await UserInstance.create({ ...req.body, uid, photo:defaultPP });
 			return res.status(201).json({ record, msg: "Création utilisateur ok" });
 		} catch (e) {
 			console.error(e)
