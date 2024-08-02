@@ -18,7 +18,7 @@ class UserController {
 			return res.status(201).json({ record, msg: "Création utilisateur ok" });
 		} catch (e) {
 			console.error(e)
-			return res.status(417).json({ msg: "Création utilisateur échouée", status: 417, route: "/create" });
+			return res.status(417).json({ msg: "Création utilisateur échouée", status: 417 });
 		}
 	}
 
@@ -30,7 +30,7 @@ class UserController {
 			return res.status(200).json({ users : records });
 		} catch (e) {
 			console.error(e)
-			return res.status(500).json({ msg: "Lecture fail", status: 500, route: "/read" });
+			return res.status(500).json({ msg: "Lecture fail", status: 500 });
 		}
 	}
 	async readByID(req: Request, res: Response) {
@@ -41,7 +41,7 @@ class UserController {
 			return res.status(200).json({record});
 		} catch (e) {
 			console.error(e)
-			return res.status(500).json({ msg: "Lecture byId fail", status: 500, route: "/read/:id" });
+			return res.status(500).json({ msg: "Lecture byId fail", status: 500 });
 		}
 	}
 
@@ -66,7 +66,7 @@ class UserController {
 			return res.json({ msg:"Modificaiton réussie",record: updatedRecord });
 		} catch (e) {
             console.error(e)
-			return res.status(500).json({ msg: "Modification impossible", route: "/update/:id" });
+			return res.status(500).json({ msg: "Modification impossible" });
 		}
 	}
 
@@ -83,7 +83,7 @@ class UserController {
 			return res.status(200).json({ record: deletedRecord });
 		} catch (e) {
             console.error(e)
-			return res.status(200).json({ msg: "fail to read", status: 500, route: "/delete/:id" });
+			return res.status(200).json({ msg: "fail to read", status: 500 });
 		}
 	}
 	
@@ -101,7 +101,7 @@ class UserController {
             return res.status(200).json({ msg: "Connexion réussie", user });
         } catch (e) {
             console.error(e)
-            return res.status(500).json({ msg: "Erreur lors de la connexion", status: 500, route: "/login" });
+            return res.status(500).json({ msg: "Erreur lors de la connexion", status: 500 });
         }
     }
 }

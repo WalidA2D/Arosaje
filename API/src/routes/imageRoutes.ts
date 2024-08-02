@@ -1,38 +1,39 @@
 import express from 'express';
+import multer from 'multer';
+
 import Middleware from '../middleware';
 import ImageController from '../controller/imageController';
 
+const storageEngine = multer.memoryStorage();
+const upload = multer({ storage: storageEngine });
+
 const router = express.Router();
 
-// Upload images for posts
 router.post(
-  '/upload',
-  Middleware.multerMiddleware.uploadMultiple,
+  '/pp/upload',
+  upload.single('image'),
   Middleware.handleValidationError,
-  // Middleware.authMiddleware({ roles: ["utilisateur"] }),
-  ImageController.uploadImage
+  ImageController.uploadPP
 );
 
-// Get images of a post
 router.get(
-  '/post/:id',
+  '/pp/:id',
   Middleware.handleValidationError,
-  // ImageController.getImagesByPost
+  ImageController.getPP
 );
 
-// Get a single image by its id
-router.get(
-  '/:id',
-  Middleware.handleValidationError,
-  // ImageController.getImageById
-);
+// router.post(
+//   '/upload/multiple',
+//   upload.array('images'),
+//   Middleware.handleValidationError,
+//   ImageController.uploadMultipleImages
+// );
 
 // Delete an image
-router.delete(
-  '/:id',
-  Middleware.handleValidationError,
-  Middleware.authMiddleware({ roles: ["admin"] }),
-  // ImageController.deleteImage
-);
+// router.delete(
+//   '/:id',
+//   Middleware.handleValidationError,
+//   ImageController.deleteImage
+// );
 
 export default router;
