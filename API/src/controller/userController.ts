@@ -13,7 +13,6 @@ class UserController {
     try {
       const email = await UserInstance.findOne({ where: { email: req.body.email } });
       if (email != null) return res.status(417).json({ success: false, msg: "Email déjà existant", status: 417 });
-
       req.body.password = await encryptMethod(req.body.password);
       const record = await UserInstance.create({ ...req.body, uid, photo: defaultPP });
       return res.status(201).json({ success: true, record, msg: "Création utilisateur ok" });

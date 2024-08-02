@@ -9,6 +9,7 @@ export default function InscriptionScreen() {
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
+    const [password, setPassword] = useState('');
     const [cityName, setCityName] = useState('');
     
     const handleNext = () => {
@@ -31,7 +32,8 @@ export default function InscriptionScreen() {
                 'email': email,
                 'address': address,
                 'phone': phone,
-                'cityName': cityName
+                'cityName': cityName,
+                'password': password
             };
 
             fetch(`${apiUrl}/user/create`, {
@@ -42,12 +44,9 @@ export default function InscriptionScreen() {
                 body: JSON.stringify(userData)
             })
             .then(response => response.json())
-            .then(data => {
-                // Handle response data
+            .then(data=>{
+                console.log(data)
             })
-            .catch(error => {
-                // Handle error
-            });
         }
     };
 
@@ -61,6 +60,7 @@ export default function InscriptionScreen() {
                     <TextInput placeholder="Last Name" value={lastName} onChangeText={setLastName} style={styles.input} />
                     <TextInput placeholder="First Name" value={firstName} onChangeText={setFirstName} style={styles.input} />
                     <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
+                    <TextInput placeholder="Password" value={password} onChangeText={setPassword} style={styles.input} />
                     <Button title="Next" onPress={handleNext} />
                 </View>
             )}
@@ -85,7 +85,9 @@ export default function InscriptionScreen() {
                     <Text>Address: {address}</Text>
                     <Text>City Name: {cityName}</Text>
                     <Text>Phone: {phone}</Text>
+                    <Text>Password: {password}</Text>
                     <Button title="Confirmer" onPress={handleConfirm} />
+                    <Button title="Modifier" onPress={() => setStep(1)} />
                 </View>
             )}
         </View>
