@@ -1,10 +1,10 @@
-import { UserInstance as OriginalUserInstance } from '../models/user';
+import { UserInstance as OriginalUserInstance } from "../models/user";
 
-declare module '../models/user' {
-    interface UserInstance {
-        role: string;
-        isBotanist: boolean;
-        isAdmin: boolean;
-        password: string;
-    }
+declare module "../models/user" {
+  interface UserInstance {
+    role: string;
+    isBotanist: boolean;
+    isAdmin: boolean;
+    password: string;
+  }
 }

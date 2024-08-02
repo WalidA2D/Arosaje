@@ -92,7 +92,7 @@ class PostController {
       const filePromises = (req.files as Express.Multer.File[]).map(
         async (file, index) => {
           const fileName = `${record.dataValues.idPosts}_${index}`;
-          const fileRef = ref(storage, `posts/${fileName}.jpg`);
+          const fileRef = ref(storage, `posts/${fileName}.jpeg`);
 
           await uploadBytesResumable(fileRef, file.buffer);
           const fileURL = await getDownloadURL(fileRef);
@@ -124,7 +124,7 @@ class PostController {
       const amont = (req.query.amont as number | undefined) || 10;
       const saut = req.query.saut as number | undefined;
       const posts = await PostInstance.findAll({
-        where: {},
+        where: { state: 0 },
         limit: amont,
         offset: saut,
       });
@@ -151,11 +151,17 @@ class PostController {
 
   async changeVisibility(req: Request, res: Response) {
     try {
-		const { id } = req.params;
-		const record = await PostInstance.findOne({where: { idPosts: id } })
-		if (!record) return res.status(404).json({ msg: "Aucun post trouvé" });
-		await record.update({state:!record.dataValues.state})
-		res.status(200).json({msg:"Changement de visibilité effectuée", status:200, etat:record.dataValues.state})
+      const { id } = req.params;
+      const record = await PostInstance.findOne({ where: { idPosts: id } });
+      if (!record) return res.status(404).json({ msg: "Aucun post trouvé" });
+      await record.update({ state: !record.dataValues.state });
+      res
+        .status(200)
+        .json({
+          msg: "Changement de visibilité effectuée",
+          status: 200,
+          etat: record.dataValues.state,
+        });
     } catch (e) {
       console.error(e);
       return res
@@ -168,21 +174,13 @@ class PostController {
     try {
       const { id } = req.params;
       const token = req.headers.authorization?.split(" ")[0];
-      if (!token)
-        return res.status(200).json({ status: 200, msg: "Aucun token fourni" });
+      if (!token) return res.status(200).json({ status: 200, msg: "Aucun token fourni" });
       const user = await UserInstance.findOne({ where: { uid: token } });
-      if (!user)
-        return res
-          .status(404)
-          .json({ status: 404, msg: "Utilisateur introuvable" });
+      if (!user) return res.status(404).json({ status: 404, msg: "Utilisateur introuvable" });
       const record = await PostInstance.findOne({ where: { idPosts: id } });
-      if (!record)
-        return res.status(404).json({ status: 404, msg: "Aucun post trouvé" });
+      if (!record) return res.status(404).json({ status: 404, msg: "Aucun post trouvé" });
 
-      if (
-        user?.dataValues.isAdmin ||
-        user?.dataValues.idUsers == record.dataValues.idUser
-      ) {
+      if ( user?.dataValues.isAdmin || user?.dataValues.idUsers == record.dataValues.idUser ) {
         await record.destroy();
         return res.status(200).json({ status: 200, msg: "Post bien supprimé" });
       } else {
@@ -190,9 +188,7 @@ class PostController {
       }
     } catch (e) {
       console.error(e);
-      return res
-        .status(500)
-        .json({ msg: "Erreur lorsde la lecture", status: 500 });
+      return res.status(500).json({ msg: "Erreur lors de la lecture", status: 500 });
     }
   }
 }

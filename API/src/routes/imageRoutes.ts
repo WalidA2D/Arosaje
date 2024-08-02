@@ -1,8 +1,8 @@
-import express from 'express';
-import multer from 'multer';
+import express from "express";
+import multer from "multer";
 
-import Middleware from '../middleware';
-import ImageController from '../controller/imageController';
+import Middleware from "../middleware";
+import ImageController from "../controller/imageController";
 
 const storageEngine = multer.memoryStorage();
 const upload = multer({ storage: storageEngine });
@@ -10,14 +10,15 @@ const upload = multer({ storage: storageEngine });
 const router = express.Router();
 
 router.post(
-  '/pp/upload',
-  upload.single('image'),
+  "/pp/upload",
+  upload.single("image"),
   Middleware.handleValidationError,
   ImageController.uploadPP
 );
 
 router.get(
-  '/pp/:id',
+  "/pp/:id",
+  Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
   ImageController.getPP
 );

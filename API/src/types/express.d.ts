@@ -1,11 +1,11 @@
-import { UserAttributes } from '../models/user';
+import { UserAttributes } from "../models/user";
 
 declare global {
-    namespace Express {
-        interface Request {
-            user?: UserAttributes;
-            file?: any;
-            files?:any;
-        }
+  namespace Express {
+    interface Request {
+      user?: UserAttributes;
+      file?: any;
+      files?: any;
     }
+  }
 }
