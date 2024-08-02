@@ -93,7 +93,7 @@ class UserController {
       if (!user) return res.status(401).json({ msg: "Utilisateur non trouvé" });
       const encryptedPassword = await encryptMethod(password);
       if (user.dataValues.password !== encryptedPassword) return res.status(401).json({ msg: "Mot de passe incorrect" });
-      return res.status(200).json({ msg: "Connexion réussie", user });
+      return res.status(200).json({ success: true, msg: "Connexion réussie", user });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ msg: "Erreur lors de la connexion", status: 500 });

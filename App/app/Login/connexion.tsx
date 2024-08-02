@@ -11,8 +11,8 @@ import HeaderTitle from '../../components/HeaderTitle';
 }
 
 export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenProps) {
-    const [email, onChangeEmail] = React.useState('w@mail.com');
-    const [motDePasse, onChangeMotDePasse] = React.useState('azerty');
+    const [email, onChangeEmail] = React.useState('a@b.com');
+    const [motDePasse, onChangeMotDePasse] = React.useState('okmpi');
     const [showPassword, setShowPassword] = React.useState(false);
     const [rememberMe, setRememberMe] = React.useState(false);
 
@@ -55,18 +55,18 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
               await AsyncStorage.removeItem('password');
           }
 
-            const response = await fetch(`${apiUrl}/api/user/connexion`, options);
+            const response = await fetch(`${apiUrl}/user/login`, options);
             const data = await response.json();
 
-            if (data.success) {
-                await AsyncStorage.setItem('userToken', data.body.token);
+            if (data.success && data.user) {
+                await AsyncStorage.setItem('userToken', data.user.uid);
                 setIsModalVisible(false, 'connexion');
                 navigation.navigate('(tabs)');
             } else {
                 Alert.alert("Échec", "Email ou mot de passe incorrect");
             }
         } catch (error) {
-            console.error('Erreur lors de la vérification de la connexion:', error);
+            console.error('Erreur lors de la vérification de la connexion:', error);            
         }
     };
 

@@ -34,7 +34,7 @@ export default function InscriptionScreen() {
                 'cityName': cityName
             };
 
-            fetch(`${apiUrl}/api/user/updateUser`, {
+            fetch(`${apiUrl}/user/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -58,22 +58,22 @@ export default function InscriptionScreen() {
             </View>
             {step === 1 && (
                 <View>
-                    <TextInput placeholder="Last Name" value={lastName} onChangeText={setLastName} />
-                    <TextInput placeholder="First Name" value={firstName} onChangeText={setFirstName} />
-                    <TextInput placeholder="Email" value={email} onChangeText={setEmail} />
+                    <TextInput placeholder="Last Name" value={lastName} onChangeText={setLastName} style={styles.input} />
+                    <TextInput placeholder="First Name" value={firstName} onChangeText={setFirstName} style={styles.input} />
+                    <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
                     <Button title="Next" onPress={handleNext} />
                 </View>
             )}
             {step === 2 && (
                 <View>
-                    <TextInput placeholder="Address" value={address} onChangeText={setAddress} />
-                    <TextInput placeholder="City Name" value={cityName} onChangeText={setCityName} />
+                    <TextInput placeholder="Address" value={address} onChangeText={setAddress} style={styles.input} />
+                    <TextInput placeholder="City Name" value={cityName} onChangeText={setCityName} style={styles.input} />
                     <Button title="Next" onPress={handleNext} />
                 </View>
             )}
             {step === 3 && (
                 <View>
-                    <TextInput placeholder="Phone" value={phone} onChangeText={setPhone} />
+                    <TextInput placeholder="Phone" value={phone} onChangeText={setPhone} style={styles.input} />
                     <Button title="Next" onPress={handleNext} />
                 </View>
             )}
@@ -106,5 +106,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 10,
         paddingTop: 20,
+    },
+    input: {
+        backgroundColor: '#F0F0F0',
+        margin: 5,
+        padding: 10,
+        width: '100%',
+        borderRadius: 5,
     },
 });
