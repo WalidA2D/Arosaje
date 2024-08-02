@@ -3,6 +3,7 @@ import multer from "multer";
 
 import Middleware from "../middleware";
 import ImageController from "../controller/imageController";
+import postValidator from "../validator/postValidator";
 
 const storageEngine = multer.memoryStorage();
 const upload = multer({ storage: storageEngine });
@@ -18,9 +19,18 @@ router.post(
 
 router.get(
   "/pp/:id",
+  postValidator.checkIdParam(),
   Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
   ImageController.getPP
+);
+
+router.put(
+  "/resetPP/:id",
+  postValidator.checkIdParam(),
+  Middleware.handleValidationError,
+  Middleware.authMiddleware({ roles: ["utilisateur"] }),
+  ImageController.resetPP
 );
 
 // router.post(

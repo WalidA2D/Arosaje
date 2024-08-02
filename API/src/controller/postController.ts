@@ -13,13 +13,11 @@ class PostController {
       console.log("token");
       const token = req.headers.authorization?.split(" ")[0];
       if (!token) {
-        return res.status(404).json({ status: 404, msg: "Aucun token fourni" });
+        return res.status(404).json({ success: false, msg: "Aucun token fourni" });
       }
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) {
-        return res
-          .status(404)
-          .json({ status: 404, msg: "Utilisateur non trouvé" });
+        return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
       }
 
       // Assurez-vous que req.body contient toutes les données requises
@@ -85,14 +83,14 @@ class PostController {
       await signInWithEmailAndPassword(auth, email, password);
 
       if (!req.files || !Array.isArray(req.files)) {
-        return res.status(400).json({ message: "Aucun fichier trouvé" });
+        return res.status(400).json({ success: false, message: "Aucun fichier trouvé" });
       }
 
       const filesURLs: string[] = [];
       const filePromises = (req.files as Express.Multer.File[]).map(
         async (file, index) => {
           const fileName = `${record.dataValues.idPosts}_${index}`;
-          const fileRef = ref(storage, `posts/${fileName}.jpeg`);
+          const fileRef = ref(storage, `posts/${fileName}.jpg`);
 
           await uploadBytesResumable(fileRef, file.buffer);
           const fileURL = await getDownloadURL(fileRef);
@@ -108,14 +106,10 @@ class PostController {
         image3: filesURLs[2] || "",
       });
 
-      return res
-        .status(200)
-        .json({ record, msg: "Création post ok", status: 200 });
+      return res.status(200).json({ success: true, record, msg: "Création post ok" });
     } catch (e) {
       console.error(e);
-      return res
-        .status(417)
-        .json({ msg: "Création post échouée", status: 417 });
+      return res.status(417).json({ success: false, msg: "Création post échouée" });
     }
   }
 
@@ -128,10 +122,10 @@ class PostController {
         limit: amont,
         offset: saut,
       });
-      return res.status(200).json({ posts });
+      return res.status(200).json({ success: true, posts });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ msg: "Lecture échouée", status: 500 });
+      return res.status(500).json({ success: false, msg: "Lecture échouée" });
     }
   }
 
@@ -139,13 +133,11 @@ class PostController {
     try {
       const { id } = req.params;
       const record = await PostInstance.findAll({ where: { idUser: id } });
-      if (!record) return res.status(404).json({ msg: "Aucun post attribué" });
-      return res.status(200).json({ record });
+      if (!record) return res.status(404).json({ success: false, msg: "Aucun post attribué" });
+      return res.status(200).json({ success: true, record });
     } catch (e) {
       console.error(e);
-      return res
-        .status(500)
-        .json({ msg: "Erreur lorsde la lecture", status: 500 });
+      return res.status(500).json({ success: false, msg: "Erreur lorsde la lecture" });
     }
   }
 
@@ -153,20 +145,12 @@ class PostController {
     try {
       const { id } = req.params;
       const record = await PostInstance.findOne({ where: { idPosts: id } });
-      if (!record) return res.status(404).json({ msg: "Aucun post trouvé" });
+      if (!record) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
       await record.update({ state: !record.dataValues.state });
-      res
-        .status(200)
-        .json({
-          msg: "Changement de visibilité effectuée",
-          status: 200,
-          etat: record.dataValues.state,
-        });
+      return res.status(200).json({ success: true, msg: "Changement de visibilité effectuée", state: record.dataValues.state });
     } catch (e) {
       console.error(e);
-      return res
-        .status(500)
-        .json({ msg: "Erreur lors du changement de visiblité", status: 500 });
+      return res.status(500).json({ success: false, msg: "Erreur lors du changement de visiblité" });
     }
   }
 
@@ -174,21 +158,21 @@ class PostController {
     try {
       const { id } = req.params;
       const token = req.headers.authorization?.split(" ")[0];
-      if (!token) return res.status(200).json({ status: 200, msg: "Aucun token fourni" });
+      if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
       const user = await UserInstance.findOne({ where: { uid: token } });
-      if (!user) return res.status(404).json({ status: 404, msg: "Utilisateur introuvable" });
+      if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
       const record = await PostInstance.findOne({ where: { idPosts: id } });
-      if (!record) return res.status(404).json({ status: 404, msg: "Aucun post trouvé" });
+      if (!record) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
 
       if ( user?.dataValues.isAdmin || user?.dataValues.idUsers == record.dataValues.idUser ) {
         await record.destroy();
-        return res.status(200).json({ status: 200, msg: "Post bien supprimé" });
+        return res.status(200).json({ success: true, msg: "Post bien supprimé" });
       } else {
-        return res.status(413).json({ status: 200, msg: "Droits requis" });
+        return res.status(413).json({ success: false, msg: "Droits requis" });
       }
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ msg: "Erreur lors de la lecture", status: 500 });
+      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture" });
     }
   }
 }

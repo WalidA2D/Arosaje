@@ -5,14 +5,14 @@ import { UserInstance } from "../models/User";
 function authMiddleware(options?: { roles?: string[] }) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization?.split(" ")[0];
-    if (!token) return res.status(401).json({ error: "Aucun token fourni" });
+    if (!token) return res.status(401).json({ success: false, error: "Aucun token fourni" });
     try {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (user == null) {
-        return res.status(401).json({ error: "Token invalide" });
+        return res.status(401).json({ success: false, error: "Token invalide" });
       }
       if (!options?.roles) {
-        return res.status(500).json({ error: "Erreur lors de la route MASSSSIIIIL" });
+        return res.status(500).json({ success: false, error: "Erreur lors de la route MASSSSIIIIL" });
       }
 
       if ((user.dataValues.isAdmin && options?.roles[0] == "admin") ||
@@ -21,10 +21,10 @@ function authMiddleware(options?: { roles?: string[] }) {
       {
           next();
       } else {
-        return res.status(403).json({ error: "Utilisateur non autorisé" });
+        return res.status(403).json({ success: false, error: "Utilisateur non autorisé" });
       }
     } catch (error) {
-      return res.status(500).json({ error: "Erreur serveur interne" });
+      return res.status(500).json({ success: false, error: "Erreur serveur interne" });
     }
   };
 }
