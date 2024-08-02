@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AnimatedCheckbox from 'react-native-checkbox-reanimated'
 import HeaderTitle from '../../components/HeaderTitle';
 
   interface ConnexionScreenProps {
@@ -13,6 +14,22 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
     const [email, onChangeEmail] = React.useState('w@mail.com');
     const [motDePasse, onChangeMotDePasse] = React.useState('azerty');
     const [showPassword, setShowPassword] = React.useState(false);
+    const [rememberMe, setRememberMe] = React.useState(false);
+
+    useEffect(() => {
+        const checkRememberMe = async () => {
+            const storedEmail = await AsyncStorage.getItem('email');
+            const storedPassword = await AsyncStorage.getItem('password');
+            if (storedEmail && storedPassword) {
+                setRememberMe(true);
+            } else {
+              setRememberMe(false);
+          }
+        };
+
+        checkRememberMe();
+    }, []);
+
     const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
     const navigation = useNavigation();
@@ -29,6 +46,14 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
                     password: motDePasse,
                 }),
             };
+
+            if (rememberMe) {
+              await AsyncStorage.setItem('email', email);
+              await AsyncStorage.setItem('password', motDePasse);
+          } else {
+              await AsyncStorage.removeItem('email');
+              await AsyncStorage.removeItem('password');
+          }
 
             const response = await fetch(`${apiUrl}/api/user/connexion`, options);
             const data = await response.json();
@@ -48,9 +73,15 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
     useEffect(() => {
         const checkToken = async () => {
             const userToken = await AsyncStorage.getItem('userToken');
+            const storedEmail = await AsyncStorage.getItem('email');
+            const storedPassword = await AsyncStorage.getItem('password');
+
             if (userToken) {
                 setIsModalVisible(false, 'connexion');
                 navigation.navigate('(tabs)');
+            } else if (storedEmail && storedPassword) {
+            onChangeEmail(storedEmail);
+            onChangeMotDePasse(storedPassword);
             }
         };
 
@@ -84,11 +115,23 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
                 secureTextEntry={!showPassword}
             />
 
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right:30 }}>
+            <Pressable onPress={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right:30 }}>
                 {showPassword ? <Ionicons name="eye" size={24} color="#668F80" /> : <Ionicons name="eye-off-outline" size={24} color="black" />}
-            </TouchableOpacity>
+            </Pressable>
 
             </View>
+
+            <View style={styles.rememberMeContainer}>
+              <Pressable onPress={() => setRememberMe(!rememberMe)} style={{ justifyContent: 'center', height:32, width:32, flexDirection: 'row', alignItems: 'center' }}>
+                <AnimatedCheckbox
+                  checked={rememberMe}
+                  highlightColor="#668F80"
+                  checkmarkColor="#ffffff"
+                  boxOutlineColor="#668F80"
+                />
+              </Pressable>
+          <Text style={{fontSize: 14, paddingLeft: 5}}>Se souvenir de moi</Text>
+        </View>
 
         </View>
     
@@ -209,6 +252,13 @@ const styles = StyleSheet.create({
       padding: 10,
       borderRadius: 5,
       backgroundColor: '#F6F6F6',
+    },
+    rememberMeContainer: {
+      justifyContent: 'center',
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '100%',
+      marginTop: 10,
     },
   });
   
