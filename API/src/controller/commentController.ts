@@ -20,7 +20,7 @@ class CommentController {
             return res.status(200).json({ record, msg: "Création commentaire ok" });
         } catch (e) {
             console.error(e)
-            return res.status(417).json({ msg: "Création commentaire échouée", status: 417, route: "/comment/create" });
+            return res.status(417).json({ msg: "Création commentaire échouée", status: 417 });
         }
     }
 
@@ -32,7 +32,7 @@ class CommentController {
             return res.status(200).json({ records });
         } catch (e) {
             console.error(e)
-            return res.status(500).json({ msg: "Lecture échouée", status: 500, route: "/comment/read" });
+            return res.status(500).json({ msg: "Lecture échouée", status: 500 });
         }
     }
 
@@ -44,7 +44,7 @@ class CommentController {
             return res.status(200).json({ comments });
         } catch (e) {
             console.error(e);
-            return res.status(500).json({ msg: "Erreur lors de la lecture", status: 500, route: "/comment/readByPost" });
+            return res.status(500).json({ msg: "Erreur lors de la lecture", status: 500 });
         }
     }
 
@@ -70,7 +70,7 @@ class CommentController {
             }
         } catch (e) {
             console.error(e);
-            return res.status(500).json({ msg: "Erreur lors de la suppression", status: 500, route: "/comment/delete" });
+            return res.status(500).json({ msg: "Erreur lors de la suppression", status: 500 });
         }
     }
 }

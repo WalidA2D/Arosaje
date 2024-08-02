@@ -17,6 +17,9 @@ interface PostAttributes {
   plantOrigin: string;
   plantRequirements: string;
   plantType: string;
+  image1: string;
+  image2: string;
+  image3: string;
 }
 
 export interface PostCreationAttributes extends Optional<PostAttributes, 'idPosts'> {}
@@ -28,7 +31,7 @@ PostInstance.init(
     idPosts: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     title: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.STRING, allowNull: false },
-    publishedAt: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
+    publishedAt: { type: DataTypes.DATE, allowNull: true, defaultValue: DataTypes.NOW },
     dateStart: { type: DataTypes.DATE, allowNull: false },
     dateEnd: { type: DataTypes.DATE, allowNull: false },
     address: { type: DataTypes.STRING, allowNull: false },
@@ -39,7 +42,10 @@ PostInstance.init(
     idUser: { type: DataTypes.INTEGER, allowNull: false },
     plantOrigin: { type: DataTypes.STRING, allowNull: false },
     plantRequirements: { type: DataTypes.STRING, allowNull: false },
-    plantType: { type: DataTypes.STRING, allowNull: false }
+    plantType: { type: DataTypes.STRING, allowNull: false },
+    image1: { type: DataTypes.STRING, allowNull: false},
+    image2: { type: DataTypes.STRING, allowNull: false},
+    image3: { type: DataTypes.STRING, allowNull: false}
   },
   { sequelize: db, tableName: 'Posts', timestamps: false }
 );

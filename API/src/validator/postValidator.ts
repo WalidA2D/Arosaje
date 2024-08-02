@@ -15,18 +15,18 @@ class PostValidator {
         .withMessage('La description est requise'),
       body('publishedAt')
         .optional()
-        .matches(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)
-        .withMessage('La date de publication doit être au format YYYY-MM-DD HH:mm:ss')
+        .isISO8601()
+        .withMessage('La date de publication doit être au format ISO 8601')
         .notEmpty()
         .withMessage('La date de publication est requise'),
       body('dateStart')
-        .matches(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)
-        .withMessage('La date de début doit être au format YYYY-MM-DD HH:mm:ss')
+        .isISO8601()
+        .withMessage('La date de début doit être au format ISO 8601')
         .notEmpty()
         .withMessage('La date de début est requise'),
       body('dateEnd')
-        .matches(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)
-        .withMessage('La date de fin doit être au format YYYY-MM-DD HH:mm:ss')
+        .isISO8601()
+        .withMessage('La date de fin doit être au format ISO 8601')
         .notEmpty()
         .withMessage('La date de fin est requise'),
       body('address')
@@ -58,7 +58,7 @@ class PostValidator {
         .withMessage('Accepté par est requis'),
       body('idUser')
         .isEmpty()
-        .withMessage('L\'identifiant de l\'utilisateur ne peut pas être ajouté par un tier'),
+        .withMessage('L\'identifiant de l\'utilisateur ne peut pas être ajouté par un tiers'),
       body('plantOrigin')
         .isString()
         .withMessage('L\'origine de la plante doit être une chaîne de caractères')
@@ -76,23 +76,25 @@ class PostValidator {
         .withMessage('Le type de plante est requis')
     ];
   }
+
   checkRead() {
-		return [
-			query('limit')
-				.optional()
-				.isInt({ min: 1, max: 10 })
-				.withMessage('La limite doit être entre : 1 à 10'),
-			query('offset')
-				.optional()
-				.isNumeric()
-				.withMessage('La valeur doit être un numéro'),
-		];
-	}
-  checkReadByUser() {
+    return [
+      query('limit')
+        .optional()
+        .isInt({ min: 1, max: 10 })
+        .withMessage('La limite doit être entre 1 et 10'),
+      query('offset')
+        .optional()
+        .isInt()
+        .withMessage('La valeur de l\'offset doit être un nombre entier'),
+    ];
+  }
+
+  checkIdParam() {
     return [
       param('id')
-        .isNumeric()
-        .withMessage("L'id doit être un numéro")
+        .isInt()
+        .withMessage("L'id doit être un nombre entier")
     ];
   }
 }
