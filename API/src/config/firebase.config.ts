@@ -19,4 +19,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage();
 
+console.log('Connecté à : ',app.options.authDomain)
+
 export { app, auth, storage };

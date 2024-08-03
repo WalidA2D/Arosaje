@@ -23,7 +23,7 @@ app.use("/img", imageRouter);
 const port = process.env.PORT || 5070;
 
 db.sync().then(() => {
-  console.log("Connecté à la database");
+  console.log("Connecté à : ", db.config.host, " => ", db.config.database);
   app.listen(port, () => {
     console.log("Server PORT : ", port);
   });
