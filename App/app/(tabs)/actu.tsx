@@ -69,6 +69,7 @@ function HomeContent() {
   
     setLoading(true);
   
+    
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
   
