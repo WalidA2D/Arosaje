@@ -74,8 +74,6 @@ function HomeContent() {
       await new Promise(resolve => setTimeout(resolve, 2000));
   
       const response = await fetch(`${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`);
-      console.log(response);
-      console.log(`${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`);
   
       if (!response.ok) {
         throw new Error('Échec de la réponse du serveur');
