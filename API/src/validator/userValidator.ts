@@ -5,17 +5,41 @@ class UserValidator {
     return [
       body("lastName")
         .notEmpty()
-        .withMessage("Le prénom est vide")
+        .withMessage("Le nom de famille est vide")
         .isString()
-        .withMessage("Nom invalide"),
+        .withMessage("Nom de famille invalide"),
       body("firstName")
         .notEmpty()
         .withMessage("Le prénom est vide")
         .isString()
         .withMessage("Prénom invalide"),
-      body("email").notEmpty().isEmail().withMessage("Email invalide"),
+      body("email")
+        .notEmpty()
+        .withMessage("L'email est vide")
+        .isEmail()
+        .withMessage("Email invalide"),
+      body("address")
+        .notEmpty()
+        .withMessage("L'adresse est vide")
+        .isString()
+        .withMessage("Adresse invalide"),
+      body("phone")
+        .notEmpty()
+        .withMessage("Le numéro de téléphone est vide")
+        .isString()
+        .withMessage("Numéro de téléphone invalide"),
+      body("cityName")
+        .notEmpty()
+        .withMessage("Le nom de la ville est vide")
+        .isString()
+        .withMessage("Nom de la ville invalide"),
+      body("password")
+        .notEmpty()
+        .withMessage("Le mot de passe est vide")
+        .isString()
+        .withMessage("Mot de passe invalide"),
     ];
-  }
+  }  
   checkRead() {
     //avec pagination
     return [

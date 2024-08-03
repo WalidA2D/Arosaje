@@ -37,22 +37,6 @@ class PostController {
         plantType,
       } = req.body;
 
-      console.log("cadeau : ", {
-        title,
-        description,
-        publishedAt,
-        dateStart,
-        dateEnd,
-        address,
-        cityName,
-        state,
-        accepted,
-        acceptedBy,
-        plantOrigin,
-        plantRequirements,
-        plantType,
-      });
-
       // Valider et convertir les dates
       const publishedAtDate = publishedAt ? new Date(publishedAt) : new Date();
       const dateStartDate = dateStart ? new Date(dateStart) : new Date();
@@ -115,11 +99,11 @@ class PostController {
 
   async readPagination(req: Request, res: Response) {
     try {
-      const amont = (req.query.amont as number | undefined) || 10;
+      const quantite = (req.query.quantite as number | undefined) || 10;
       const saut = req.query.saut as number | undefined;
       const posts = await PostInstance.findAll({
         where: { state: 0 },
-        limit: amont,
+        limit: quantite,
         offset: saut,
       });
       return res.status(200).json({ success: true, posts });

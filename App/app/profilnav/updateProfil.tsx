@@ -73,12 +73,12 @@ const UpdateProfil = () => {
     }
     const userToken = await AsyncStorage.getItem('userToken');
     const options = {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization' : userToken,
       },
       body: JSON.stringify({
-        token: 'OWb.RO]cReozwr^o!w#D', // token de l'utilisateur à mettre à jour
         lastName: newLastName,
         firstName: newFirstName,
         address: newAddress,
@@ -87,7 +87,7 @@ const UpdateProfil = () => {
       }),
     };
 
-    fetch(`${apiUrl}/api/user/updateUser`, options)
+    fetch(`${apiUrl}/user/update`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {

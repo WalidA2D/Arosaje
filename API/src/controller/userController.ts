@@ -21,6 +21,30 @@ class UserController {
       return res.status(417).json({ success: false, msg: "Création utilisateur échouée" });
     }
   }
+  
+  async readOwnProfile(req: Request, res: Response){
+    try{
+      const token = req.headers.authorization?.split(" ")[0];
+      const user = await UserInstance.findOne({ where: { uid: token } });
+      if (!user) return res.status(404).json({ success: false, msg: "Cible non trouvée" });
+      const role = user.dataValues.isAdmin ? "Administrateur" : user.dataValues.isBotanist ? "Botaniste" : "Utilisateur" ;
+      return res.status(200).json({ success:true, msg: "Lecture du profil OK", user:{
+        idUsers:user.dataValues.idUsers,
+        lastName:user.dataValues.lastName,
+        firstName:user.dataValues.firstName,
+        email:user.dataValues.email,
+        address:user.dataValues.address,
+        phone:user.dataValues.phone,
+        cityName:user.dataValues.cityName,
+        photo:user.dataValues.photo,
+        role,
+        note:user.dataValues.note,
+      }})
+    } catch (e){
+      console.error(e);
+      return res.status(417).json({ success: false, msg: "Lecture du profil échouée" });
+    }
+  }
 
   async readPagination(req: Request, res: Response) {
     try {
@@ -36,10 +60,14 @@ class UserController {
   async readByID(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const record = await UserInstance.findOne({ where: { idUsers: id } });
-      if (!record)
+      const user = await UserInstance.findOne({ where: { idUsers: id } });
+      if (!user)
         return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
-      return res.status(200).json({ success: true, record });
+      return res.status(200).json({ success:true, msg: "Lecture du profil OK", user:{
+        lastName:user.dataValues.lastName,
+        firstName:user.dataValues.firstName,
+        cityName:user.dataValues.cityName,
+      }})
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Lecture byId fail" });
@@ -51,8 +79,8 @@ class UserController {
       const token = req.headers.authorization?.split(" ")[0];
       const record = await UserInstance.findOne({ where: { uid: token } });
       if (!record) return res.status(404).json({ success: false, msg: "Cible non trouvée" });
-      const { lastName, firstName, email, address, phone, cityName, password } = req.body;
-      const encryptedPassword = await encryptMethod(password);
+      const { lastName, firstName, email, address, phone, cityName } = req.body;
+      // const encryptedPassword = await encryptMethod(password);
       const updatedRecord = await record.update({
         lastName,
         firstName,
@@ -60,9 +88,9 @@ class UserController {
         address,
         phone,
         cityName,
-        password: encryptedPassword,
+        // password: encryptedPassword,
       });
-      return res.status(200).json({ success: true, msg: "Modificaiton réussie", record: updatedRecord });
+      return res.status(200).json({ success: true, msg: "Modification réussie", record: updatedRecord });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Modification impossible" });

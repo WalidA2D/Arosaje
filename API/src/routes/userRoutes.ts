@@ -13,8 +13,16 @@ router.post(
 );
 
 router.get(
+  "/profil",
+  Middleware.authMiddleware({ roles: ["utilisateur"] }),
+  Middleware.handleValidationError,
+  UserController.readOwnProfile
+);
+
+router.get(
   "/read",
   UserValidator.checkRead(),
+  Middleware.authMiddleware({ roles: ["admin"] }),
   Middleware.handleValidationError,
   UserController.readPagination
 );
@@ -27,8 +35,7 @@ router.get(
 );
 
 router.put(
-  "/update/:id",
-  UserValidator.checkIdParam(),
+  "/update",
   Middleware.handleValidationError,
   UserController.update
 );
