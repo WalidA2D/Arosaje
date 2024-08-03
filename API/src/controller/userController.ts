@@ -27,8 +27,18 @@ class UserController {
       const token = req.headers.authorization?.split(" ")[0];
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Cible non trouvée" });
+      const role = user.dataValues.isAdmin ? "Administrateur" : user.dataValues.isBotanist ? "Botaniste" : "Utilisateur" ;
       return res.status(200).json({ success:true, msg: "Lecture du profil OK", user:{
-
+        idUsers:user.dataValues.idUsers,
+        lastName:user.dataValues.lastName,
+        firstName:user.dataValues.firstName,
+        email:user.dataValues.email,
+        address:user.dataValues.address,
+        phone:user.dataValues.phone,
+        cityName:user.dataValues.cityName,
+        photo:user.dataValues.photo,
+        role,
+        note:user.dataValues.note,
       }})
     } catch (e){
       console.error(e);
