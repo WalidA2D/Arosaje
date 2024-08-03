@@ -22,27 +22,27 @@ jobs:
           node-version: '18.x'
 
       - name: --------- INSTALLATION DES DEPENDANCES ---------
-        working-directory: backend
+        working-directory: API
         run: npm install
 
       - name: --------- DEMARRAGE DU SERVEUR ---------
-        working-directory: backend
+        working-directory: API
         run: |
           # Démarrer le serveur en arrière-plan et capturer le PID
-          nohup node index > server.log 2>&1 &
+          nohup npm run dev > server.log 2>&1 &
           echo $! > server.pid
           sleep 5  # Attendre que le serveur démarre complètement
 
       - name: --------- EXECUTION DES TESTS ---------
-        working-directory: backend
+        working-directory: API
         run: npm test
 
       - name: --------- ARRÊTER LE SERVEUR ---------
         if: always()
         run: |
           # Lire le PID depuis le fichier et arrêter le serveur
-          if [ -f backend/server.pid ]; then
-            SERVER_PID=$(cat backend/server.pid)
+          if [ -f API/server.pid ]; then
+            SERVER_PID=$(cat API/server.pid)
             echo "Arrêt du serveur avec PID $SERVER_PID"
             kill -9 $SERVER_PID || true
           else
@@ -50,6 +50,6 @@ jobs:
           fi
 
       - name: --------- CONSTRUCTION DU PROJET ---------
-        working-directory: backend
+        working-directory: API
         run: npm run build
         continue-on-error: true
