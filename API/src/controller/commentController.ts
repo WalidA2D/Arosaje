@@ -24,9 +24,9 @@ class CommentController {
 
   async readPagination(req: Request, res: Response) {
     try {
-      const amont = parseInt(req.query.amont as string, 10) || 10;
+      const quantite = parseInt(req.query.quantite as string, 10) || 10;
       const saut = parseInt(req.query.saut as string, 10) || 0;
-      const records = await CommentInstance.findAll({ where: {}, limit: amont, offset: saut });
+      const records = await CommentInstance.findAll({ where: {}, limit: quantite, offset: saut });
       return res.status(200).json({ success: true, records });
     } catch (e) {
       console.error(e);

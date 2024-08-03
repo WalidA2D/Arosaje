@@ -79,8 +79,8 @@ class UserController {
       const token = req.headers.authorization?.split(" ")[0];
       const record = await UserInstance.findOne({ where: { uid: token } });
       if (!record) return res.status(404).json({ success: false, msg: "Cible non trouvée" });
-      const { lastName, firstName, email, address, phone, cityName, password } = req.body;
-      const encryptedPassword = await encryptMethod(password);
+      const { lastName, firstName, email, address, phone, cityName } = req.body;
+      // const encryptedPassword = await encryptMethod(password);
       const updatedRecord = await record.update({
         lastName,
         firstName,
@@ -88,7 +88,7 @@ class UserController {
         address,
         phone,
         cityName,
-        password: encryptedPassword,
+        // password: encryptedPassword,
       });
       return res.status(200).json({ success: true, msg: "Modification réussie", record: updatedRecord });
     } catch (e) {
