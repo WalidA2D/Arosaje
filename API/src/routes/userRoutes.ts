@@ -36,7 +36,6 @@ router.get(
 
 router.put(
   "/update",
-  UserValidator.checkIdParam(),
   Middleware.handleValidationError,
   UserController.update
 );

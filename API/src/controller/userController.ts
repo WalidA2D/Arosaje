@@ -27,7 +27,9 @@ class UserController {
       const token = req.headers.authorization?.split(" ")[0];
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Cible non trouvée" });
-      return res.status(200).json({ success:true, msg: "Lecture du profil OK", user})
+      return res.status(200).json({ success:true, msg: "Lecture du profil OK", user:{
+
+      }})
     } catch (e){
       console.error(e);
       return res.status(417).json({ success: false, msg: "Lecture du profil échouée" });
