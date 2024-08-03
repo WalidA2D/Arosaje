@@ -37,22 +37,6 @@ class PostController {
         plantType,
       } = req.body;
 
-      console.log("cadeau : ", {
-        title,
-        description,
-        publishedAt,
-        dateStart,
-        dateEnd,
-        address,
-        cityName,
-        state,
-        accepted,
-        acceptedBy,
-        plantOrigin,
-        plantRequirements,
-        plantType,
-      });
-
       // Valider et convertir les dates
       const publishedAtDate = publishedAt ? new Date(publishedAt) : new Date();
       const dateStartDate = dateStart ? new Date(dateStart) : new Date();
