@@ -30,7 +30,7 @@ class ImageController {
       const file = req.file;
       const fileRef = ref(storage,`profilepictures/${user.dataValues.idUsers + user.dataValues.firstName[0]}.jpg`);
       const metadata = { contentType: 'image/jpg' };
-      await uploadBytesResumable(fileRef, file.buffer);
+      await uploadBytesResumable(fileRef, file.buffer, metadata);
       const fileUrl = await getDownloadURL(fileRef);
 
       await user.update({ photo: fileUrl });
@@ -38,7 +38,7 @@ class ImageController {
       res.status(201).json({ success: true, msg: "Image ajoutée avec succès", url: fileUrl });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ success: false, msg: "Lecture échouée" });
+      return res.status(500).json({ success: false, msg: "Upload PP échouée" });
     }
   }
 
