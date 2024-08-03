@@ -109,7 +109,7 @@ export default function PubLoca() {
     let address = await Location.reverseGeocodeAsync({ latitude, longitude });
     if (address.length > 0) {
       const { street, city, region, postalCode } = address[0];
-      const fullAddress = `${street}, ${postalCode} ${city}, ${region}`;
+      const fullAddress = `${street}, ${city}, ${postalCode}, ${region}`;
       setLocalisation(fullAddress);
       setLocCompleted(true);
       setIsEditing(false);
