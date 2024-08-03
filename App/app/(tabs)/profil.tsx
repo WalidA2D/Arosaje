@@ -76,44 +76,39 @@ export function ProfilScreen() {
   const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', address: '', phone: '', profilePic: '' });
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true); 
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMorePosts, setHasMorePosts] = useState(true);
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
   const fetchProfileData = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     const options = {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token: userToken,
-      }),
+        'Authorization' : userToken,
+      }
     };
 
-    fetch(`${apiUrl}/api/user/getUser`, options)
+    fetch(`${apiUrl}/user/profil`, options)
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          const profilePicURI = `data:image/png;base64,${data.body.profilePic.body}`;
-          const userId = data.body.iduser;
+          const userId = data.user.idUsers;
           setProfileData({
-            lastName: data.body.lastName,
-            firstName: data.body.firstName,
-            role: data.body.role,
+            lastName: data.user.lastName,
+            firstName: data.user.firstName,
+            role: data.user.role,
             idUser: userId,
-            cityName: data.body.cityName,
-            address: data.body.address,
-            phone: data.body.phone,
-            profilePic: profilePicURI
+            cityName: data.user.cityName,
+            address: data.user.address,
+            phone: data.user.phone,
+            profilePic: data.user.photo
           });
           if (userId) {
-            fetchUserPosts(userId, 1);
+            fetchUserPosts(userId);
           } else {
             console.error('User ID is undefined');
           }
+          
         }
       })
       .catch(error => {
@@ -121,33 +116,26 @@ export function ProfilScreen() {
       });
   };
 
-  const fetchUserPosts = async (idUser: string, page: number) => {
-    setLoadingMore(true);
+  const fetchUserPosts = async (idUser: string) => {
+    setLoading(true);
     const options = {
-      method: 'POST',
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ idUser, page }),
+      }
     };
 
     try {
-      const response = await fetch(`${apiUrl}/api/post/postsOf`, options);
+      const response = await fetch(`${apiUrl}/post/read/${idUser}`, options);
       const data = await response.json();
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Ajouter un délai artificiel de 1 seconde
 
       if (data.success) {
-        if (data.body.length === 0) {
-          setHasMorePosts(false); // No more posts to load
-        } else {
-          setPosts(prevPosts => [...prevPosts, ...data.body]);
-        }
+        setPosts(data.body);
       }
     } catch (error) {
-      console.error('Error fetching user posts:', error);
+      console.error('Error fetching user posts:', error); 
     } finally {
       setLoading(false);
-      setLoadingMore(false);
     }
   };
 
@@ -186,26 +174,12 @@ export function ProfilScreen() {
     );
   };
 
-  const fetchNextPage = () => {
-    if (!loadingMore && hasMorePosts) {
-      setPage(prevPage => {
-        const newPage = prevPage + 1;
-        fetchUserPosts(profileData.idUser, newPage);
-        return newPage;
-      });
-    }
-  };
-
   const renderItem = ({ item }: { item: Post }) => (
     <View style={styles.post}>
       <Text style={styles.postTitle}>{item.title}</Text>
       <Text style={styles.postContent}>{item.description}</Text>
       <Text style={styles.postContent}>Publié le: {item.publishedAt}</Text>
     </View>
-  );
-
-  const ListEndLoader = () => (
-    loadingMore ? <ActivityIndicator size="large" color="#668F80" /> : null
   );
 
   const popupRef = useRef<any>(null);
@@ -265,9 +239,6 @@ export function ProfilScreen() {
           data={posts}
           renderItem={renderItem}
           keyExtractor={(item) => item.idPosts.toString()}
-          onEndReached={fetchNextPage}
-          onEndReachedThreshold={0.8}
-          ListFooterComponent={ListEndLoader}
         />
       ) : (
         <View style={styles.imagesContainer}>
