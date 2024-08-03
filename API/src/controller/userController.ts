@@ -12,13 +12,13 @@ class UserController {
     const uid = uuidv4();
     try {
       const email = await UserInstance.findOne({ where: { email: req.body.email } });
-      if (email != null) return res.status(417).json({ success: false, msg: "Email déjà existant", status: 417 });
+      if (email != null) return res.status(417).json({ success: false, msg: "Email déjà existant" });
       req.body.password = await encryptMethod(req.body.password);
       const record = await UserInstance.create({ ...req.body, uid, photo: defaultPP });
       return res.status(201).json({ success: true, record, msg: "Création utilisateur ok" });
     } catch (e) {
       console.error(e);
-      return res.status(417).json({ success: false, msg: "Création utilisateur échouée", status: 417 });
+      return res.status(417).json({ success: false, msg: "Création utilisateur échouée" });
     }
   }
 
@@ -30,7 +30,7 @@ class UserController {
       return res.status(200).json({ success: true, users: records });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ success: false, msg: "Lecture fail", status: 500 });
+      return res.status(500).json({ success: false, msg: "Lecture fail" });
     }
   }
   async readByID(req: Request, res: Response) {
@@ -42,7 +42,7 @@ class UserController {
       return res.status(200).json({ success: true, record });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ success: false, msg: "Lecture byId fail", status: 500 });
+      return res.status(500).json({ success: false, msg: "Lecture byId fail" });
     }
   }
 
@@ -62,7 +62,7 @@ class UserController {
         cityName,
         password: encryptedPassword,
       });
-      return res.status(200).json({ success: true, msg: "Modificaiton réussie", record: updatedRecord, status: 200 });
+      return res.status(200).json({ success: true, msg: "Modificaiton réussie", record: updatedRecord });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Modification impossible" });
@@ -74,13 +74,13 @@ class UserController {
       const { id } = req.params;
       const record = await UserInstance.findOne({ where: { idUsers: id } });
 
-      if (!record) return res.status(500).json({ success: false, status: 500, msg: "Can not find existing record" });
+      if (!record) return res.status(500).json({ success: false, msg: "Can not find existing record" });
 
       const deletedRecord = await record.destroy();
       return res.status(200).json({ success: true, record: deletedRecord });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ success: false, msg: "fail to read", status: 500 });
+      return res.status(500).json({ success: false, msg: "fail to read" });
     }
   }
 
@@ -94,7 +94,7 @@ class UserController {
       return res.status(200).json({ success: true, msg: "Connexion réussie", user });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ success: false, msg: "Erreur lors de la connexion", status: 500 });
+      return res.status(500).json({ success: false, msg: "Erreur lors de la connexion" });
     }
   }
 }

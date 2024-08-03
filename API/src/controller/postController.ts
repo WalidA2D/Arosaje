@@ -91,8 +91,8 @@ class PostController {
         async (file, index) => {
           const fileName = `${record.dataValues.idPosts}_${index}`;
           const fileRef = ref(storage, `posts/${fileName}.jpg`);
-
-          await uploadBytesResumable(fileRef, file.buffer);
+          const metadata = { contentType: 'image/jpg' };
+          await uploadBytesResumable(fileRef, file.buffer, metadata);
           const fileURL = await getDownloadURL(fileRef);
           filesURLs[index] = fileURL;
         }
