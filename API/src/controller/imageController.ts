@@ -56,12 +56,14 @@ class ImageController {
   
   async resetPP(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const record = await UserInstance.findOne({ where: { idUsers: id } });
-      if (!record) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
-      await record.update({ photo: defaultPP });
+      const token = req.headers.authorization?.split(" ")[0];
 
-      return res.status(200).json({ success: true, url: record.dataValues.photo });
+      const user = await UserInstance.findOne({ where: { uid: token } });
+      if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
+
+      await user.update({ photo: defaultPP });
+
+      return res.status(200).json({ success: true, url: user.dataValues.photo });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Update échoué" });

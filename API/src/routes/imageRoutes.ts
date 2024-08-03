@@ -26,8 +26,7 @@ router.get(
 );
 
 router.put(
-  "/resetPP/:id",
-  postValidator.checkIdParam(),
+  "/resetPP",
   Middleware.handleValidationError,
   Middleware.authMiddleware({ roles: ["utilisateur"] }),
   ImageController.resetPP
