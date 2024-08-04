@@ -10,7 +10,6 @@ import { UserInstance } from "../models/User";
 class PostController {
   async create(req: Request, res: Response) {
     try {
-      console.log("token");
       const token = req.headers.authorization?.split(" ")[0];
       if (!token) {
         return res.status(404).json({ success: false, msg: "Aucun token fourni" });
@@ -41,7 +40,7 @@ class PostController {
       const publishedAtDate = publishedAt ? new Date(publishedAt) : new Date();
       const dateStartDate = dateStart ? new Date(dateStart) : new Date();
       const dateEndDate = dateEnd ? new Date(dateEnd) : new Date();
-
+      
       const record = await PostInstance.create({
         title,
         description,
@@ -69,7 +68,6 @@ class PostController {
       if (!req.files || !Array.isArray(req.files)) {
         return res.status(400).json({ success: false, message: "Aucun fichier trouvé" });
       }
-
       const filesURLs: string[] = [];
       const filePromises = (req.files as Express.Multer.File[]).map(
         async (file, index) => {
