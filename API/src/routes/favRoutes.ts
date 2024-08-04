@@ -8,17 +8,17 @@ import favController from "../controller/favController"
 const router = express.Router();
 
 router.post(
-  "/add/:id",
-  postValidator.checkIdParam(),
+  "/add",
   Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
+  favController.add
 );
 
 router.get(
-  "/read/:id",
-  postValidator.checkIdParam(),
+  "/read",
   Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
+  favController.read
 );
 
 router.delete(

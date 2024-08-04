@@ -7,6 +7,7 @@ import userRouter from "./routes/userRoutes";
 import postRouter from "./routes/postRoutes";
 import commentRouter from "./routes/commentRoutes";
 import imageRouter from "./routes/imageRoutes";
+import favRouter from "./routes/favRoutes"
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use("/user", userRouter);
 app.use("/post", postRouter);
 app.use("/comment", commentRouter);
 app.use("/img", imageRouter);
+app.use("/fav", favRouter);
 
 const port = process.env.PORT || 5070;
 

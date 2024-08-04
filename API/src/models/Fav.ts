@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Optional } from "sequelize";
 import db from '../config/database.config';
 
 export interface FavAttributes {
@@ -7,13 +7,15 @@ export interface FavAttributes {
   idPost: number;
 }
 
-export class FavInstance extends Model<FavAttributes> {}
+export interface FavCreationAttributes extends Optional<FavAttributes, 'idFavorites'> {}
+
+export class FavInstance extends Model<FavCreationAttributes> {}
 
 FavInstance.init(
   {
     idFavorites: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    idUser: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'idUsers' } },
-    idPost: { type: DataTypes.INTEGER, references: { model: 'Posts', key: 'idPosts' } }
+    idUser: { type: DataTypes.INTEGER },
+    idPost: { type: DataTypes.INTEGER }
   },
   {
     sequelize: db,
