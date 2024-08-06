@@ -149,6 +149,7 @@ function HomeContent() {
     fetchPosts();
   }, []);
 
+  
   return (
     <View style={styles.container}>
       <TextInput
