@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList, ActivityIndicator, Text } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput } from 'react-native';
+import { NavigationContainer, } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import ContentItem from '../../components/navigation/ContentItem';
-
+import Filtre from '../actunav/actufiltre';
 type Post = {
   idPosts: number;
   title: string;
@@ -31,7 +31,7 @@ type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
-function HomeScreen() {
+function HomeScreen({ }) {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator
@@ -51,6 +51,20 @@ function HomeScreen() {
         <Stack.Screen
           name="Actualités"
           component={HomeContent}
+          options={({ navigation }) => ({
+            headerRight: () => (
+              <Button
+                onPress={() => navigation.navigate('Filtre')}
+                title="Filtre"
+                color="#fff"
+              />
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="Filtre"
+          component={Filtre}
+          options={{ headerBackTitleVisible: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -58,6 +72,7 @@ function HomeScreen() {
 }
 
 function HomeContent() {
+  const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<ContentItemData[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
@@ -66,19 +81,19 @@ function HomeContent() {
 
   const fetchPosts = async () => {
     if (loading) return;
-  
+
     setLoading(true);
-  
+
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
       const response = await fetch(`${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`);
       if (!response.ok) {
         throw new Error('Échec de la réponse du serveur');
       }
-  
+
       const result = await response.json();
-  
+
       if (Array.isArray(result.posts)) {
         if (result.posts.length === 0) {
           if (items.length > 0 && !error) {
@@ -91,13 +106,13 @@ function HomeContent() {
             const year = datePart.slice(0, 4);
             const month = datePart.slice(5, 7);
             const day = datePart.slice(8, 10);
-  
+
             // Extraire l'heure
             const timePart = post.publishedAt.slice(11, 16); // "HH:mm"
-  
+
             // Formater la date comme "Année/Mois/Jour Heure"
             const formattedDate = `${year}/${month}/${day} ${timePart}`;
-  
+
             return {
               id: post.idPosts.toString(),
               images: [post.image1, post.image2, post.image3].filter(Boolean) as string[],
@@ -106,7 +121,7 @@ function HomeContent() {
               time: formattedDate,
             };
           });
-  
+
           setItems((prevItems) => [...prevItems, ...newItems]);
           setSaut((prevSaut) => prevSaut + quantite);
           setError('');
@@ -120,9 +135,9 @@ function HomeContent() {
       setLoading(false);
     }
   };
-  
-  
-  
+
+
+
 
   const loadMoreItems = () => {
     if (!loading && !error) {
@@ -136,6 +151,13 @@ function HomeContent() {
 
   return (
     <View style={styles.container}>
+      <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher..."
+            placeholderTextColor="#888"
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
+          />
       {error ? (
         <Text style={styles.errorText}>{error}</Text>
       ) : (
@@ -161,6 +183,20 @@ function HomeContent() {
 }
 
 const styles = StyleSheet.create({
+  searchContainer: {
+    marginTop: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingLeft: 15,
+    backgroundColor: '#F0F0F0',
+    color: '#000',
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFF',
@@ -174,6 +210,12 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 16,
     margin: 20,
+  },
+  body: {
+    flex: 1,
+    width: '100%',
+    paddingHorizontal: 20,
+    backgroundColor: '#FFF',
   },
 });
 
