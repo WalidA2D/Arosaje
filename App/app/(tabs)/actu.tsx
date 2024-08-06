@@ -5,6 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import ContentItem from '../../components/navigation/ContentItem';
 import Filtre from '../actunav/actufiltre';
+import Load from '@/components/Loading';
+
 type Post = {
   idPosts: number;
   title: string;
@@ -74,14 +76,14 @@ function HomeScreen({ }) {
 function HomeContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<ContentItemData[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [saut, setSaut] = useState<number>(0);
   const quantite = 5;
 
   const fetchPosts = async () => {
     if (loading) return;
-
+    
     setLoading(true);
 
     try {
@@ -149,7 +151,12 @@ function HomeContent() {
     fetchPosts();
   }, []);
 
-  
+  if (loading) {
+    return (
+      <Load></Load>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -176,7 +183,7 @@ function HomeContent() {
           )}
           onEndReached={loadMoreItems}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={loading ? <ActivityIndicator size="large" color="#668F80" /> : null}
+          ListFooterComponent={loading ? <Load></Load> : null}
         />
       )}
     </View>
