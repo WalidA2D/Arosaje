@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput } from 'react-native';
-import { NavigationContainer, } from '@react-navigation/native';
+import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput, Pressable  } from 'react-native';
+import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 import ContentItem from '../../components/navigation/ContentItem';
 import Filtre from '../actunav/actufiltre';
-import Load from '@/components/Loading';
+import BlogFocus from '../actunav/BlogFocus';
+import { StackNavigationProp } from '@react-navigation/stack';
 
+type ActuNavigationProp = StackNavigationProp<RootStackParamList, 'Actualités'>;
 type Post = {
   idPosts: number;
   title: string;
@@ -28,6 +29,7 @@ type ContentItemData = {
 type RootStackParamList = {
   Actualités: undefined;
   Filtre: undefined;
+  BlogFocus: { id: string }; 
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -68,12 +70,18 @@ function HomeScreen({ }) {
           component={Filtre}
           options={{ headerBackTitleVisible: false }}
         />
+        <Stack.Screen
+          name="BlogFocus"
+          component={BlogFocus}
+          options={{ headerBackTitleVisible: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
 function HomeContent() {
+  const navigation = useNavigation<ActuNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<ContentItemData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,8 +90,7 @@ function HomeContent() {
   const quantite = 5;
 
   const fetchPosts = async () => {
-    if (loading) return;
-    
+
     setLoading(true);
 
     try {
@@ -95,11 +102,10 @@ function HomeContent() {
       }
 
       const result = await response.json();
-
       if (Array.isArray(result.posts)) {
         if (result.posts.length === 0) {
-          if (items.length > 0 && !error) {
-            setError('Aucun poste supplémentaire à charger.');
+          if (items.length > 0 && !error) { // Plus de poste a charger
+            return
           }
         } else {
           const newItems = result.posts.map((post: Post) => {
@@ -138,55 +144,55 @@ function HomeContent() {
     }
   };
 
-
-
-
   const loadMoreItems = () => {
     if (!loading && !error) {
       fetchPosts();
     }
   };
 
+  const blogFocusNavigate = (id: string) => {
+    navigation.navigate('BlogFocus', { id });
+  };
+
   useEffect(() => {
     fetchPosts();
   }, []);
 
-  if (loading) {
-    return (
-      <Load></Load>
-    );
-  }
-
   return (
-    <View style={styles.container}>
-      <TextInput
-            style={styles.searchInput}
-            placeholder="Rechercher..."
-            placeholderTextColor="#888"
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
-          />
-      {error ? (
-        <Text style={styles.errorText}>{error}</Text>
-      ) : (
-        <FlatList
-          contentContainerStyle={styles.scrollViewContent}
-          data={items}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ContentItem
-              images={item.images}
-              title={item.title}
-              description={item.description}
-              time={item.time}
-            />
-          )}
-          onEndReached={loadMoreItems}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={loading ? <Load></Load> : null}
+    <>
+      <View style={styles.container}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Rechercher..."
+          placeholderTextColor="#888"
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
         />
-      )}
-    </View>
+        {error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : (
+          <FlatList
+            contentContainerStyle={styles.scrollViewContent}
+            data={items}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+            
+                <ContentItem
+                  id={item.id}
+                  images={item.images}
+                  title={item.title}
+                  description={item.description}
+                  time={item.time}
+                  onPress={blogFocusNavigate}
+                />
+            )}
+            onEndReached={loadMoreItems}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={loading ? <ActivityIndicator size="large" color="#668F80" /> : null}
+          />
+        )}
+      </View>
+    </>
   );
 }
 
