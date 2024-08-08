@@ -103,10 +103,8 @@ function HomeContent() {
 
       const result = await response.json();
       if (Array.isArray(result.posts)) {
-        if (result.posts.length === 0) {
-          if (items.length > 0 && !error) { // Plus de poste a charger
-            return
-          }
+        if (result.posts.length === 0 && items.length > 0 && !error) { // Plus de poste a charger
+            return;
         } else {
           const newItems = result.posts.map((post: Post) => {
             // Extraire l'année, le mois et le jour
