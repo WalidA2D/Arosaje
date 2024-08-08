@@ -33,6 +33,13 @@ router.get(
   PostController.readByUser
 );
 
+router.get(
+  "/:id",
+  postValidator.checkIdParam(),
+  Middleware.handleValidationError,
+  PostController.readById
+);
+
 router.put(
   "/visib/:id",
   postValidator.checkIdParam(),

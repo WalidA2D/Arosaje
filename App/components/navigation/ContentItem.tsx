@@ -1,20 +1,29 @@
 import React, { useRef, useState } from 'react';
-import { StyleSheet, View, useWindowDimensions, FlatList, Image, Text, PanResponder } from 'react-native';
+import { StyleSheet, View, useWindowDimensions, FlatList, Image, Text, PanResponder, PanResponderGestureState, PanResponderInstance, TouchableOpacity } from 'react-native';
 
-const ContentItem = ({ images, title, description, time }) => {
+// Définir les types pour les props du composant
+type ContentItemProps = {
+  id: string;
+  images: string[];
+  title: string;
+  description: string;
+  time: string;
+  onPress?: (id: string) => void;
+};
+const ContentItem: React.FC<ContentItemProps> = ({ id,images, title, description, time, onPress}) => {
   const imagesArray = images || [];
   const { width: windowWidth } = useWindowDimensions();
-  const flatListRef = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef<FlatList<string> | null>(null); // Typage de la référence
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
 
-  const panResponder = PanResponder.create({
+  const panResponder: PanResponderInstance = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: (event, gestureState) => {
+    onPanResponderMove: (event, gestureState: PanResponderGestureState) => {
       const { dx } = gestureState;
       if (Math.abs(dx) > 40) { // Réduction de la valeur de comparaison pour une détection plus sensible
         const newIndex = dx > 0 ? currentIndex - 1 : currentIndex + 1;
         if (newIndex >= 0 && newIndex < imagesArray.length) {
-          flatListRef.current.scrollToIndex({ index: newIndex, animated: true });
+          flatListRef.current?.scrollToIndex({ index: newIndex, animated: true });
           setCurrentIndex(newIndex);
         }
       }
@@ -22,7 +31,9 @@ const ContentItem = ({ images, title, description, time }) => {
   });
 
   return (
+    
     <View style={styles.container} {...panResponder.panHandlers}>
+      <TouchableOpacity onPress={() => onPress?.(id)}>
       <FlatList
         ref={flatListRef}
         horizontal
@@ -41,7 +52,7 @@ const ContentItem = ({ images, title, description, time }) => {
           const newIndex = Math.round(event.nativeEvent.contentOffset.x / windowWidth);
           setCurrentIndex(newIndex);
         }}
-      />
+        />
       <View style={styles.content}>
         <View style={styles.descriptionContainer}>
           <Text style={styles.title}>{title}</Text>
@@ -54,6 +65,7 @@ const ContentItem = ({ images, title, description, time }) => {
           ))}
         </View>
       </View>
+</TouchableOpacity>
     </View>
   );
 };

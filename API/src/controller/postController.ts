@@ -6,6 +6,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { PostInstance } from "../models/Post";
 import { UserInstance } from "../models/User";
+import { CommentInstance } from "../models/Comment";
 
 class PostController {
   async create(req: Request, res: Response) {
@@ -120,6 +121,19 @@ class PostController {
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lorsde la lecture" });
+    }
+  }
+
+  async readById(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const post = await PostInstance.findOne({ where: { idPosts: id } });
+      if (!post) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
+      const comments = await CommentInstance.findAll({ where: {idPost : id }, order: [['publishedAt', 'DESC']] })
+      return res.status(200).json({ success: true, post, comments });
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ success: false, msg: "Erreur lors de la recherche d'un post par l'id" });
     }
   }
 
