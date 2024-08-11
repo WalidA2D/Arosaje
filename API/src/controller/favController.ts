@@ -35,7 +35,13 @@ class FavController {
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
       
       const favs = await FavInstance.findAll({ where : { idUser : user.dataValues.idUsers }})
-      return res.status(200).json({ success: true, msg: favs?"Favoris bien trouvés":"Aucun favori répertorié", favs})
+      
+      const postIds = favs.map(fav => fav.dataValues.idPost);
+      const posts = await Promise.all(postIds.map(idPost => PostInstance.findOne({ where: { idPosts:idPost } })));
+
+      const record = posts.filter(post => post !== null);
+
+      return res.status(200).json({ success: true, msg: favs?"Favoris bien trouvés":"Aucun favori répertorié", record})
     } catch (e){
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des favoris" });
