@@ -109,18 +109,24 @@ export default function PubEspece() {
         )}
       />
       <BigButtonDown buttonText="Choisir" onPress={handleValidation} />
-      <Modal visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+      <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
         {selectedSpeciesDetails && (
           <View style={styles.modalContent}>
-            <Text>Nom : {selectedSpeciesDetails.common_name}</Text>
-            <Text>Nom scientifique : {selectedSpeciesDetails.scientific_name}</Text>
-            <Text>Années : {selectedSpeciesDetails.year}</Text>
-            <Text>Nom de famille : {selectedSpeciesDetails.family_common_name}</Text>
-            <Text>Endroits : {selectedSpeciesDetails.observations}</Text>
+            <Text style={styles.modalContentText}>Nom : {selectedSpeciesDetails.common_name}</Text>
+            <Text style={styles.modalContentText}>Nom scientifique : {selectedSpeciesDetails.scientific_name}</Text>
+            <Text style={styles.modalContentText}>Années : {selectedSpeciesDetails.year}</Text>
+            <Text style={styles.modalContentText}>Nom de famille : {selectedSpeciesDetails.family_common_name}</Text>
+            <Text style={styles.modalContentText}>Endroits : {selectedSpeciesDetails.observations}</Text>
             <Image source={{ uri: selectedSpeciesDetails.image_url }} style={styles.imageModal} />
-            <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text>Retour</Text>
-            </TouchableOpacity>
+            <View style={styles.fixedDetailsBtn}>
+                <View style={styles.selectorContainer}>
+                  <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
+                    <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
+                    Retour
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
           </View>
         )}
       </Modal>
@@ -156,6 +162,35 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF8F0',
+  },
+  modalContentText:{
+    padding: 5,
+    marginBottom: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  fixedDetailsBtn: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  selectorContainer: {
+    flexDirection: 'row',
+    marginBottom: 50,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 25,
+    overflow: 'hidden',
+    width: '90%',
+    alignItems: 'center',
+  },
+  selectorButton: {
+    flex: 1,
+    paddingVertical: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
