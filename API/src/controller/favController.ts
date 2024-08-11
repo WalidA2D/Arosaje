@@ -17,7 +17,7 @@ class FavController {
       if(await FavInstance.findOne({where: { idPost :id, idUser: user.dataValues.idUsers } })) return res.status(413).json({ success: false, msg:"Ce post est déjà parmi les favoris"})
 
       await FavInstance.create({
-        idPost:id,
+        idPost : id,
         idUser : user.dataValues.idUsers
       })
       
@@ -54,7 +54,7 @@ class FavController {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
       const { id } = req.params
-      const favoriPointed = await FavInstance.findOne({ where : { idFavorites : id }})
+      const favoriPointed = await FavInstance.findOne({ where : { idPost : id, idUser: user.dataValues.idUsers }})
       if ( !favoriPointed ) return res.status(404).json({ success: false, msg:"Favori introuvable"})
       if ( favoriPointed.dataValues.idUser != user.dataValues.idUsers ) return res.status(413).json({ success: false, msg:"Droit requis"})
       await favoriPointed.destroy()
