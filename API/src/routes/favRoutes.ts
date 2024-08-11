@@ -26,6 +26,7 @@ router.delete(
   postValidator.checkIdParam(),
   Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
+  favController.delete
 )
 
 export default router;
