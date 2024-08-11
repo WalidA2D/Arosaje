@@ -8,7 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Filtre from '../actunav/actufiltre';
 import BlogFocus from '../actunav/BlogFocus';
-import Map from '../actunav/actumap';
+import Carte from '../actunav/actumap';
 
 type ActuNavigationProp = StackNavigationProp<RootStackParamList, 'Actualités'>;
 type Post = {
@@ -61,7 +61,7 @@ function HomeScreen({ }) {
           component={HomeContent}
           options={({ navigation }) => ({
             headerLeft: () =>(
-              <Ionicons name="map-outline" size={24} color="#fff" onPress={() => navigation.navigate('Map')} />
+              <Ionicons name="map-outline" size={24} color="#fff" onPress={() => navigation.navigate('Carte')} />
             ),
             headerRight: () => (
               <Button
@@ -78,8 +78,8 @@ function HomeScreen({ }) {
           options={{ headerBackTitleVisible: false }}
         />
         <Stack.Screen
-          name="Map"
-          component={Map}
+          name="Carte"
+          component={Carte}
           options={{ headerBackTitleVisible: false }}
         />
         <Stack.Screen

@@ -104,6 +104,7 @@ class PostController {
         where: { state: 0 },
         limit: quantite,
         offset: saut,
+        order: [['publishedAt', 'DESC']]
       });
       return res.status(200).json({ success: true, posts });
     } catch (e) {
