@@ -11,8 +11,8 @@ import BigButtonDown from '../../components/BigButtonDown';
 import Loading from '../../components/Loading';
 
 type RootStackParamList = {
-  Publier: { locValid?: boolean, localisation: string };
-  Localisation: { localisation: '' };
+  Publier: { locValid?: boolean, localisation: string, cityName: string };
+  Localisation: { localisation: '', cityName: '' };
 };
 
 type UpdateLocaNavigationProp = StackNavigationProp<RootStackParamList, 'Localisation'>;
@@ -37,6 +37,8 @@ export default function PubLoca() {
   });
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
+  const [cityName, setCityName] = useState('');
+  const [citySuggestions, setCitySuggestions] = useState<Suggestion[]>([]);
 
   useEffect(() => {
     loadLocalisation();
@@ -45,8 +47,10 @@ export default function PubLoca() {
   const loadLocalisation = async () => {
     try {
       const savedLocalisation = await AsyncStorage.getItem('savedLocalisation');
-      if (savedLocalisation) {
+      const savedCityName = await AsyncStorage.getItem('savedCityName');
+      if (savedLocalisation && savedCityName) {
         setLocalisation(savedLocalisation);
+        setCityName(savedCityName);
         setLocCompleted(true);
         setIsEditing(false);
       }
@@ -58,19 +62,20 @@ export default function PubLoca() {
   const saveLocalisation = async () => {
     try {
       await AsyncStorage.setItem('savedLocalisation', localisation);
+      await AsyncStorage.setItem('savedCityName', cityName);
     } catch (error) {
       console.error('Erreur lors de la sauvegarde de la localisation:', error);
     }
   };
 
   const handleValidation = () => {
-    if (localisation.trim() !== '') {
+    if (localisation.trim() !== '' && cityName.trim() !== '') {
       setLocCompleted(true);
       setIsEditing(false);
       saveLocalisation();
-      navigation.navigate('Publier', { locValid: true, localisation: localisation });
+      navigation.navigate('Publier', { locValid: true, localisation: localisation, cityName: cityName });
     } else {
-      navigation.navigate('Publier', { locValid: false, localisation: '' });
+      navigation.navigate('Publier', { locValid: false, localisation: '', cityName: '' });
     }
   };
 
@@ -78,7 +83,9 @@ export default function PubLoca() {
     try {
       if (!isEditing) {
         await AsyncStorage.removeItem('savedLocalisation');
+        await AsyncStorage.removeItem('savedCityName');
         setLocalisation('');
+        setCityName('');
         setLocCompleted(false);
       }
     } catch (error) {
@@ -110,7 +117,17 @@ export default function PubLoca() {
     if (address.length > 0) {
       const { street, city, region, postalCode } = address[0];
       const fullAddress = `${street}, ${city}, ${postalCode}, ${region}`;
-      setLocalisation(fullAddress);
+      const parts = fullAddress.split(', ');
+      let addressPart = parts[0];
+      let cityPart = `${parts[1]}, ${parts[2]}`;
+
+      if (/\d/.test(parts[0][0])) {
+        addressPart = `${parts[0]} ${parts[1]}`;
+        cityPart = `${parts[2]}, ${parts[3]}`;
+      }
+
+      setLocalisation(addressPart);
+      setCityName(cityPart);
       setLocCompleted(true);
       setIsEditing(false);
       saveLocalisation();
@@ -123,14 +140,32 @@ export default function PubLoca() {
     setSuggestions(response.data);
   };
 
+  const fetchCitySuggestions = async (input: string) => {
+    const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&countrycodes=fr`);
+    setCitySuggestions(response.data);
+  };
+
   const handleSelectSuggestion = (suggestion: Suggestion) => {
     const { lat, lon, display_name } = suggestion;
     setRegion({
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     });
-    setLocalisation(display_name);
+
+    const parts = display_name.split(', ');
+    let addressPart = parts[0];
+    let cityPart = `${parts[2]}, ${parts[6]}`;
+
+    // Si le premier caractère de la première partie est un chiffre, c'est probablement un numéro de rue
+    if (/\d/.test(parts[0][0])) {
+        addressPart = `${parts[0]} ${parts[1]}`;
+        cityPart = `${parts[3]}, ${parts[8]}`;
+    }
+
+    setLocalisation(addressPart);
+    setCityName(cityPart);
     setSuggestions([]);
+    setCitySuggestions([]);
   };
 
   return (
@@ -141,7 +176,12 @@ export default function PubLoca() {
       {loading && <Loading />}
       {!loading && (
         <>
-          {locCompleted ? <Text style={styles.text}>Localisation : {localisation}</Text> : null}
+          {locCompleted ? (
+              <>
+                <Text style={styles.text}>Ville : {cityName}</Text>
+                <Text style={styles.text}>Addresse : {localisation}</Text>
+              </>
+            ) : null}
           <View style={styles.mapContainer}>
             <OpenLayersMap latitude={region.latitude} longitude={region.longitude} />
           </View>
@@ -153,6 +193,27 @@ export default function PubLoca() {
           </TouchableOpacity>
           {isEditing && (
             <>
+              <TextInput
+                style={styles.input}
+                placeholder="Entrez la ville"
+                value={cityName}
+                onChangeText={text => {
+                  setCityName(text);
+                  fetchCitySuggestions(text);
+                }}
+                textAlignVertical="top"
+                returnKeyType="done"
+                onSubmitEditing={Keyboard.dismiss}
+              />
+              <FlatList
+                data={citySuggestions}
+                keyExtractor={(item) => item.place_id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => handleSelectSuggestion(item)}>
+                    <Text style={styles.suggestion}>{item.display_name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
               <TextInput
                 style={styles.input}
                 placeholder="Entrez l'adresse"
@@ -242,5 +303,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    marginBottom: 20,
   },
 });

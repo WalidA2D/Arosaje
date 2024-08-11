@@ -29,6 +29,7 @@ type RootStackParamList = {
     description: string,
     locValid?: boolean,
     localisation: string,
+    cityName: string,
     espValid?: boolean,
     espece: string,
     photoValid?: boolean,
@@ -37,7 +38,7 @@ type RootStackParamList = {
   Titre: { titre: '' };
   Date: { selectedStartDate: '', selectedEndDate: ''}
   Description: { description: '' };
-  Localisation: { localisation: '' };
+  Localisation: { localisation: '', cityName: '' };
   Espece: { espece: '' };
   Photo: { photo: '' };
 };
@@ -108,12 +109,31 @@ function PublierContent() {
   const [descValid, setDescValid] = useState(false);
   const [locValid, setLocValid] = useState(false);
   const [localisation, setLocalisation] = useState('');
+  const [cityName, setCityName] = useState('');
   const [espValid, setEspValid] = useState(false);
   const [espece, setEspece] = useState('');
   const [photoValid, setPhotoValid] = useState(false);
   const [photo, setPhoto] = useState('');
 
   const [modalVisible, setModalVisible] = useState(false);
+
+  const apiUrl = process.env.EXPO_PUBLIC_API_IP;
+
+  const resetPost = () => {
+    Alert.alert(
+      "Confirmation",
+      "ATTENTION êtes vous sûre que vous voulez recommencez le post ? (toutes les informations seront remise à zéro).",
+      [
+        { text: "Oui", onPress: () => resetForm() },
+        {
+          text: "Non",
+          style: "cancel"
+        }
+      ],
+      { cancelable: false }
+    );
+  }
+  
 
   const handleSend = async () => {
     const postData = {
@@ -123,16 +143,20 @@ function PublierContent() {
       dateStart: selectedStartDate,
       dateEnd: selectedEndDate,
       address: localisation,
-      cityName: localisation,
-      state: localisation,
+      cityName: cityName,
+      state: true,
       accepted: false,
       acceptedBy: 1,
-      idUser: 1,
-      idPlant: 1
+      plantOrigin: espece,
+      plantRequirements: 'Exemples requis',
+      plantType: 'Exemple type',
+      images: photo,
+      image2: photo,
+      image3: photo,
     };
 
     try {
-      const response = await fetch('https://your-api-endpoint.com/posts', {
+      const response = await fetch(`${apiUrl}/post/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -152,14 +176,25 @@ function PublierContent() {
     }
   };
 
-  const resetForm = () => {
+  const resetForm = async () => {
     setTitre('');
+    await AsyncStorage.removeItem('titre');
+    await AsyncStorage.removeItem('savedTitre');
     setDescription('');
+    await AsyncStorage.removeItem('description');
+    await AsyncStorage.removeItem('descValid');
+    await AsyncStorage.removeItem('savedDescription');
     setSelectedStartDate('');
     setSelectedEndDate('');
     setLocalisation('');
+    setCityName('');
+    await AsyncStorage.removeItem('localisation');
+    await AsyncStorage.removeItem('locValid');
+    await AsyncStorage.removeItem('savedLocalisation');
+    await AsyncStorage.removeItem('savedCityName');
     setEspece('');
     setPhoto('');
+    await AsyncStorage.removeItem('photo');
     setTitreValid(false);
     setDateValid(false);
     setDescValid(false);
@@ -179,6 +214,8 @@ function PublierContent() {
       const storedDateValid = await AsyncStorage.getItem('dateValid');
       const storedDescValid = await AsyncStorage.getItem('descValid');
       const storedLocValid = await AsyncStorage.getItem('locValid');
+      const storedLocalisation = await AsyncStorage.getItem('localisation');
+      const storedCityName = await AsyncStorage.getItem('cityName');
       const storedEspValid = await AsyncStorage.getItem('espValid');
       const storedEspece = await AsyncStorage.getItem('espece');
       const storedphotoValid = await AsyncStorage.getItem('photoValid');
@@ -198,6 +235,8 @@ function PublierContent() {
       if (storedEndDate) setSelectedEndDate(storedEndDate);
       if (storedDescription) setDescription(storedDescription);
       if (storedEspece) setEspece(storedEspece);
+      if (storedLocalisation) setLocalisation(storedLocalisation);
+      if (storedCityName) setCityName(storedCityName);
       if (storedTitreValid) setTitreValid(storedTitreValid === 'true');
       if (storedDateValid) setDateValid(storedDateValid === 'true');
       if (storedDescValid) setDescValid(storedDescValid === 'true');
@@ -210,8 +249,8 @@ function PublierContent() {
     loadData();
 
     const unsubscribe = navigation.addListener('focus', () => {
-      const { titreValid, dateValid, descValid, locValid, espValid, photoValid } = route.params || {};
-      console.log('Params:', { titreValid, dateValid, descValid, locValid, espValid, photoValid });
+      const { titreValid, dateValid, descValid, locValid, espValid, photoValid, localisation, cityName } = route.params || {};
+      console.log('Params:', { titreValid, dateValid, descValid, locValid, espValid, photoValid, localisation, cityName });
       setIsValid(
         (titreValid !== undefined ? titreValid : false) &&
         (dateValid !== undefined ? dateValid : false) &&
@@ -220,6 +259,8 @@ function PublierContent() {
         (espValid !== undefined ? espValid : false) &&
         (photoValid !== undefined ? photoValid : false)
       );
+      if (localisation) setLocalisation(localisation);
+      if (cityName) setCityName(cityName);
     });
 
     return unsubscribe;
@@ -245,6 +286,10 @@ function PublierContent() {
     if (route.params?.localisation) {
       setLocalisation(route.params.localisation);
       AsyncStorage.setItem('localisation', route.params.localisation);
+    }
+    if (route.params?.cityName) {
+      setCityName(route.params.cityName);
+      AsyncStorage.setItem('cityName', route.params.cityName);
     }
     if (route.params?.espece) {
       setEspece(route.params.espece);
@@ -285,7 +330,9 @@ function PublierContent() {
       AsyncStorage.setItem('locValid', route.params.locValid.toString());
       if (!route.params.locValid) {
         setLocalisation('');
+        setCityName('');
         AsyncStorage.removeItem('localisation');
+        AsyncStorage.removeItem('cityName');
       }
     }
     if (route.params?.espValid !== undefined) {
@@ -342,7 +389,7 @@ function PublierContent() {
         <ListDash buttonText={`Description : ${description ? '{...}' : ''}`} onPress={() => navigation.navigate('Description', { description: "" })} />
         <Ionicons name={descValid ? 'checkmark-circle' : 'close-circle'} size={24} color={descValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
-        <ListDash buttonText={`Localisation : ${localisation}`} onPress={() => navigation.navigate('Localisation', { localisation: "" })} />
+        <ListDash buttonText={`Localisation : ${localisation ? '{...} ,' : ''} ${cityName}`} onPress={() => navigation.navigate('Localisation', { localisation: "", cityName: "" })} />
         <Ionicons name={locValid ? 'checkmark-circle' : 'close-circle'} size={24} color={locValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
         <ListDash buttonText={`Espèce : ${espece}`} onPress={() => navigation.navigate('Espece', { espece: "" })} />
@@ -353,6 +400,9 @@ function PublierContent() {
         <View style={styles.separatorDetails} />
       </View>
       <View style={styles.fixedDetailsBtn}>
+      <TouchableOpacity onPress={() => resetPost()} style={styles.clearButtonContainer}>
+            <Text style={styles.clearButton}>Recommencez</Text>
+          </TouchableOpacity>
         <View style={styles.selectorContainer}>
           <TouchableOpacity style={[styles.selectorButton, { backgroundColor: isValid ? '#668F80' : '#828282' }]} disabled={!isValid} onPress={() => setModalVisible(true)}>
             <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
@@ -369,26 +419,26 @@ function PublierContent() {
         }}
       >
         <View style={styles.modalView}>
-        <View style={styles.modalViewBg}>
-        <Text style={styles.modalTitre}>Confirmation</Text>
-          <Text style={styles.modalText}>Vérifiez attentivement les informations que vous envoyez. La saisie de fausses informations peut entraîner des conséquences indésirables.</Text>
-          <View style={styles.fixedDetailsBtnModal}>
-            <View style={styles.selectorContainer}>
-              <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => handleSend()}>
-                <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
-                  Envoyer
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.selectorContainer}>
-              <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
-                <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
-                  Modifier
-                </Text>
-              </TouchableOpacity>
+          <View style={styles.modalViewBg}>
+            <Text style={styles.modalTitre}>Confirmation</Text>
+            <Text style={styles.modalText}>Vérifiez attentivement les informations que vous envoyez. La saisie de fausses informations peut entraîner des conséquences indésirables.</Text>
+            <View style={styles.fixedDetailsBtnModal}>
+              <View style={styles.selectorContainer}>
+                <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => handleSend()}>
+                  <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
+                    Envoyer
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.selectorContainer}>
+                <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
+                  <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
+                    Modifier
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
         </View>
       </Modal>
     </View>
@@ -497,6 +547,15 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 14,
     textAlign: 'center',
+  },
+  clearButtonContainer: {
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  clearButton: {
+    fontSize: 16,
+    color: 'red',
+    marginTop: 20,
   },
 });
 
