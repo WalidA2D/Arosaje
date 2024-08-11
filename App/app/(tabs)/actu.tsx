@@ -3,9 +3,12 @@ import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput,
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ContentItem from '../../components/navigation/ContentItem';
+import { StackNavigationProp } from '@react-navigation/stack';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import Filtre from '../actunav/actufiltre';
 import BlogFocus from '../actunav/BlogFocus';
-import { StackNavigationProp } from '@react-navigation/stack';
+import Map from '../actunav/actumap';
 
 type ActuNavigationProp = StackNavigationProp<RootStackParamList, 'Actualités'>;
 type Post = {
@@ -29,6 +32,7 @@ type ContentItemData = {
 type RootStackParamList = {
   Actualités: undefined;
   Filtre: undefined;
+  Map: undefined;
   BlogFocus: { id: string }; 
 };
 
@@ -56,6 +60,9 @@ function HomeScreen({ }) {
           name="Actualités"
           component={HomeContent}
           options={({ navigation }) => ({
+            headerLeft: () =>(
+              <Ionicons name="map-outline" size={24} color="#fff" onPress={() => navigation.navigate('Map')} />
+            ),
             headerRight: () => (
               <Button
                 onPress={() => navigation.navigate('Filtre')}
@@ -68,6 +75,11 @@ function HomeScreen({ }) {
         <Stack.Screen
           name="Filtre"
           component={Filtre}
+          options={{ headerBackTitleVisible: false }}
+        />
+        <Stack.Screen
+          name="Map"
+          component={Map}
           options={{ headerBackTitleVisible: false }}
         />
         <Stack.Screen

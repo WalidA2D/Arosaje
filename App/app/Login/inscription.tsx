@@ -150,11 +150,18 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
         <TouchableOpacity
             style={styles.suggestion}
             onPress={() => {
-                console.log(Number.isInteger(item.display_name.split(',')[0][0]))
-                let i = 0;
-                    if( true ) i++
-                    setAddress(`${item.display_name.split(',')[i-1]} ${item.display_name.split(',')[i]}`);
-                    setCityName(`${item.display_name.split(',')[i+1]}, ${item.display_name.split(',')[i+2]}`);
+                const parts = item.display_name.split(', ');
+                let addressPart = parts[0];
+                let cityPart = `${parts[2]}, ${parts[6]}`;
+
+                // Si le premier caractère de la première partie est un chiffre, c'est probablement un numéro de rue
+                if (/\d/.test(parts[0][0])) {
+                    addressPart = `${parts[0]} ${parts[1]}`;
+                    cityPart = `${parts[3]}, ${parts[8]}`;
+                }
+
+                setAddress(addressPart);
+                setCityName(cityPart);
                 setAddressSuggestions([]);
                 setCitySuggestions([]);
             }}
@@ -271,7 +278,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                             }}
                             style={[styles.input, !cityValid && styles.invalidInput]} 
                             onBlur={validateCity}
-                            editable={false}
+                            editable={true}
                         />
                         <FlatList 
                             data={citySuggestions}
@@ -289,7 +296,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                             }}
                             style={[styles.input, !addressValid && styles.invalidInput]} 
                             onBlur={validateAddress}
-                            editable={false}
+                            editable={true}
                         />
                         <FlatList 
                             data={addressSuggestions}
