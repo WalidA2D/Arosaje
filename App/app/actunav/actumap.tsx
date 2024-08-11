@@ -8,6 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function ActuMap() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [loading, setLoading] = useState(false); // Ajout de l'état de chargement
   const mapRef = useRef<any>(null);
 
   useEffect(() => {
@@ -24,11 +25,13 @@ export default function ActuMap() {
   }, []);
 
   const recenterMap = async () => {
+    setLoading(true); // Début du chargement
     let location = await Location.getCurrentPositionAsync({});
     setLocation(location);
     if (mapRef.current) {
       (mapRef.current as any).setCenter([location.coords.longitude, location.coords.latitude]);
     }
+    setLoading(false); // Fin du chargement
   };
 
   return (
@@ -45,8 +48,12 @@ export default function ActuMap() {
           <Loading />
         )}
       </View>
-      <TouchableOpacity style={styles.button} onPress={recenterMap}>
-        <Ionicons name="navigate-outline" size={32} color="#fff" />
+      <TouchableOpacity style={styles.button} onPress={recenterMap} disabled={loading}>
+        {loading ? (
+          <Loading /> // Affichage du composant de chargement
+        ) : (
+          <Ionicons name="navigate-outline" size={32} color="#fff" />
+        )}
       </TouchableOpacity>
     </View>
   );

@@ -36,7 +36,7 @@ type RootStackParamList = {
     photo: string,
   };
   Titre: { titre: '' };
-  Date: { selectedStartDate: '', selectedEndDate: ''}
+  Date: { selectedStartDate: '', selectedEndDate: '' }
   Description: { description: '' };
   Localisation: { localisation: '', cityName: '' };
   Espece: { espece: '' };
@@ -51,46 +51,46 @@ function PublierScreen({ }) {
   return (
     <NavigationContainer independent={true}>
       <Stack.Navigator initialRouteName="Publier"
-      screenOptions ={{
-        headerStyle:{
-          backgroundColor: '#668F80',
-        },
-        headerTintColor: '#fff',
-        headerTitleStyle:{
-          color: '#FFF',
-          fontSize: 24,
-          fontWeight: 'bold',
-        },
-      }}>
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: '#668F80',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            color: '#FFF',
+            fontSize: 24,
+            fontWeight: 'bold',
+          },
+        }}>
         <Stack.Screen name="Publier" component={PublierContent} />
         <Stack.Screen name="Titre" component={PubTitre}
-        options={{
-          headerBackTitleVisible: false
-      }} />
+          options={{
+            headerBackTitleVisible: false
+          }} />
         <Stack.Screen name="Date" component={PubDate}
-        options={{
-          headerBackTitleVisible: false
-      }} />
+          options={{
+            headerBackTitleVisible: false
+          }} />
         <Stack.Screen name="Photo" component={PubPhoto}
-        options={{
-          headerBackTitleVisible: false
-      }} />
+          options={{
+            headerBackTitleVisible: false
+          }} />
         <Stack.Screen name="Description" component={PubDesc}
-        options={{
-          headerBackTitleVisible: false
-      }} />
+          options={{
+            headerBackTitleVisible: false
+          }} />
         <Stack.Screen name="Localisation" component={PubLoca}
-        options={{
-          headerBackTitleVisible: false
-      }} />
+          options={{
+            headerBackTitleVisible: false
+          }} />
         <Stack.Screen name="Espece" component={PubEspece}
-        options={{
-          headerBackTitleVisible: false
-      }} />
+          options={{
+            headerBackTitleVisible: false
+          }} />
         <Stack.Screen name="Entretien" component={PubEntretien}
-        options={{
-          headerBackTitleVisible: false
-      }} />
+          options={{
+            headerBackTitleVisible: false
+          }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -133,37 +133,45 @@ function PublierContent() {
       { cancelable: false }
     );
   }
-  
+
 
   const handleSend = async () => {
-    const postData = {
-      title: titre,
-      description: description,
-      publishedAt: new Date().toISOString(),
-      dateStart: selectedStartDate,
-      dateEnd: selectedEndDate,
-      address: localisation,
-      cityName: cityName,
-      state: true,
-      accepted: false,
-      acceptedBy: 1,
-      plantOrigin: espece,
-      plantRequirements: 'Exemples requis',
-      plantType: 'Exemple type',
-      images: photo,
-      image2: photo,
-      image3: photo,
-    };
 
     try {
+      const userToken = await AsyncStorage.getItem('userToken');
+      if (!userToken) {
+        Alert.alert('Erreur', 'Token utilisateur manquant');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('title', titre);
+      formData.append('description', description);
+      formData.append('publishedAt', new Date().toISOString());
+      formData.append('dateStart', selectedStartDate);
+      formData.append('dateEnd', selectedEndDate);
+      formData.append('address', localisation);
+      formData.append('cityName', cityName);
+      formData.append('state', JSON.stringify(false));
+      formData.append('accepted', JSON.stringify(false));
+      formData.append('plantOrigin', espece);
+      formData.append('plantRequirements', 'Exemples requis');
+      formData.append('plantType', 'Exemple type');
+      formData.append('images', {
+        uri: photo,
+        type: 'image/jpeg',
+        name: 'photo.jpg',
+      } as unknown as Blob);
+
       const response = await fetch(`${apiUrl}/post/create`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
+          'Authorization': userToken,
         },
-        body: JSON.stringify(postData),
+        body: formData,
       });
-
+      console.log(response)
       if (response.ok) {
         Alert.alert('Succès', 'Le post a été envoyé avec succès');
         setModalVisible(false);
@@ -179,22 +187,30 @@ function PublierContent() {
   const resetForm = async () => {
     setTitre('');
     await AsyncStorage.removeItem('titre');
+    await AsyncStorage.removeItem('titreValid');
     await AsyncStorage.removeItem('savedTitre');
     setDescription('');
     await AsyncStorage.removeItem('description');
     await AsyncStorage.removeItem('descValid');
     await AsyncStorage.removeItem('savedDescription');
     setSelectedStartDate('');
+    await AsyncStorage.removeItem('selectedStartDate');
+    await AsyncStorage.removeItem('dateValid');
     setSelectedEndDate('');
+    await AsyncStorage.removeItem('selectedEndDate');
     setLocalisation('');
     setCityName('');
     await AsyncStorage.removeItem('localisation');
+    await AsyncStorage.removeItem('cityName');
     await AsyncStorage.removeItem('locValid');
     await AsyncStorage.removeItem('savedLocalisation');
     await AsyncStorage.removeItem('savedCityName');
     setEspece('');
+    await AsyncStorage.removeItem('espece');
+    await AsyncStorage.removeItem('espValid');
     setPhoto('');
     await AsyncStorage.removeItem('photo');
+    await AsyncStorage.removeItem('photoValid');
     setTitreValid(false);
     setDateValid(false);
     setDescValid(false);
@@ -400,9 +416,9 @@ function PublierContent() {
         <View style={styles.separatorDetails} />
       </View>
       <View style={styles.fixedDetailsBtn}>
-      <TouchableOpacity onPress={() => resetPost()} style={styles.clearButtonContainer}>
-            <Text style={styles.clearButton}>Recommencez</Text>
-          </TouchableOpacity>
+        <TouchableOpacity onPress={() => resetPost()} style={styles.clearButtonContainer}>
+          <Text style={styles.clearButton}>Recommencez</Text>
+        </TouchableOpacity>
         <View style={styles.selectorContainer}>
           <TouchableOpacity style={[styles.selectorButton, { backgroundColor: isValid ? '#668F80' : '#828282' }]} disabled={!isValid} onPress={() => setModalVisible(true)}>
             <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
@@ -491,7 +507,7 @@ const styles = StyleSheet.create({
     color: '#BDBDBD',
   },
   selectorOptionsText: {
-    fontSize : 14,
+    fontSize: 14,
   },
   fixedDetailsBtn: {
     position: 'absolute',
