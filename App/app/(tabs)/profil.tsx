@@ -84,7 +84,7 @@ export function ProfilScreen() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization' : userToken,
+        'Authorization' : userToken || '',
       }
     };
 
