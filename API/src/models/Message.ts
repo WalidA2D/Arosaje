@@ -18,8 +18,8 @@ MessageInstance.init(
     idMessages: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     text: { type: DataTypes.STRING, allowNull: false },
     publishedAt: { type: DataTypes.DATE, allowNull: true, defaultValue: DataTypes.NOW },
-    idConversation: { type: DataTypes.INTEGER, allowNull: false },
-    idUser: { type: DataTypes.INTEGER, allowNull: false },
+    idConversation: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Conversations', key: 'idConversations' } },
+    idUser: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Users', key: 'idUsers' } },
   },
   { sequelize: db, tableName: 'Messages', timestamps: false }
 );

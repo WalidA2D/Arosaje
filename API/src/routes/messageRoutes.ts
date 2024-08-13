@@ -18,7 +18,7 @@ router.get(
   "/read",
   Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
-  // messageController.read
+  messageController.readByUser
 );
 
 router.delete(

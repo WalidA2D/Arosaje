@@ -1,4 +1,4 @@
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, Optional} from "sequelize";
 import db from '../config/database.config';
 
 export interface CommentAttributes {
@@ -9,6 +9,9 @@ export interface CommentAttributes {
   idUser: number;
   idPost: number;
 }
+
+
+export interface MessageCreationAttributes extends Optional<CommentAttributes, 'idComments'> {}
 
 export class CommentInstance extends Model<CommentAttributes> {}
 

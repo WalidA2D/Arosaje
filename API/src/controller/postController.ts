@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { auth, storage } from "../config/firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { Op } from 'sequelize'
 
 import { PostInstance } from "../models/Post";
 import { UserInstance } from "../models/User";
@@ -101,16 +102,11 @@ class PostController {
     try {
       const quantite = Number(req.query.quantite) || 10;
       const saut = Number(req.query.saut) || 0;
-
+  
       const filterConditions: any = { state: 0 };
       for (const [key, value] of Object.entries(req.query)) {
-        if (key == 'cityName' 
-          || key == 'dateStart'
-          || key == 'dateEnd'
-          || key == 'plantType'
-          || key == 'plantOrigin'
-        ) {
-          filterConditions[key] = value;
+        if (key === 'cityName' || key === 'dateStart' || key === 'dateEnd' || key === 'plantType' || key === 'plantOrigin') {
+          filterConditions[key] = { [Op.like]: `${value}%` };
         }
       }
       

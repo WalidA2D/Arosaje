@@ -14,8 +14,8 @@ export class FavInstance extends Model<FavCreationAttributes> {}
 FavInstance.init(
   {
     idFavorites: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    idUser: { type: DataTypes.INTEGER },
-    idPost: { type: DataTypes.INTEGER }
+    idUser: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'idUsers' } },
+    idPost: { type: DataTypes.INTEGER, references: { model: 'Posts', key: 'idPosts' } }
   },
   {
     sequelize: db,
