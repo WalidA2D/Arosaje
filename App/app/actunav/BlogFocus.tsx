@@ -38,9 +38,6 @@ export default function BlogFocus() {
       try {
         const response = await fetch(`${apiUrl}/post/${id}`);
         const data = await response.json();
-        
-        // Vérifiez le format des données
-        console.log('Données du blog:', data);
 
         if (data.success) {
           setBlogData({
