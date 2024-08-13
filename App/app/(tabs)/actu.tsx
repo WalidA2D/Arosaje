@@ -174,10 +174,6 @@ function HomeContent() {
     setItems([]);
     fetchPosts(true); // Passe `true` pour indiquer un rafraîchissement
   };
-
-  useEffect(() => {
-    console.log('Items:', items.map(item => item.id));
-  }, [items]);
   return (
     <>
       <View style={styles.container}>
