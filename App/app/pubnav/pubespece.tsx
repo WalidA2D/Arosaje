@@ -33,8 +33,8 @@ export default function PubEspece() {
 
   const showSpeciesDetails = async (id: number) => {
     try {
-      const response = await axios.get(`https://trefle.io/api/v1/species/${id}?token=48y8dGrqGaAxEOkOWOkDi8z5EjU1XcN9gF1BWFAJmn8`);
-      setSelectedSpeciesDetails(response.data.data);
+      const response = await axios.get(`https://my-api.plantnet.org/v2/projects/k-southwestern-europe/species/${id}?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF`);
+      setSelectedSpeciesDetails(response.data);
       setModalVisible(true);
     } catch (error) {
       console.error("Erreur lors de la récupération des détails de l'espèce:", error);
@@ -44,11 +44,25 @@ export default function PubEspece() {
   useEffect(() => {
     const fetchSpecies = async () => {
       try {
-        const response = await axios.get('https://trefle.io/api/v1/species?token=48y8dGrqGaAxEOkOWOkDi8z5EjU1XcN9gF1BWFAJmn8');
-        const speciesData = response.data.data;
-        // Ajout de l'élément "Autre / Je ne sais pas"
+        const response = await axios.get('https://my-api.plantnet.org/v2/species?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF');
+        const speciesData = response.data
+          .filter((item: any) => item.commonNames && item.commonNames.length > 0)
+          .map((item: any) => ({
+            id: item.id || '',
+            common_name: item.commonNames[0] || '',
+            scientific_name: item.scientificNameWithoutAuthor || '',
+            scientific_author: item.scientificNameAuthorship || '',
+            family_common_name: item.gbifId || '',
+            observations: item.powoId || '',
+          }));
+
+        const uniqueSpecies = Array.from(new Set(speciesData.map((s: { common_name: string }) => s.common_name)))
+          .map(common_name => {
+            return speciesData.find((s: { common_name: string }) => s.common_name === common_name);
+          });
+
         const otherSpecies = { id: -1, common_name: "Autre / Je ne sais pas", image_url: "" };
-        setSpecies([...speciesData, otherSpecies]);
+        setSpecies([otherSpecies, ...uniqueSpecies]);
         setLoading(false);
       } catch (error: any) {
         setError("Erreur: " + (error as Error).message);
@@ -80,7 +94,7 @@ export default function PubEspece() {
     <View style={styles.container}>
       <FlatList
         data={species}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => item.id.toString() + index.toString()}
         ListFooterComponent={<View style={styles.footerPadding} />}
         renderItem={({ item }) => (
           <View style={styles.item}>
@@ -114,19 +128,19 @@ export default function PubEspece() {
           <View style={styles.modalContent}>
             <Text style={styles.modalContentText}>Nom : {selectedSpeciesDetails.common_name}</Text>
             <Text style={styles.modalContentText}>Nom scientifique : {selectedSpeciesDetails.scientific_name}</Text>
-            <Text style={styles.modalContentText}>Années : {selectedSpeciesDetails.year}</Text>
+            <Text style={styles.modalContentText}>Années : {selectedSpeciesDetails.scientific_author}</Text>
             <Text style={styles.modalContentText}>Nom de famille : {selectedSpeciesDetails.family_common_name}</Text>
             <Text style={styles.modalContentText}>Endroits : {selectedSpeciesDetails.observations}</Text>
             <Image source={{ uri: selectedSpeciesDetails.image_url }} style={styles.imageModal} />
             <View style={styles.fixedDetailsBtn}>
-                <View style={styles.selectorContainer}>
-                  <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
-                    <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
+              <View style={styles.selectorContainer}>
+                <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
+                  <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
                     Retour
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                  </Text>
+                </TouchableOpacity>
               </View>
+            </View>
           </View>
         )}
       </Modal>
@@ -166,7 +180,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFF8F0',
   },
-  modalContentText:{
+  modalContentText: {
     padding: 5,
     marginBottom: 10,
     fontSize: 16,
