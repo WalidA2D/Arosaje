@@ -33,7 +33,6 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
     const fetchPlantOrigins = async () => {
       try {
         const response = await fetch('https://my-api.plantnet.org/v2/species?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF');
-        console.log(response)
         const data = await response.json();
         const originOptions = data.map((plant: any) => ({
           label: plant.commonNames.join(', ') || plant.scientificNameWithoutAuthor,
