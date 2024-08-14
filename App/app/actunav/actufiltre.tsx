@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Modal, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Modal, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import RNPickerSelect from 'react-native-picker-select';
 
-export default function ActuFiltre() {
+export default function ActuFiltre({ navigation }: { navigation: any }) {
   const [cityName, setCityName] = useState<string>('');
   const [dateStart, setDateStart] = useState<string | undefined>(undefined);
   const [dateEnd, setDateEnd] = useState<string | undefined>(undefined);
@@ -12,6 +12,7 @@ export default function ActuFiltre() {
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [cities, setCities] = useState<Array<{ label: string, value: string }>>([]);
+  const [plantOrigins, setPlantOrigins] = useState<Array<{ label: string, value: string }>>([]);
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -29,7 +30,24 @@ export default function ActuFiltre() {
       }
     };
 
+    const fetchPlantOrigins = async () => {
+      try {
+        const response = await fetch('https://my-api.plantnet.org/v2/species?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF');
+        console.log(response)
+        const data = await response.json();
+        const originOptions = data.map((plant: any) => ({
+          label: plant.commonNames.join(', ') || plant.scientificNameWithoutAuthor,
+          value: plant.commonNames.join(', ') || plant.scientificNameWithoutAuthor,
+        }));
+        setPlantOrigins(originOptions);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des origines des plantes:', error);
+        Alert.alert('Erreur', 'Impossible de récupérer la liste des origines des plantes.');
+      }
+    };
+
     fetchCities();
+    fetchPlantOrigins();
   }, []);
 
   const handleSearch = () => {
@@ -39,20 +57,14 @@ export default function ActuFiltre() {
     }
 
     const apiUrl = process.env.EXPO_PUBLIC_API_IP;
-    let query = `${apiUrl}/post/read?quantite=5&saut=0`;
+    let queryString = `${apiUrl}/post/read?quantite=5&saut=0`;
 
-    if (cityName) query += `&cityName=${encodeURIComponent(cityName)}`;
-    if (dateStart) query += `&dateStart=${dateStart}`;
-    if (dateEnd) query += `&dateEnd=${dateEnd}`;
-    if (plantOrigin) query += `&plantOrigin=${encodeURIComponent(plantOrigin)}`;
-    
-    fetch(query)
-      .then(response => response.json())
-      .then(data => {
-      })
-      .catch(error => {
-        console.error('Erreur:', error);
-      });
+    if (cityName) queryString += `&cityName=${encodeURIComponent(cityName)}`;
+    if (dateStart) queryString += `&dateStart=${dateStart}`;
+    if (dateEnd) queryString += `&dateEnd=${dateEnd}`;
+    if (plantOrigin) queryString += `&plantOrigin=${encodeURIComponent(plantOrigin)}`;
+
+    navigation.goBack({ queryString });
   };
 
   const handleDayPress = (day: DateData, type: 'start' | 'end') => {
@@ -77,7 +89,7 @@ export default function ActuFiltre() {
             items={cities}
             style={pickerSelectStyles}
           />
-  
+
           <Text style={styles.label}>Date de début</Text>
           <TouchableOpacity onPress={() => setShowStartDatePicker(true)}>
             <Text style={[styles.input, dateStart ? styles.selectedDate : {}]}>
@@ -92,7 +104,7 @@ export default function ActuFiltre() {
                     <TouchableOpacity style={styles.closeButton} onPress={() => setShowStartDatePicker(false)}>
                       <Text style={styles.closeButtonText}>×</Text>
                     </TouchableOpacity>
-  
+
                     <Calendar
                       markedDates={{ [dateStart?.toString().split('T')[0] || '']: { selected: true, selectedColor: '#668F80' } }}
                       onDayPress={(day: DateData) => handleDayPress(day, 'start')}
@@ -109,7 +121,7 @@ export default function ActuFiltre() {
               </TouchableWithoutFeedback>
             </Modal>
           )}
-  
+
           <Text style={styles.label}>Date de fin</Text>
           <TouchableOpacity onPress={() => setShowEndDatePicker(true)}>
             <Text style={[styles.input, dateEnd ? styles.selectedDate : {}]}>
@@ -124,7 +136,7 @@ export default function ActuFiltre() {
                     <TouchableOpacity style={styles.closeButton} onPress={() => setShowEndDatePicker(false)}>
                       <Text style={styles.closeButtonText}>×</Text>
                     </TouchableOpacity>
-  
+
                     <Calendar
                       markedDates={{ [dateEnd?.toString().split('T')[0] || '']: { selected: true, selectedColor: '#668F80' } }}
                       onDayPress={(day: DateData) => handleDayPress(day, 'end')}
@@ -141,16 +153,16 @@ export default function ActuFiltre() {
               </TouchableWithoutFeedback>
             </Modal>
           )}
-  
-          <Text style={styles.label}>Origine de la plante</Text>
-          <TextInput
-            style={styles.input}
+
+          <Text style={styles.label}>Plante</Text>
+          <RNPickerSelect
+            placeholder={{ label: 'Sélectionnez une Plante', value: null }}
             value={plantOrigin}
-            onChangeText={setPlantOrigin}
-            placeholder="Origine de la plante"
-            placeholderTextColor="#4A6670"
+            onValueChange={(value) => setPlantOrigin(value)}
+            items={plantOrigins}
+            style={pickerSelectStyles}
           />
-  
+
           <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
             <Text style={styles.searchButtonText}>Rechercher</Text>
           </TouchableOpacity>

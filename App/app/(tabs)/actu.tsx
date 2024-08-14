@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput, RefreshControl  } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { NavigationContainer, useNavigation, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ContentItem from '../../components/navigation/ContentItem';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -11,6 +11,8 @@ import BlogFocus from '../actunav/BlogFocus';
 import Carte from '../actunav/actumap';
 
 type ActuNavigationProp = StackNavigationProp<RootStackParamList, 'Actualités'>;
+type ActuRouteProp = RouteProp<RootStackParamList, 'Actualités'>;
+
 type Post = {
   idPosts: number;
   title: string;
@@ -30,10 +32,10 @@ type ContentItemData = {
 };
 
 type RootStackParamList = {
-  Actualités: undefined;
+  Actualités: { cityName?: string; dateStart?: string; dateEnd?: string; plantOrigin?: string; queryString?: string } | undefined;
   Filtre: undefined;
   Carte: undefined;
-  BlogFocus: { id: string }; 
+  BlogFocus: { id: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -92,7 +94,7 @@ function HomeScreen({ }) {
   );
 }
 
-function HomeContent() {
+function HomeContent({ route }: { route: ActuRouteProp }) {
   const navigation = useNavigation<ActuNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<ContentItemData[]>([]);
@@ -108,11 +110,13 @@ function HomeContent() {
     } else {
       setLoading(true);
     }
+    const queryString = route.params?.queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`;
+    const url = queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`;
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const response = await fetch(`${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`);
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Échec de la réponse du serveur');
       }
