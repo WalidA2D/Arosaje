@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Image, View, Text, FlatList, TouchableOpacity, Linking, Alert, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, Linking } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Image } from 'react-native';
 
 import ProfileImagePopup from '../profilnav/ProfileImagePopup';
 import Calendrier from '../profilnav/calendar';
@@ -67,14 +68,27 @@ interface Post {
   title: string;
   description: string;
   publishedAt: string;
+  isFavorite?: boolean; // Ajouter un attribut pour suivre l'état du favori
 }
+
+interface Favorite extends Post {}
 
 export function ProfilScreen() {
   const navigation = useNavigation<ProfilScreenNavigationProp>();
   const route = useRoute<ProfilScreenRouteProp>();
   const [selectedTab, setSelectedTab] = useState('Posts');
-  const [profileData, setProfileData] = useState({ lastName: '', firstName: '', role: '', cityName: '', idUser: '', address: '', phone: '', profilePic: '' });
+  const [profileData, setProfileData] = useState({
+    lastName: '',
+    firstName: '',
+    role: '',
+    cityName: '',
+    idUser: '',
+    address: '',
+    phone: '',
+    profilePic: ''
+  });
   const [posts, setPosts] = useState<Post[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true); 
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
@@ -84,36 +98,39 @@ export function ProfilScreen() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization' : userToken,
+        'Authorization': userToken,
       }
     };
 
-    fetch(`${apiUrl}/user/profil`, options)
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          const userId = data.user.idUsers;
-          setProfileData({
-            lastName: data.user.lastName,
-            firstName: data.user.firstName,
-            role: data.user.role,
-            idUser: userId,
-            cityName: data.user.cityName,
-            address: data.user.address,
-            phone: data.user.phone,
-            profilePic: data.user.photo
-          });
-          if (userId) {
-            fetchUserPosts(userId);
-          } else {
-            console.error('User ID is undefined');
-          }
-          
+    try {
+      const response = await fetch(`${apiUrl}/user/profil`, options);
+      const data = await response.json();
+
+      if (data.success) {
+        const userId = data.user.idUsers;
+        setProfileData({
+          lastName: data.user.lastName,
+          firstName: data.user.firstName,
+          role: data.user.role,
+          idUser: userId,
+          cityName: data.user.cityName,
+          address: data.user.address,
+          phone: data.user.phone,
+          profilePic: data.user.photo
+        });
+
+        if (userId) {
+          fetchUserPosts(userId);
+          fetchUserFavorites(userId);
+        } else {
+          console.error('User ID is undefined');
         }
-      })
-      .catch(error => {
-        console.error('Error fetching profile data:', error);
-      });
+      } else {
+        console.error('Failed to fetch profile data:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
   };
 
   const fetchUserPosts = async (idUser: string) => {
@@ -128,14 +145,104 @@ export function ProfilScreen() {
     try {
       const response = await fetch(`${apiUrl}/post/read/${idUser}`, options);
       const data = await response.json();
-
+      
       if (data.success) {
-        setPosts(data.body);
+        setPosts(data.record);
+      } else {
+        console.error('Failed to fetch posts:', data.message);
       }
     } catch (error) {
       console.error('Error fetching user posts:', error); 
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchUserFavorites = async (idUser: string) => {
+    setLoading(true);
+    const userToken = await AsyncStorage.getItem('userToken');
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userToken
+      }
+    };
+
+    try {
+      const response = await fetch(`${apiUrl}/fav/read`, options);
+      const data = await response.json();
+      if (data.success) {
+        // Ajoutez isFavorite à chaque favori
+        const favoritesWithState = data.record.map((fav: Favorite) => ({
+          ...fav,
+          isFavorite: true,
+        }));
+        setFavorites(favoritesWithState);
+      } else {
+        console.error('Failed to fetch favorites:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching user favorites:', error); 
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRemoveFavorite = async (idPost: number) => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userToken,
+      }
+    };
+  
+    try {
+      const response = await fetch(`${apiUrl}/fav/delete/${idPost}`, options);
+      const data = await response.json();
+      if (data.success) {
+        // Mettez à jour l'état isFavorite de l'élément dans la liste des favoris
+        setFavorites((prevFavorites) =>
+          prevFavorites.map((favorite) =>
+            favorite.idPosts === idPost ? { ...favorite, isFavorite: false } : favorite
+          )
+        );
+      } else {
+        console.error('Failed to delete favorite:', data.message);
+      }
+    } catch (error) {
+      console.error('Error deleting favorite:', error);
+    }
+  };
+
+  const handleAddFavorite = async (idPost: number) => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userToken,
+      },
+      body: JSON.stringify({ id: idPost })
+    };
+  
+    try {
+      const response = await fetch(`${apiUrl}/fav/add`, options);
+      const data = await response.json();
+      if (data.success) {
+        // Mettez à jour l'état isFavorite de l'élément dans la liste des favoris
+        setFavorites((prevFavorites) =>
+          prevFavorites.map((favorite) =>
+            favorite.idPosts === idPost ? { ...favorite, isFavorite: true } : favorite
+          )
+        );
+      } else {
+        console.error('Failed to add favorite:', data.message);
+      }
+    } catch (error) {
+      console.error('Error adding favorite:', error);
     }
   };
 
@@ -149,7 +256,7 @@ export function ProfilScreen() {
 
   const openMap = (cityName: string) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cityName)}`;
-
+  
     Alert.alert(
       'Confirmation',
       `Voulez-vous être redirigé vers la carte ?`,
@@ -159,14 +266,14 @@ export function ProfilScreen() {
           text: 'Oui',
           onPress: () => {
             Linking.canOpenURL(url)
-              .then((supported) => {
+              .then((supported: boolean) => {
                 if (supported) {
                   return Linking.openURL(url);
                 } else {
                   console.error("Don't know how to open URI: " + url);
                 }
               })
-              .catch(err => console.error('An error occurred', err));
+              .catch((err: Error) => console.error('An error occurred', err));
           },
         },
       ],
@@ -174,13 +281,43 @@ export function ProfilScreen() {
     );
   };
 
-  const renderItem = ({ item }: { item: Post }) => (
-    <View style={styles.post}>
-      <Text style={styles.postTitle}>{item.title}</Text>
-      <Text style={styles.postContent}>{item.description}</Text>
-      <Text style={styles.postContent}>Publié le: {item.publishedAt}</Text>
-    </View>
-  );
+  const renderItem = ({ item }: { item: Post | Favorite }) => {
+    if (selectedTab === 'Posts') {
+      // Affichage pour les posts
+      return (
+        <View style={styles.post}>
+          <Text style={styles.postTitle}>{item.title}</Text>
+          <Text style={styles.postContent}>{item.description}</Text>
+          <Text style={styles.postContent}>Publié le: {item.publishedAt}</Text>
+        </View>
+      );
+    } else if (selectedTab === 'Favorites') {
+      // Affichage pour les favoris
+      const isFavorite = item.isFavorite !== false;
+      return (
+        <View style={styles.post}>
+          <Text style={styles.postTitle}>{item.title}</Text>
+          <Text style={styles.postContent}>{item.description}</Text>
+          <Text style={styles.postContent}>
+            Publié le: {item.publishedAt} 
+          </Text>
+          <TouchableOpacity
+            onPress={() =>
+              isFavorite ? handleRemoveFavorite(item.idPosts) : handleAddFavorite(item.idPosts)
+            }
+          >
+            <Ionicons
+              name="heart"
+              size={25}
+              color={isFavorite ? '#FF4500' : '#A9A9A9'}
+              style={styles.postIcon}
+            />
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return null;
+  };
 
   const popupRef = useRef<any>(null);
 
@@ -226,10 +363,10 @@ export function ProfilScreen() {
             <Text style={[styles.selectorText, selectedTab === 'Posts' && styles.activeText]}>Posts</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.selectorButton, selectedTab === 'Images' && styles.activeButton]}
-            onPress={() => setSelectedTab('Images')}
+            style={[styles.selectorButton, selectedTab === 'Favorites' && styles.activeButton]}
+            onPress={() => setSelectedTab('Favorites')}
           >
-            <Text style={[styles.selectorText, selectedTab === 'Images' && styles.activeText]}>Images</Text>
+            <Text style={[styles.selectorText, selectedTab === 'Favorites' && styles.activeText]}>Favoris</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -241,11 +378,11 @@ export function ProfilScreen() {
           keyExtractor={(item) => item.idPosts.toString()}
         />
       ) : (
-        <View style={styles.imagesContainer}>
-          <Image source={require('@/assets/images/plante1.jpg')} style={styles.imageContent} />
-          <Image source={require('@/assets/images/plante2.jpg')} style={styles.imageContent} />
-          <Image source={require('@/assets/images/plante3.jpg')} style={styles.imageContent} />
-        </View>
+      <FlatList
+          data={favorites}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.idPosts.toString()}
+        />
       )}
     </View>
   );
@@ -264,22 +401,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
     paddingTop: 20,
-  },
-  headerTitleContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 50,
-    alignItems: 'center',
-  },
-  headerButton: {
-    padding: 10,
-    paddingBottom: 80,
-  },
-  headerButtonText: {
-    color: '#FFF',
-    fontSize: 14,
-    paddingBottom: 50,
   },
   profileImageContainer: {
     position: 'absolute',
@@ -312,12 +433,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'gray',
   },
-  body: {
-    flex: 1,
-    width: '100%',
-    paddingHorizontal: 20,
-    backgroundColor: '#FFF',
-  },
   selectorContainer: {
     flexDirection: 'row',
     marginBottom: 20,
@@ -345,7 +460,8 @@ const styles = StyleSheet.create({
   },
   post: {
     marginBottom: 20,
-    paddingHorizontal: 10, 
+    paddingHorizontal: 10,
+    position: 'relative', 
   },
   postTitle: {
     fontSize: 16,
@@ -355,32 +471,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'gray',
   },
-  image: {
-    marginBottom: 20,
-  },
-  imageContent: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-  },
-  loadingText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'red',
-  },
-  imagesContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
+  postIcon: {
+    position: 'absolute',
+    right: 25, 
+    top: '50%', 
+    transform: [{ translateY: -40 }], 
   },
 });
 
