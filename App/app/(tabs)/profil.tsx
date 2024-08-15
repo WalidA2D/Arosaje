@@ -68,7 +68,7 @@ interface Post {
   title: string;
   description: string;
   publishedAt: string;
-  isFavorite?: boolean; // Ajouter un attribut pour suivre l'état du favori
+  isFavorite?: boolean; 
 }
 
 interface Favorite extends Post {}
@@ -99,7 +99,6 @@ export function ProfilScreen() {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': userToken,
-
       }
     };
 
@@ -191,6 +190,13 @@ export function ProfilScreen() {
   };
 
   const handleRemoveFavorite = async (idPost: number) => {
+    // Mettre à jour immédiatement l'état local pour refléter la suppression du favori
+    setFavorites((prevFavorites) =>
+      prevFavorites.map((favorite) =>
+        favorite.idPosts === idPost ? { ...favorite, isFavorite: false } : favorite
+      )
+    );
+
     const userToken = await AsyncStorage.getItem('userToken');
     const options = {
       method: 'DELETE',
@@ -203,22 +209,34 @@ export function ProfilScreen() {
     try {
       const response = await fetch(`${apiUrl}/fav/delete/${idPost}`, options);
       const data = await response.json();
-      if (data.success) {
-        // Mettez à jour l'état isFavorite de l'élément dans la liste des favoris
+      if (!data.success) {
+        console.error('Failed to delete favorite:', data.message);
+        // Revert state change if API call fails
         setFavorites((prevFavorites) =>
           prevFavorites.map((favorite) =>
-            favorite.idPosts === idPost ? { ...favorite, isFavorite: false } : favorite
+            favorite.idPosts === idPost ? { ...favorite, isFavorite: true } : favorite
           )
         );
-      } else {
-        console.error('Failed to delete favorite:', data.message);
       }
     } catch (error) {
       console.error('Error deleting favorite:', error);
+      // Revert state change if API call fails
+      setFavorites((prevFavorites) =>
+        prevFavorites.map((favorite) =>
+          favorite.idPosts === idPost ? { ...favorite, isFavorite: true } : favorite
+        )
+      );
     }
   };
 
   const handleAddFavorite = async (idPost: number) => {
+    // Mettre à jour immédiatement l'état local pour refléter l'ajout du favori
+    setFavorites((prevFavorites) =>
+      prevFavorites.map((favorite) =>
+        favorite.idPosts === idPost ? { ...favorite, isFavorite: true } : favorite
+      )
+    );
+
     const userToken = await AsyncStorage.getItem('userToken');
     const options = {
       method: 'POST',
@@ -232,18 +250,23 @@ export function ProfilScreen() {
     try {
       const response = await fetch(`${apiUrl}/fav/add`, options);
       const data = await response.json();
-      if (data.success) {
-        // Mettez à jour l'état isFavorite de l'élément dans la liste des favoris
+      if (!data.success) {
+        console.error('Failed to add favorite:', data.message);
+        // Revert state change if API call fails
         setFavorites((prevFavorites) =>
           prevFavorites.map((favorite) =>
-            favorite.idPosts === idPost ? { ...favorite, isFavorite: true } : favorite
+            favorite.idPosts === idPost ? { ...favorite, isFavorite: false } : favorite
           )
         );
-      } else {
-        console.error('Failed to add favorite:', data.message);
       }
     } catch (error) {
       console.error('Error adding favorite:', error);
+      // Revert state change if API call fails
+      setFavorites((prevFavorites) =>
+        prevFavorites.map((favorite) =>
+          favorite.idPosts === idPost ? { ...favorite, isFavorite: false } : favorite
+        )
+      );
     }
   };
 
@@ -254,6 +277,16 @@ export function ProfilScreen() {
       navigation.setParams({ updated: false });
     }
   }, [route.params?.updated]);
+
+  // Ajouter un useEffect pour surveiller le changement de `selectedTab`
+  useEffect(() => {
+    if (selectedTab === 'Favorites') {
+      const userId = profileData.idUser;
+      if (userId) {
+        fetchUserFavorites(userId);
+      }
+    }
+  }, [selectedTab]);
 
   const openMap = (cityName: string) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cityName)}`;
@@ -293,7 +326,6 @@ export function ProfilScreen() {
         </View>
       );
     } else if (selectedTab === 'Favorites') {
-      // Affichage pour les favoris
       const isFavorite = item.isFavorite !== false;
       return (
         <View style={styles.post}>
@@ -310,7 +342,7 @@ export function ProfilScreen() {
             <Ionicons
               name="heart"
               size={25}
-              color={isFavorite ? '#FF4500' : '#A9A9A9'}
+              color={isFavorite ? '#668F80' : '#A9A9A9'}
               style={styles.postIcon}
             />
           </TouchableOpacity>
