@@ -96,21 +96,37 @@ class PostController {
     }
   }
 
+
   async readPagination(req: Request, res: Response) {
     try {
-      const quantite = (req.query.quantite as number | undefined) || 10;
-      const saut = req.query.saut as number | undefined;
+      const quantite = Number(req.query.quantite) || 10;
+      const saut = Number(req.query.saut) || 0;
+
+      const filterConditions: any = { state: 0 };
+      for (const [key, value] of Object.entries(req.query)) {
+        if (key == 'cityName' 
+          || key == 'dateStart'
+          || key == 'dateEnd'
+          || key == 'plantType'
+          || key == 'plantOrigin'
+        ) {
+          filterConditions[key] = value;
+        }
+      }
+      
       const posts = await PostInstance.findAll({
-        where: { state: 0 },
+        where: filterConditions,
         limit: quantite,
         offset: saut,
+        order: [['publishedAt', 'DESC']]
       });
+  
       return res.status(200).json({ success: true, posts });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Lecture échouée" });
     }
-  }
+  }  
 
   async readByUser(req: Request, res: Response) {
     try {

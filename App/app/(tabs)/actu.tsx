@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput, Pressable  } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
+import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput, RefreshControl  } from 'react-native';
+import { NavigationContainer, useNavigation, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ContentItem from '../../components/navigation/ContentItem';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -8,9 +8,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import Filtre from '../actunav/actufiltre';
 import BlogFocus from '../actunav/BlogFocus';
-import Map from '../actunav/actumap';
+import Carte from '../actunav/actumap';
 
 type ActuNavigationProp = StackNavigationProp<RootStackParamList, 'Actualités'>;
+type ActuRouteProp = RouteProp<RootStackParamList, 'Actualités'>;
+
 type Post = {
   idPosts: number;
   title: string;
@@ -30,10 +32,10 @@ type ContentItemData = {
 };
 
 type RootStackParamList = {
-  Actualités: undefined;
+  Actualités: { cityName?: string; dateStart?: string; dateEnd?: string; plantOrigin?: string; queryString?: string } | undefined;
   Filtre: undefined;
-  Map: undefined;
-  BlogFocus: { id: string }; 
+  Carte: undefined;
+  BlogFocus: { id: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -61,7 +63,7 @@ function HomeScreen({ }) {
           component={HomeContent}
           options={({ navigation }) => ({
             headerLeft: () =>(
-              <Ionicons name="map-outline" size={24} color="#fff" onPress={() => navigation.navigate('Map')} />
+              <Ionicons name="map-outline" size={24} color="#fff" onPress={() => navigation.navigate('Carte')} />
             ),
             headerRight: () => (
               <Button
@@ -78,8 +80,8 @@ function HomeScreen({ }) {
           options={{ headerBackTitleVisible: false }}
         />
         <Stack.Screen
-          name="Map"
-          component={Map}
+          name="Carte"
+          component={Carte}
           options={{ headerBackTitleVisible: false }}
         />
         <Stack.Screen
@@ -92,44 +94,42 @@ function HomeScreen({ }) {
   );
 }
 
-function HomeContent() {
+function HomeContent({ route }: { route: ActuRouteProp }) {
   const navigation = useNavigation<ActuNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<ContentItemData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string>('');
   const [saut, setSaut] = useState<number>(0);
   const quantite = 5;
 
-  const fetchPosts = async () => {
-
-    setLoading(true);
+  const fetchPosts = async (isRefreshing: boolean = false) => {
+    if (isRefreshing) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    const queryString = route.params?.queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`;
+    const url = queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`;
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const response = await fetch(`${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`);
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Échec de la réponse du serveur');
       }
 
       const result = await response.json();
       if (Array.isArray(result.posts)) {
-        if (result.posts.length === 0 && items.length > 0 && !error) { // Plus de poste a charger
-            return;
+        if (result.posts.length === 0) {
+          setError('Plus de poste à charger');
         } else {
           const newItems = result.posts.map((post: Post) => {
-            // Extraire l'année, le mois et le jour
-            const datePart = post.publishedAt.slice(0, 10); // "YYYY-MM-DD"
-            const year = datePart.slice(0, 4);
-            const month = datePart.slice(5, 7);
-            const day = datePart.slice(8, 10);
-
-            // Extraire l'heure
-            const timePart = post.publishedAt.slice(11, 16); // "HH:mm"
-
-            // Formater la date comme "Année/Mois/Jour Heure"
-            const formattedDate = `${year}/${month}/${day} ${timePart}`;
+            const datePart = post.publishedAt.slice(0, 10);
+            const timePart = post.publishedAt.slice(11, 16);
+            const formattedDate = `${datePart} ${timePart}`;
 
             return {
               id: post.idPosts.toString(),
@@ -140,7 +140,7 @@ function HomeContent() {
             };
           });
 
-          setItems((prevItems) => [...prevItems, ...newItems]);
+          setItems((prevItems) => (saut === 0 ? newItems : [...prevItems, ...newItems]));
           setSaut((prevSaut) => prevSaut + quantite);
           setError('');
         }
@@ -150,12 +150,16 @@ function HomeContent() {
     } catch (error) {
       setError("Impossible de charger les postes. Veuillez vérifier votre connexion et réessayer.");
     } finally {
-      setLoading(false);
+      if (isRefreshing) {
+        setRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
   const loadMoreItems = () => {
-    if (!loading && !error) {
+    if (!loading && !refreshing && !error) {
       fetchPosts();
     }
   };
@@ -168,6 +172,12 @@ function HomeContent() {
     fetchPosts();
   }, []);
 
+  const onRefresh = () => {
+    setError('');
+    setSaut(0);
+    setItems([]);
+    fetchPosts(true); // Passe `true` pour indiquer un rafraîchissement
+  };
   return (
     <>
       <View style={styles.container}>
@@ -178,29 +188,35 @@ function HomeContent() {
           value={searchQuery}
           onChangeText={(text) => setSearchQuery(text)}
         />
-        {error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : (
-          <FlatList
-            contentContainerStyle={styles.scrollViewContent}
-            data={items}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-            
-                <ContentItem
-                  id={item.id}
-                  images={item.images}
-                  title={item.title}
-                  description={item.description}
-                  time={item.time}
-                  onPress={blogFocusNavigate}
-                />
-            )}
-            onEndReached={loadMoreItems}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={loading ? <ActivityIndicator size="large" color="#668F80" /> : null}
-          />
-        )}
+        <FlatList
+  refreshing={refreshing}
+  onRefresh={onRefresh}
+  contentContainerStyle={styles.scrollViewContent}
+  data={items}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => (
+    <ContentItem
+      id={item.id}
+      images={item.images}
+      title={item.title}
+      description={item.description}
+      time={item.time}
+      onPress={blogFocusNavigate}
+    />
+  )}
+  onEndReached={loadMoreItems}
+  onEndReachedThreshold={0.5}
+  ListFooterComponent={loading && !refreshing ? <ActivityIndicator size="large" color="#668F80" /> : null}
+  refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+      tintColor ={'#668F80'} // Couleur du loader sur iOS
+      colors={['#668F80']} // Couleur du loader sur android
+    />
+  }
+/>
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
     </>
   );

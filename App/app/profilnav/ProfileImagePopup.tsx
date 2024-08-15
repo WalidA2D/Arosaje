@@ -57,7 +57,7 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
       method: 'POST',
       headers: {
         'Content-Type' : 'multipart/form-data',
-        'Authorization': userToken,
+        'Authorization': userToken || '',
       },
       body: formData,
     };
@@ -86,7 +86,7 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': userToken,
+        'Authorization': userToken || '',
       },
       body: formData,
     };

@@ -15,7 +15,6 @@
   "dependencies": {
     "@firebase/storage": "^0.12.6",
     "@types/express": "^4.17.21",
-    "@types/multer": "^1.4.11",
     "@types/sqlite3": "^3.1.11",
     "@types/uuid": "^10.0.0",
     "dotenv": "^16.4.5",
@@ -31,6 +30,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/multer": "^1.4.11",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.3",
     "typescript": "^5.5.4"

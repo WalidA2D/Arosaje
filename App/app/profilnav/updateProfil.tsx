@@ -76,7 +76,7 @@ const UpdateProfil = () => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization' : userToken,
+        'Authorization' : userToken || '',
       },
       body: JSON.stringify({
         lastName: newLastName,

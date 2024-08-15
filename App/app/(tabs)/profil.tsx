@@ -99,6 +99,7 @@ export function ProfilScreen() {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': userToken,
+
       }
     };
 
