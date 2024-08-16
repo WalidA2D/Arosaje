@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Pressable, Modal } from 'react-native';
 import AnimatedCheckbox from 'react-native-checkbox-reanimated'
 import axios from 'axios';
@@ -26,19 +26,16 @@ export default function PubEspece() {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedSpeciesDetails, setSelectedSpeciesDetails] = useState<any | null>(null);
   const [checkedId, setCheckedId] = useState<number | null>(null);
+  const flatListRef = useRef<FlatList>(null);
 
   const handleCheckboxPress = (id: number) => {
     setCheckedId(prev => (prev === id ? null : id));
   }
 
-  const showSpeciesDetails = async (id: number) => {
-    try {
-      const response = await axios.get(`https://my-api.plantnet.org/v2/projects/k-southwestern-europe/species/${id}?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF`);
-      setSelectedSpeciesDetails(response.data);
-      setModalVisible(true);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des détails de l'espèce:", error);
-    }
+  const showSpeciesDetails = (id: number) => {
+    const selectedSpecies = species.find(species => species.id === id);
+    setSelectedSpeciesDetails(selectedSpecies);
+    setModalVisible(true);
   };
 
   useEffect(() => {
@@ -93,6 +90,7 @@ export default function PubEspece() {
   return (
     <View style={styles.container}>
       <FlatList
+        ref={flatListRef}
         data={species}
         keyExtractor={(item, index) => item.id.toString() + index.toString()}
         ListFooterComponent={<View style={styles.footerPadding} />}
@@ -122,16 +120,21 @@ export default function PubEspece() {
           </View>
         )}
       />
+      <TouchableOpacity onPress={() => flatListRef.current?.scrollToOffset({ offset: 0, animated: true })} style={styles.scrollToTopButton}>
+            <Ionicons name="arrow-up-outline" size={32} color="#fff" />
+          </TouchableOpacity>
       <BigButtonDown buttonText="Choisir" onPress={handleValidation} />
       <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
         {selectedSpeciesDetails && (
           <View style={styles.modalContent}>
+            <Text style={styles.modalContentTitre}>{selectedSpeciesDetails.common_name}</Text>
             <Text style={styles.modalContentText}>Nom : {selectedSpeciesDetails.common_name}</Text>
             <Text style={styles.modalContentText}>Nom scientifique : {selectedSpeciesDetails.scientific_name}</Text>
-            <Text style={styles.modalContentText}>Années : {selectedSpeciesDetails.scientific_author}</Text>
-            <Text style={styles.modalContentText}>Nom de famille : {selectedSpeciesDetails.family_common_name}</Text>
+            <Text style={styles.modalContentText}>Auteur : {selectedSpeciesDetails.scientific_author}</Text>
+            {/*<Text style={styles.modalContentText}>Nom de famille : {selectedSpeciesDetails.family_common_name}</Text>
             <Text style={styles.modalContentText}>Endroits : {selectedSpeciesDetails.observations}</Text>
-            <Image source={{ uri: selectedSpeciesDetails.image_url }} style={styles.imageModal} />
+            <Image source={{ uri: selectedSpeciesDetails.image_url }} style={styles.imageModal} />*/}
+            <Image style={styles.imageModal} source={require('../../assets/images/noflower.png')} />
             <View style={styles.fixedDetailsBtn}>
               <View style={styles.selectorContainer}>
                 <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
@@ -186,6 +189,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  modalContentTitre: {
+    padding: 5,
+    marginBottom: 10,
+    fontSize: 32,
+    fontWeight: 'bold',
+  },
   fixedDetailsBtn: {
     position: 'absolute',
     bottom: 0,
@@ -214,5 +223,15 @@ const styles = StyleSheet.create({
   },
   footerPadding: {
     height: 100,
+  },
+  scrollToTopButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 20,
+    backgroundColor: '#668F80',
+    padding: 10,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignContent: 'center',
   },
 });

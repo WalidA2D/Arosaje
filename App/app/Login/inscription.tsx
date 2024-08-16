@@ -277,25 +277,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             {step === 4 && (
                 <>
                     <View style={styles.textInput}>
-                        <Text style={styles.textSizeInput}>Ville:</Text>
-                        <TextInput
-                            placeholder="Ville"
-                            value={cityName}
-                            onChangeText={(text) => {
-                                setCityName(text);
-                                fetchSuggestions(text, 'city');
-                            }}
-                            style={[styles.input, !cityValid && styles.invalidInput]}
-                            onBlur={validateCity}
-                            editable={true}
-                        />
-                        <FlatList
-                            data={citySuggestions}
-                            keyExtractor={(item) => item.place_id}
-                            renderItem={renderSuggestion}
-                            style={styles.suggestionList}
-                        />
-                        <Text style={styles.textSizeInput}>Addresse:</Text>
+                    <Text style={styles.textSizeInput}>Addresse:</Text>
                         <TextInput
                             placeholder="Addresse"
                             value={address}
@@ -313,6 +295,24 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                             renderItem={renderSuggestion}
                             style={styles.suggestionList}
                         />
+                        <Text style={styles.textSizeInput}>Ville:</Text>
+                        <TextInput
+                            placeholder="Ville"
+                            value={cityName}
+                            onChangeText={(text) => {
+                                setCityName(text);
+                                fetchSuggestions(text, 'city');
+                            }}
+                            style={[styles.input, !cityValid && styles.invalidInput]}
+                            onBlur={validateCity}
+                            editable={false}
+                        />
+                        {/*<FlatList
+                            data={citySuggestions}
+                            keyExtractor={(item) => item.place_id}
+                            renderItem={renderSuggestion}
+                            style={styles.suggestionList}
+                        />*/}
                         <Text style={[styles.textInput, { color: 'red', textAlign: 'center' }]}>Pour utiliser la localisation automatique, veillez à être a l'endroit oû ce trouve vos plantes.</Text>
                         {isLoading && <Load />}
                     </View>
