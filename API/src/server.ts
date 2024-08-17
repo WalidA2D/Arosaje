@@ -8,6 +8,8 @@ import postRouter from "./routes/postRoutes";
 import commentRouter from "./routes/commentRoutes";
 import imageRouter from "./routes/imageRoutes";
 import favRouter from "./routes/favRoutes"
+import msgRouteur from "./routes/messageRoutes"
+import convRouteur from "./routes/conversationRoutes"
 
 dotenv.config();
 
@@ -21,6 +23,8 @@ app.use("/post", postRouter);
 app.use("/comment", commentRouter);
 app.use("/img", imageRouter);
 app.use("/fav", favRouter);
+app.use("/msg", msgRouteur)
+app.use("/conv", convRouteur)
 
 const port = process.env.PORT || 5070;
 
