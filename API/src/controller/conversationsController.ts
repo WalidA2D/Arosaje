@@ -13,6 +13,10 @@ class ConversationsController {
 
       const { dateStart, dateEnd, idUser1, idUser2 } = req.body;
 
+
+
+      // await ConvInstance.findOne({ where : { idUser1 : idUser1, idUser2 : idUser2 } })
+
       await ConvInstance.create({
         dateStart,
         dateEnd,

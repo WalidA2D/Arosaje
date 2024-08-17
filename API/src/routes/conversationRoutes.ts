@@ -15,10 +15,10 @@ router.post(
 );
 
 router.get(
-    "/read",
-    Middleware.handleValidationError,
-    Middleware.authMiddleware({ roles: ["admin"] }),
-    convController.read
+  "/readAll",
+  Middleware.handleValidationError,
+  Middleware.authMiddleware({ roles: ["admin"] }),
+  convController.read
 )
 
 router.get(

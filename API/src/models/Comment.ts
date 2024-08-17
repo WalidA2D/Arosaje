@@ -10,10 +10,9 @@ export interface CommentAttributes {
   idPost: number;
 }
 
-
 export interface MessageCreationAttributes extends Optional<CommentAttributes, 'idComments'> {}
 
-export class CommentInstance extends Model<CommentAttributes> {}
+export class CommentInstance extends Model<CommentAttributes, MessageCreationAttributes> {}
 
 CommentInstance.init(
   {

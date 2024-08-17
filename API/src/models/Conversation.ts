@@ -12,13 +12,13 @@ export interface ConvAttributes {
 
 export interface ConvCreationAttributes extends Optional<ConvAttributes, 'idConversations'> {}
 
-export class ConvInstance extends Model<ConvAttributes> {}
+export class ConvInstance extends Model<ConvAttributes, ConvCreationAttributes> {}
 
 ConvInstance.init(
   {
     idConversations: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    dateStart: { type: DataTypes.DATE, allowNull: true },
-    dateEnd: { type: DataTypes.DATE, allowNull: true },
+    dateStart: { type: DataTypes.DATE, allowNull: true, defaultValue: DataTypes.NOW },
+    dateEnd: { type: DataTypes.DATE, allowNull: true, defaultValue: DataTypes.NOW },
     seen: { type: DataTypes.INTEGER, allowNull: false }, 
     idUser1: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'idUsers' }, allowNull: false },
     idUser2: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'idUsers' }, allowNull: false }

@@ -9,7 +9,7 @@ export interface FavAttributes {
 
 export interface FavCreationAttributes extends Optional<FavAttributes, 'idFavorites'> {}
 
-export class FavInstance extends Model<FavCreationAttributes> {}
+export class FavInstance extends Model<FavCreationAttributes, FavCreationAttributes> {}
 
 FavInstance.init(
   {
