@@ -158,8 +158,8 @@ export default function PubLoca() {
 
     // Si le premier caractère de la première partie est un chiffre, c'est probablement un numéro de rue
     if (/\d/.test(parts[0][0])) {
-        addressPart = `${parts[0]} ${parts[1]}`;
-        cityPart = `${parts[3]}, ${parts[8]}`;
+      addressPart = `${parts[0]} ${parts[1]}`;
+      cityPart = `${parts[3]}, ${parts[8]}`;
     }
 
     setLocalisation(addressPart);
@@ -177,11 +177,11 @@ export default function PubLoca() {
       {!loading && (
         <>
           {locCompleted ? (
-              <>
-                <Text style={styles.text}>Ville : {cityName}</Text>
-                <Text style={styles.text}>Addresse : {localisation}</Text>
-              </>
-            ) : null}
+            <>
+              <Text style={styles.text}>Ville : {cityName}</Text>
+              <Text style={styles.text}>Addresse : {localisation}</Text>
+            </>
+          ) : null}
           <View style={styles.mapContainer}>
             <OpenLayersMap latitude={region.latitude} longitude={region.longitude} />
           </View>
@@ -193,27 +193,6 @@ export default function PubLoca() {
           </TouchableOpacity>
           {isEditing && (
             <>
-              <TextInput
-                style={styles.input}
-                placeholder="Entrez la ville"
-                value={cityName}
-                onChangeText={text => {
-                  setCityName(text);
-                  fetchCitySuggestions(text);
-                }}
-                textAlignVertical="top"
-                returnKeyType="done"
-                onSubmitEditing={Keyboard.dismiss}
-              />
-              <FlatList
-                data={citySuggestions}
-                keyExtractor={(item) => item.place_id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => handleSelectSuggestion(item)}>
-                    <Text style={styles.suggestion}>{item.display_name}</Text>
-                  </TouchableOpacity>
-                )}
-              />
               <TextInput
                 style={styles.input}
                 placeholder="Entrez l'adresse"
@@ -235,6 +214,28 @@ export default function PubLoca() {
                   </TouchableOpacity>
                 )}
               />
+              <TextInput
+                style={styles.input}
+                placeholder="Entrez la ville"
+                value={cityName}
+                onChangeText={text => {
+                  setCityName(text);
+                  fetchCitySuggestions(text);
+                }}
+                textAlignVertical="top"
+                returnKeyType="done"
+                onSubmitEditing={Keyboard.dismiss}
+                editable={false}
+              />
+              {/*<FlatList
+                data={citySuggestions}
+                keyExtractor={(item) => item.place_id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity onPress={() => handleSelectSuggestion(item)}>
+                    <Text style={styles.suggestion}>{item.display_name}</Text>
+                  </TouchableOpacity>
+                )}
+              />*/}
             </>
           )}
           <TouchableOpacity onPress={clearLocalisation} style={styles.clearButtonContainer}>

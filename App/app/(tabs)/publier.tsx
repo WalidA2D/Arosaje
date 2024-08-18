@@ -34,13 +34,17 @@ type RootStackParamList = {
     espece: string,
     photoValid?: boolean,
     photo: string,
+    plantName: string,
+    entretien: string,
+    ettValid?: boolean,
   };
   Titre: { titre: '' };
   Date: { selectedStartDate: '', selectedEndDate: '' }
   Description: { description: '' };
   Localisation: { localisation: '', cityName: '' };
   Espece: { espece: '' };
-  Photo: { photo: '' };
+  Photo: { photo: '', plantName: '' };
+  Entretien: { entretien: '' };
 };
 
 type UpdatePublierNavigationProp = StackNavigationProp<RootStackParamList, 'Publier'>;
@@ -113,7 +117,10 @@ function PublierContent() {
   const [espValid, setEspValid] = useState(false);
   const [espece, setEspece] = useState('');
   const [photoValid, setPhotoValid] = useState(false);
+  const [ettValid, setEttValid] = useState(false); // Entretien optionnel
+  const [entretien, setEntretien] = useState('');
   const [photo, setPhoto] = useState('');
+  const [planteName, setPlante] = useState('');
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -155,8 +162,8 @@ function PublierContent() {
       formData.append('state', JSON.stringify(false));
       formData.append('accepted', JSON.stringify(false));
       formData.append('plantOrigin', espece);
-      formData.append('plantRequirements', 'Exemples requis');
-      formData.append('plantType', 'Exemple type');
+      formData.append('plantRequirements', entretien);
+      formData.append('plantType', planteName);
       formData.append('images', {
         uri: photo,
         type: 'image/jpeg',
@@ -208,8 +215,12 @@ function PublierContent() {
     setEspece('');
     await AsyncStorage.removeItem('espece');
     await AsyncStorage.removeItem('espValid');
+    setEntretien('');
+    await AsyncStorage.removeItem('entretien');
     setPhoto('');
+    setPlante('');
     await AsyncStorage.removeItem('photo');
+    await AsyncStorage.removeItem('plante');
     await AsyncStorage.removeItem('photoValid');
     setTitreValid(false);
     setDateValid(false);
@@ -217,6 +228,7 @@ function PublierContent() {
     setLocValid(false);
     setEspValid(false);
     setPhotoValid(false);
+    setEttValid(false);
     setIsValid(false);
   };
 
@@ -234,8 +246,11 @@ function PublierContent() {
       const storedCityName = await AsyncStorage.getItem('cityName');
       const storedEspValid = await AsyncStorage.getItem('espValid');
       const storedEspece = await AsyncStorage.getItem('espece');
+      const storedEntretien = await AsyncStorage.getItem('entretien');
+      const storedettValid = await AsyncStorage.getItem('ettValid');
       const storedphotoValid = await AsyncStorage.getItem('photoValid');
       const storedphoto = await AsyncStorage.getItem('photo');
+      const storedplantName = await AsyncStorage.getItem('plante')
 
       console.log('Loaded Data:', {
         storedTitreValid,
@@ -244,6 +259,7 @@ function PublierContent() {
         storedLocValid,
         storedEspValid,
         storedphotoValid,
+        storedettValid
       });
 
       if (storedTitre) setTitre(storedTitre);
@@ -259,14 +275,17 @@ function PublierContent() {
       if (storedLocValid) setLocValid(storedLocValid === 'true');
       if (storedEspValid) setEspValid(storedEspValid === 'true');
       if (storedphotoValid) setPhotoValid(storedphotoValid === 'true');
+      if (storedettValid) setEttValid(storedettValid === 'true');
+      if (storedEntretien) setEntretien(storedEntretien);
       if (storedphoto) setPhoto(storedphoto);
+      if (storedplantName) setPlante(storedplantName);
     };
 
     loadData();
 
     const unsubscribe = navigation.addListener('focus', () => {
-      const { titreValid, dateValid, descValid, locValid, espValid, photoValid, localisation, cityName } = route.params || {};
-      console.log('Params:', { titreValid, dateValid, descValid, locValid, espValid, photoValid, localisation, cityName });
+      const { titreValid, dateValid, descValid, locValid, espValid, photoValid, ettValid, localisation, cityName } = route.params || {};
+      console.log('Params:', { titreValid, dateValid, descValid, locValid, espValid, photoValid, ettValid, localisation, cityName });
       setIsValid(
         (titreValid !== undefined ? titreValid : false) &&
         (dateValid !== undefined ? dateValid : false) &&
@@ -311,9 +330,17 @@ function PublierContent() {
       setEspece(route.params.espece);
       AsyncStorage.setItem('espece', route.params.espece);
     }
+    if (route.params?.entretien) {
+      setPlante(route.params.entretien);
+      AsyncStorage.setItem('entretien', route.params.entretien);
+    }
     if (route.params?.photo) {
       setPhoto(route.params.photo);
       AsyncStorage.setItem('photo', route.params.photo);
+    }
+    if (route.params?.plantName) {
+      setPlante(route.params.plantName);
+      AsyncStorage.setItem('plant', route.params.plantName);
     }
     if (route.params?.titreValid !== undefined) {
       setTitreValid(route.params.titreValid);
@@ -367,11 +394,26 @@ function PublierContent() {
         AsyncStorage.removeItem('photo');
       }
     }
+    if (route.params?.ettValid !== undefined) {
+      setPhotoValid(route.params.ettValid);
+      AsyncStorage.setItem('ettValid', route.params.ettValid.toString());
+      if (!route.params.ettValid) {
+        setEntretien('');
+        AsyncStorage.removeItem('entretien');
+      }
+    }
+    if (route.params?.photoValid !== undefined) {
+      setPhotoValid(route.params.photoValid);
+      AsyncStorage.setItem('photoValid', route.params.photoValid.toString());
+      if (!route.params.photoValid) {
+        setPlante('');
+        AsyncStorage.removeItem('plant');
+      }
+    }
   }, [route.params]);
 
   useEffect(() => {
     const params = route.params || {};
-    console.log('Params:', params);
 
     if (params.titreValid !== undefined) setTitreValid(params.titreValid);
     if (params.dateValid !== undefined) setDateValid(params.dateValid);
@@ -379,6 +421,7 @@ function PublierContent() {
     if (params.locValid !== undefined) setLocValid(params.locValid);
     if (params.espValid !== undefined) setEspValid(params.espValid);
     if (params.photoValid !== undefined) setPhotoValid(params.photoValid);
+    if (params.ettValid !== undefined) setEttValid(params.ettValid);
   }, [route.params]);
 
   useEffect(() => {
@@ -399,7 +442,7 @@ function PublierContent() {
         <ListDash buttonText={`Date(s) : ${selectedStartDate ? formatDate(selectedStartDate) : ''} - ${selectedEndDate ? formatDate(selectedEndDate) : ''}`} onPress={() => navigation.navigate('Date', { selectedStartDate: "", selectedEndDate: "" })} />
         <Ionicons name={dateValid ? 'checkmark-circle' : 'close-circle'} size={24} color={dateValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
-        <ListDash buttonText={`Photo : ${photo ? '{...}' : ''}`} onPress={() => navigation.navigate('Photo', { photo: "" })} />
+        <ListDash buttonText={`Photo : ${photo ? '{...},' : ''} ${planteName}`} onPress={() => navigation.navigate('Photo', { photo: "", plantName: '' })} />
         <Ionicons name={photoValid ? 'checkmark-circle' : 'close-circle'} size={24} color={photoValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
         <ListDash buttonText={`Description : ${description ? '{...}' : ''}`} onPress={() => navigation.navigate('Description', { description: "" })} />
@@ -411,8 +454,8 @@ function PublierContent() {
         <ListDash buttonText={`Espèce : ${espece}`} onPress={() => navigation.navigate('Espece', { espece: "" })} />
         <Ionicons name={espValid ? 'checkmark-circle' : 'close-circle'} size={24} color={espValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
-        <ListDash buttonText="Exigence d'entretien (optionel)" onPress={() => navigation.navigate('Entretien')} />
-        <Ionicons name={'close-circle'} size={24} color={"#828282"} style={styles.iconValid} />
+        <ListDash buttonText={`${entretien ? 'Exigence d’entretien : {...}' : 'Exigence d’entretien (optionel)'}`} onPress={() => navigation.navigate('Entretien', { entretien: "" })} />
+        <Ionicons name={ettValid ? 'checkmark-circle' : 'close-circle'} size={24} color={ettValid ? "#668F80" : "#828282"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
       </View>
       <View style={styles.fixedDetailsBtn}>

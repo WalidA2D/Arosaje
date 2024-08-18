@@ -98,7 +98,7 @@ export function ProfilScreen() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': userToken,
+        'Authorization': userToken || '',
       }
     };
 
@@ -165,7 +165,7 @@ export function ProfilScreen() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': userToken
+        'Authorization': userToken || ''
       }
     };
 
@@ -202,7 +202,7 @@ export function ProfilScreen() {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': userToken,
+        'Authorization': userToken || '',
       }
     };
   
@@ -242,7 +242,7 @@ export function ProfilScreen() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': userToken,
+        'Authorization': userToken || '',
       },
       body: JSON.stringify({ id: idPost })
     };

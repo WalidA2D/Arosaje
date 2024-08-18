@@ -10,16 +10,17 @@ import Loading from '../../components/Loading';
 import BigButtonDown from '../../components/BigButtonDown';
 
 type RootStackParamList = {
-  Publier: { espValid?: boolean, espece: string };
-  Espece: { espece: '' };
+  Publier: { plaValid?: boolean, plante: string };
+  Plantes: { plante: '' };
+  Photo: {};
 };
 
-type UpdateEspeceNavigationProp = StackNavigationProp<RootStackParamList, 'Espece'>;
-type UpdateEspeceRouteProp = RouteProp<RootStackParamList, 'Espece'>;
+type UpdateplanteNavigationProp = StackNavigationProp<RootStackParamList, 'Plantes'>;
+type UpdateplanteRouteProp = RouteProp<RootStackParamList, 'Plantes'>;
 
-export default function PubEspece() {
-  const navigation = useNavigation<UpdateEspeceNavigationProp>();
-  const route = useRoute<UpdateEspeceRouteProp>();
+export default function PubPlantes() {
+  const navigation = useNavigation<UpdateplanteNavigationProp>();
+  const route = useRoute<UpdateplanteRouteProp>();
   const [species, setSpecies] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
@@ -73,9 +74,9 @@ export default function PubEspece() {
   const handleValidation = () => {
     if (checkedId !== null) {
       const selectedSpecies = species.find(species => species.id === checkedId);
-      navigation.navigate('Publier', { espValid: true, espece: selectedSpecies.common_name });
+      navigation.navigate('Photo', { plaValid: true, plante: selectedSpecies.common_name });
     } else {
-      navigation.navigate('Publier', { espValid: false, espece: '' });
+      navigation.navigate('Photo', { plaValid: false, plante: '' });
     }
   };
 

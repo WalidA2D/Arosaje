@@ -59,7 +59,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Index',
-          tabBarStyle: {display : 'none'},
+          tabBarStyle: { display: 'none' },
           tabBarButton: () => null,
         }}
       />

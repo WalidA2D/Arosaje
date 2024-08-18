@@ -110,6 +110,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
                 style={styles.inputMdp}
                 onChangeText={onChangeMotDePasse}
                 value={motDePasse}
+                autoCapitalize='words'
                 placeholder="Mot de passe"
                 placeholderTextColor="#BDBDBD"
                 secureTextEntry={!showPassword}

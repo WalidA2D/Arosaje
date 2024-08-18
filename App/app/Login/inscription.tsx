@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TextInput, Text, Alert, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, View, TextInput, Text, Alert, TouchableOpacity, FlatList, Pressable } from 'react-native';
 import HeaderTitle from '../../components/HeaderTitle';
 import * as Location from 'expo-location';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AnimatedCheckbox from 'react-native-checkbox-reanimated';
+import Load from '../../components/Loading';
 
 interface InscriptionScreenProps {
     setIsModalVisible: (isVisible: boolean, type: string) => void;
@@ -36,6 +38,8 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
     const [cityValid, setCityValid] = useState(true);
     const [citySuggestions, setCitySuggestions] = useState([]);
     const [addressSuggestions, setAddressSuggestions] = useState([]);
+    const [isConsentChecked, setIsConsentChecked] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -60,7 +64,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
     };
 
     const handleConfirm = () => {
-        if (step === 5) {
+        if (step === 5 && isConsentChecked) {
             const userData = {
                 lastName,
                 firstName,
@@ -85,7 +89,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             Alert.alert("Bienvenue", "Inscription réussi, veuillez vous connectez");
             setIsModalVisible(false, 'inscription');
         } else {
-            Alert.alert("Échec", "Inscription échoué");
+            Alert.alert("Échec", "Inscription échoué. Veuillez accepter les termes et conditions.");
         }
     };
 
@@ -93,13 +97,13 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
         const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&countrycodes=fr&namedetails=1`);
         const data = await response.json();
         const suggestions = data
-        .filter((item: any) => (item.address.street) && (item.address.city) && item.address.postcode)
-        .map((item: any) => ({
-            place_id: item.place_id,
-            display_name: `${item.address.street}, ${item.address.city}, ${item.address.postcode}`,
-            lat: item.lat,
-            lon: item.lon
-        }));
+            .filter((item: any) => (item.address.street) && (item.address.city) && item.address.postcode)
+            .map((item: any) => ({
+                place_id: item.place_id,
+                display_name: `${item.address.street}, ${item.address.city}, ${item.address.postcode}`,
+                lat: item.lat,
+                lon: item.lon
+            }));
         if (type === 'address') {
             setAddressSuggestions(suggestions);
         } else {
@@ -109,10 +113,12 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
     };
 
     const handleAutoLocation = async () => {
+        setIsLoading(true);
         try {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 console.error('Permission to access location was denied');
+                setIsLoading(false);
                 return;
             }
 
@@ -127,6 +133,8 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             }
         } catch (error) {
             console.error('Erreur lors de la récupération de la localisation :', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -183,13 +191,13 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                         <Text style={styles.textSizeInput}>Prénom:</Text>
                         <TextInput placeholder="First Name" value={firstName} onChangeText={setFirstName} style={styles.input} />
                         <Text style={styles.textSizeInput}>Email:</Text>
-                        <TextInput  
-                            value={email} 
+                        <TextInput
+                            value={email}
                             onChangeText={setEmail}
-                            style={styles.input} 
-                            keyboardType="email-address" 
-                            autoCapitalize="none" 
-                            autoCorrect={false} 
+                            style={styles.input}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
                             textContentType="emailAddress"
                             onBlur={() => {
                                 if (email && !emailRegex.test(email)) {
@@ -202,7 +210,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
                             <TouchableOpacity style={styles.selectorButton} onPress={handleNext}>
-                                <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Suivant</Text>
+                                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -212,27 +220,28 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                 <>
                     <View style={styles.textInput}>
                         <Text style={styles.textSizeInput}>Mot de passe:</Text>
-                        <TextInput 
-                            placeholder="Mot de passe" 
-                            value={password} 
-                            onChangeText={setPassword} 
-                            secureTextEntry={true} 
-                            style={styles.input} 
+                        <TextInput
+                            placeholder="Mot de passe"
+                            value={password}
+                            onChangeText={setPassword}
+                            autoCapitalize='words'
+                            secureTextEntry={true}
+                            style={styles.input}
                         />
                         <Text style={styles.textSizeInput}>Confirmation du Mot de passe:</Text>
-                        <TextInput 
-                            placeholder="Confirmation du mot de passe" 
-                            value={confirmPassword} 
-                            onChangeText={setConfirmPassword} 
-                            secureTextEntry={true} 
-                            style={styles.input} 
+                        <TextInput
+                            placeholder="Confirmation du mot de passe"
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            secureTextEntry={true}
+                            style={styles.input}
                         />
                         <Text style={[styles.textInput, { color: 'red', textAlign: 'center' }]}>Le mot de passe doit contenir au moins 8 caractères, dont au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial (@$!%*?&).</Text>
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
                             <TouchableOpacity style={styles.selectorButton} onPress={handleNext}>
-                                <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Suivant</Text>
+                                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -242,24 +251,24 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                 <>
                     <View style={styles.textInput}>
                         <Text style={styles.textSizeInput}>Téléphone:</Text>
-                        <TextInput 
-                            placeholder="Téléphone" 
-                            value={phone} 
-                            onChangeText={setPhone} 
-                            style={styles.input} 
+                        <TextInput
+                            placeholder="Téléphone"
+                            value={phone}
+                            onChangeText={setPhone}
+                            style={styles.input}
                             keyboardType="phone-pad"
                             onBlur={() => {
                                 if (phone.length === 0) {
                                     setPhone('');
                                 }
-                            }} 
+                            }}
                             returnKeyType="done"
                         />
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
                             <TouchableOpacity style={styles.selectorButton} onPress={handleNext}>
-                                <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Suivant</Text>
+                                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -268,54 +277,55 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             {step === 4 && (
                 <>
                     <View style={styles.textInput}>
-                        <Text style={styles.textSizeInput}>Ville:</Text>
-                        <TextInput 
-                            placeholder="Ville" 
-                            value={cityName} 
-                            onChangeText={(text) => {
-                                setCityName(text);
-                                fetchSuggestions(text, 'city');
-                            }}
-                            style={[styles.input, !cityValid && styles.invalidInput]} 
-                            onBlur={validateCity}
-                            editable={true}
-                        />
-                        <FlatList 
-                            data={citySuggestions}
-                            keyExtractor={(item) => item.place_id}
-                            renderItem={renderSuggestion}
-                            style={styles.suggestionList}
-                        />
-                        <Text style={styles.textSizeInput}>Addresse:</Text>
-                        <TextInput 
-                            placeholder="Addresse" 
-                            value={address} 
+                    <Text style={styles.textSizeInput}>Addresse:</Text>
+                        <TextInput
+                            placeholder="Addresse"
+                            value={address}
                             onChangeText={(text) => {
                                 setAddress(text);
                                 fetchSuggestions(text, 'address');
                             }}
-                            style={[styles.input, !addressValid && styles.invalidInput]} 
+                            style={[styles.input, !addressValid && styles.invalidInput]}
                             onBlur={validateAddress}
                             editable={true}
                         />
-                        <FlatList 
+                        <FlatList
                             data={addressSuggestions}
                             keyExtractor={(item) => item.place_id}
                             renderItem={renderSuggestion}
                             style={styles.suggestionList}
                         />
+                        <Text style={styles.textSizeInput}>Ville:</Text>
+                        <TextInput
+                            placeholder="Ville"
+                            value={cityName}
+                            onChangeText={(text) => {
+                                setCityName(text);
+                                fetchSuggestions(text, 'city');
+                            }}
+                            style={[styles.input, !cityValid && styles.invalidInput]}
+                            onBlur={validateCity}
+                            editable={false}
+                        />
+                        {/*<FlatList
+                            data={citySuggestions}
+                            keyExtractor={(item) => item.place_id}
+                            renderItem={renderSuggestion}
+                            style={styles.suggestionList}
+                        />*/}
                         <Text style={[styles.textInput, { color: 'red', textAlign: 'center' }]}>Pour utiliser la localisation automatique, veillez à être a l'endroit oû ce trouve vos plantes.</Text>
+                        {isLoading && <Load />}
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={styles.autoLocationButton} onPress={handleAutoLocation}>
-                                <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Localisation automatique</Text>
+                            <TouchableOpacity style={styles.autoLocationButton} onPress={handleAutoLocation} disabled={isLoading}>
+                                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Localisation automatique</Text>
                                 <Ionicons name="search-outline" size={24} color="white" />
                             </TouchableOpacity>
                         </View>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={styles.selectorButton} onPress={handleNext}>
-                                <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Suivant</Text>
+                            <TouchableOpacity style={styles.selectorButton} onPress={handleNext} disabled={isLoading}>
+                                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -331,15 +341,26 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                         <Text style={styles.textSizeInput}>Ville: {cityName}</Text>
                         <Text style={styles.textSizeInput}>Téléphone: {phone}</Text>
                     </View>
+                    <View style={styles.consentContainer}>
+                        <Pressable onPress={() => setIsConsentChecked(!isConsentChecked)} style={styles.checkbox}>
+                            <AnimatedCheckbox
+                                checked={isConsentChecked}
+                                highlightColor="#668F80"
+                                checkmarkColor="#ffffff"
+                                boxOutlineColor="#668F80"
+                            />
+                        </Pressable>
+                        <Text style={[styles.consentText, { color: 'red' }]}>J'accepte les termes et conditions</Text>
+                    </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
                             <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setStep(1)}>
-                                <Text style={{color : '#668F80', fontSize : 18, fontWeight: 'bold',}}>Modifier</Text>
+                                <Text style={{ color: '#668F80', fontSize: 18, fontWeight: 'bold', }}>Modifier</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.selectorContainer}>
                             <TouchableOpacity style={styles.selectorButton} onPress={handleConfirm}>
-                                <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Confirmer</Text>
+                                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Confirmer</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -372,7 +393,7 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
     },
-    textSizeInput:{
+    textSizeInput: {
         fontSize: 16
     },
     textInput: {
@@ -396,7 +417,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#E0E0E0',
         borderRadius: 25,
         overflow: 'hidden',
-        width: '90%', 
+        width: '90%',
         alignItems: 'center',
     },
     selectorButton: {
@@ -421,5 +442,20 @@ const styles = StyleSheet.create({
     suggestionList: {
         width: '90%',
         maxHeight: 150,
+    },
+    consentContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 20,
+        padding: 20,
+        justifyContent: 'center',
+    },
+    checkbox: {
+        width: 24,
+        height: 24,
+        marginRight: 10,
+    },
+    consentText: {
+        fontSize: 16,
     },
 });
