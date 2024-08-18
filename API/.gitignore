@@ -6,6 +6,6 @@ dist/
 
 # Database & SQLite
 **.db
-**.sqlite
 **.sql
+**.sqlite
 **.database
