@@ -59,26 +59,36 @@ class ConversationsController {
           ]
         }
       });
-  
+      
       if (records.length === 0) {
         return res.status(404).json({ success: false, msg: "Aucune conversation trouvée concernant cet utilisateur" });
       }
-  
+      
       const usersId = records.map(record => 
         record.dataValues.idUser1 === userId ? record.dataValues.idUser2 : record.dataValues.idUser1
       );
-  
+      
       const users = await Promise.all(usersId.map(idU => UserInstance.findOne({ where: { idUsers: idU } })));
-  
+      
       const record = users.filter(u => u !== null);
-      const conversations = record.map(u => ({
+      
+      const conversations = record.map((u, index) => ({
+        //info users
         idUser: u.dataValues.idUsers,
         firstName: u.dataValues.firstName,
         lastName: u.dataValues.lastName,
         photo: u.dataValues.photo,
         role: u.dataValues.isAdmin ? "Administrateur" : u.dataValues.isBotanist ? "Botaniste" : "",
-        note: u.dataValues.note
+        note: u.dataValues.note,
+
+        //infos convs
+        idConversation: records[index].dataValues.idConversations,
+        dateStart: records[index].dataValues.dateStart,
+        seen: records[index].dataValues.seen
       }));
+      
+      return res.status(200).json({ success: true, msg: "Conversations bien trouvées", conversations });
+      
   
       return res.status(200).json({ success: true, msg: "Conversations bien trouvées", conversations });
     } catch (e) {
