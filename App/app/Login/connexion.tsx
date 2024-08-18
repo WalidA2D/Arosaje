@@ -11,7 +11,7 @@ import HeaderTitle from '../../components/HeaderTitle';
 }
 
 export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenProps) {
-    const [email, onChangeEmail] = React.useState('a.b@c.com');
+    const [email, onChangeEmail] = React.useState('a@b.com');
     const [motDePasse, onChangeMotDePasse] = React.useState('Azerty12345!');
     const [showPassword, setShowPassword] = React.useState(false);
     const [rememberMe, setRememberMe] = React.useState(false);

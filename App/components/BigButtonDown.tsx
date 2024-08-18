@@ -3,11 +3,11 @@ import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-nati
 
 const screenHeight = Dimensions.get('window').height;
 
-const BigButtonDown = ({ buttonText, onPress }: { buttonText: string, onPress?: () => void }) => {
+const BigButtonDown = ({ buttonText, onPress, disabled, bgColor }: { buttonText: string, onPress?: () => void, disabled?: boolean, bgColor?: string }) => {
   return (
     <View style={styles.fixedDetailsBtn}>
-    <View style={styles.selectorContainer}>
-      <TouchableOpacity style={styles.selectorButton} onPress={onPress}>
+    <View style={[styles.selectorContainer, { backgroundColor: bgColor || '#E0E0E0' }]}>
+      <TouchableOpacity style={styles.selectorButton} onPress={onPress} disabled={disabled}>
         <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
             {buttonText}
         </Text>
@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
   selectorContainer: {
     flexDirection: 'row',
     marginBottom: 20,
-    backgroundColor: '#E0E0E0',
     borderRadius: 25,
     overflow: 'hidden',
     width: '90%',
