@@ -17,7 +17,7 @@ export default function StartApp() {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/Arosaje.png')} style={[styles.logo, {width: 170, height: 170,}]}/>
+      <Image source={require('../assets/images/Arosaje.png')} style={[styles.logo, {width: 250, height: 250,}]}/>
       <View style={styles.fixedDetailsBtn}>
         <View style={styles.selectorContainer}>
           <TouchableOpacity style={styles.selectorButton} onPress={() => setModalVisible(true, 'connexion')}>
