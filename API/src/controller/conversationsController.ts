@@ -33,6 +33,16 @@ class ConversationsController {
     }
   }
   
+  async read(req: Request, res: Response) {
+    try{
+      const record = await ConvInstance.findAll()
+      return res.status(200).json({ success: true, msg: record?"Conversations bien trouvées":"Aucune conversation répertoriée", record})
+    } catch (e){
+      console.error(e);
+      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des conversations" });
+    }
+  }
+
   async readByUser(req: Request, res: Response) {
     try {
       const token = req.headers.authorization?.split(" ")[0];
@@ -41,7 +51,6 @@ class ConversationsController {
   
       const userId = user.dataValues.idUsers;
   
-      // Rechercher toutes les conversations où l'utilisateur est soit idUser1, soit idUser2
       const records = await ConvInstance.findAll({
         where: {
           [Op.or]: [
@@ -55,12 +64,10 @@ class ConversationsController {
         return res.status(404).json({ success: false, msg: "Aucune conversation trouvée concernant cet utilisateur" });
       }
   
-      // Récupérer les IDs des autres utilisateurs (ceux qui ne sont pas l'utilisateur courant)
       const usersId = records.map(record => 
         record.dataValues.idUser1 === userId ? record.dataValues.idUser2 : record.dataValues.idUser1
       );
   
-      // Récupérer les informations des autres utilisateurs
       const users = await Promise.all(usersId.map(idU => UserInstance.findOne({ where: { idUsers: idU } })));
   
       const record = users.filter(u => u !== null);
@@ -77,6 +84,7 @@ class ConversationsController {
       return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des conversations" });
     }
   }
+  
 
   async delete(req: Request, res: Response) {
     try{
