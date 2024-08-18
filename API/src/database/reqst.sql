@@ -1,1 +1,2 @@
-Update Users Set uid = 'TOKEN'
+ALTER TABLE Users ADD COLUMN CodePostal TEXT;
+ALTER TABLE Posts ADD COLUMN CodePostal TEXT;

@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Op } from "sequelize"
 
 import { UserInstance } from "../models/User";
 import { ConvInstance } from "../models/Conversation";
@@ -32,48 +33,46 @@ class ConversationsController {
     }
   }
   
-  async read(req: Request, res: Response) {
-    try{
-      const record = await ConvInstance.findAll()
-      return res.status(200).json({ success: true, msg: record?"Conversations bien trouvées":"Aucune conversation répertoriée", record})
-    } catch (e){
-      console.error(e);
-      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des conversations" });
-    }
-  }
-
   async readByUser(req: Request, res: Response) {
-    try{
+    try {
       const token = req.headers.authorization?.split(" ")[0];
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
-     
-      let records = await ConvInstance.findAll({ where : { idUser1 : user.dataValues.idUsers }})
-      let userIsId2 = 1;
-      if(!records) {
-        records = await ConvInstance.findAll({ where : { idUser2 : user.dataValues.idUsers }})
-        if(!records) return res.status(404).json({ success: false, msg: "Aucune conversation trouvée concernant ce user"})
-          userIsId2 = 2;
+  
+      const userId = user.dataValues.idUsers;
+  
+      // Rechercher toutes les conversations où l'utilisateur est soit idUser1, soit idUser2
+      const records = await ConvInstance.findAll({
+        where: {
+          [Op.or]: [
+            { idUser1: userId },
+            { idUser2: userId }
+          ]
+        }
+      });
+  
+      if (records.length === 0) {
+        return res.status(404).json({ success: false, msg: "Aucune conversation trouvée concernant cet utilisateur" });
       }
-
-      let usersId;
-      if(userIsId2 == 2){
-        usersId = records.map(u => u.dataValues.idUser2);
-      } else {
-        usersId = records.map(u => u.dataValues.idUser1)
-      }
+  
+      // Récupérer les IDs des autres utilisateurs (ceux qui ne sont pas l'utilisateur courant)
+      const usersId = records.map(record => 
+        record.dataValues.idUser1 === userId ? record.dataValues.idUser2 : record.dataValues.idUser1
+      );
+  
+      // Récupérer les informations des autres utilisateurs
       const users = await Promise.all(usersId.map(idU => UserInstance.findOne({ where: { idUsers: idU } })));
-
+  
       const record = users.filter(u => u !== null);
       const conversations = record.map(u => ({
         firstName: u.dataValues.firstName,
         lastName: u.dataValues.lastName,
         photo: u.dataValues.photo,
-        role: u.dataValues.isAdmin?"Administrateur":u.dataValues.isBotanist?"Botaniste":""
+        role: u.dataValues.isAdmin ? "Administrateur" : u.dataValues.isBotanist ? "Botaniste" : ""
       }));
-      
-      return res.status(200).json({ success: true, msg: "Conversations bien trouvées", conversations})
-    } catch (e){
+  
+      return res.status(200).json({ success: true, msg: "Conversations bien trouvées", conversations });
+    } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des conversations" });
     }
