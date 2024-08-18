@@ -48,12 +48,31 @@ class ConversationsController {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
      
-      let record = await ConvInstance.findAll({ where : { idUser1 : user.dataValues.idUsers }})
-      if(!record) {
-        record = await ConvInstance.findAll({ where : { idUser2 : user.dataValues.idUsers }})
-        if(!record) return res.status(404).json({ success: false, msg: "Aucune conversation trouvée concernant ce user"})
+      let records = await ConvInstance.findAll({ where : { idUser1 : user.dataValues.idUsers }})
+      let userIsId2 = 1;
+      if(!records) {
+        records = await ConvInstance.findAll({ where : { idUser2 : user.dataValues.idUsers }})
+        if(!records) return res.status(404).json({ success: false, msg: "Aucune conversation trouvée concernant ce user"})
+          userIsId2 = 2;
       }
-      return res.status(200).json({ success: true, msg: "Conversations bien trouvées", record})
+
+      let usersId;
+      if(userIsId2 == 2){
+        usersId = records.map(u => u.dataValues.idUser2);
+      } else {
+        usersId = records.map(u => u.dataValues.idUser1)
+      }
+      const users = await Promise.all(usersId.map(idU => UserInstance.findOne({ where: { idUsers: idU } })));
+
+      const record = users.filter(u => u !== null);
+      const conversations = record.map(u => ({
+        firstName: u.dataValues.firstName,
+        lastName: u.dataValues.lastName,
+        photo: u.dataValues.photo,
+        role: u.dataValues.isAdmin?"Administrateur":u.dataValues.isBotanist?"Botaniste":""
+      }));
+      
+      return res.status(200).json({ success: true, msg: "Conversations bien trouvées", conversations})
     } catch (e){
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des conversations" });
