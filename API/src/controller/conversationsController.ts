@@ -72,10 +72,12 @@ class ConversationsController {
   
       const record = users.filter(u => u !== null);
       const conversations = record.map(u => ({
+        idUser: u.dataValues.idUsers,
         firstName: u.dataValues.firstName,
         lastName: u.dataValues.lastName,
         photo: u.dataValues.photo,
-        role: u.dataValues.isAdmin ? "Administrateur" : u.dataValues.isBotanist ? "Botaniste" : ""
+        role: u.dataValues.isAdmin ? "Administrateur" : u.dataValues.isBotanist ? "Botaniste" : "",
+        note: u.dataValues.note
       }));
   
       return res.status(200).json({ success: true, msg: "Conversations bien trouvées", conversations });
