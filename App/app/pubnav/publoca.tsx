@@ -9,7 +9,6 @@ import axios from 'axios';
 import OpenLayersMap from '../../components/OpenLayersMap';
 import BigButtonDown from '../../components/BigButtonDown';
 import Loading from '../../components/Loading';
-import { ScrollView } from 'react-native-gesture-handler';
 
 type RootStackParamList = {
   Publier: { locValid?: boolean, localisation: string, cityName: string };
