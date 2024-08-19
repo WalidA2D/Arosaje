@@ -9,6 +9,7 @@ import axios from 'axios';
 import OpenLayersMap from '../../components/OpenLayersMap';
 import BigButtonDown from '../../components/BigButtonDown';
 import Loading from '../../components/Loading';
+import { ScrollView } from 'react-native-gesture-handler';
 
 type RootStackParamList = {
   Publier: { locValid?: boolean, localisation: string, cityName: string };
@@ -95,6 +96,9 @@ export default function PubLoca() {
 
   const editLocalisation = () => {
     setIsEditing(true);
+    if (isEditing){
+      setIsEditing(false);
+    }
   };
 
   const handleAutoLocation = async () => {
@@ -182,9 +186,6 @@ export default function PubLoca() {
               <Text style={styles.text}>Addresse : {localisation}</Text>
             </>
           ) : null}
-          <View style={styles.mapContainer}>
-            <OpenLayersMap latitude={region.latitude} longitude={region.longitude} />
-          </View>
           <TouchableOpacity onPress={handleAutoLocation} style={styles.autoButton}>
             <Text style={styles.buttonText}>Localisation automatique</Text>
           </TouchableOpacity>
@@ -238,6 +239,9 @@ export default function PubLoca() {
               />*/}
             </>
           )}
+          <View style={styles.mapContainer}>
+            <OpenLayersMap latitude={region.latitude} longitude={region.longitude} />
+          </View>
           <TouchableOpacity onPress={clearLocalisation} style={styles.clearButtonContainer}>
             <Text style={styles.clearButton}>Vider la localisation</Text>
           </TouchableOpacity>
