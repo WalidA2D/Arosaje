@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { auth, storage } from "../config/firebase.config";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { UserInstance } from "../models/User";
 import { MessageInstance } from "../models/Message";
 
@@ -12,11 +15,28 @@ class MessageController {
 
       const { text, publishedAt, idConversation } = req.body;
 
+      const publishedAtDate = publishedAt ? new Date(publishedAt) : new Date();
+      const newToken = Date.now().toString(36) + Math.random().toString(36)
+
+      const email = process.env.FIREBASE_AUTH_EMAIL!;
+      const password = process.env.FIREBASE_AUTH_PASSWORD!;
+
+      await signInWithEmailAndPassword(auth, email, password);
+
+      let urlFile = ""
+      if (req.file) {
+        const fileRef = ref(storage,`filesMessages/${newToken}.jpg`);
+        const metadata = { contentType: 'image/jpg' };
+        await uploadBytesResumable(fileRef, req.file.buffer, metadata);
+        urlFile = await getDownloadURL(fileRef);
+      }
+
       await MessageInstance.create({
         text,
-        publishedAt,
+        publishedAt: publishedAtDate,
         idConversation,
-        idUser:user.dataValues.idUsers
+        idUser:user.dataValues.idUsers,
+        file: urlFile
       })
       
       return res.status(200).json({ success: true, msg: "Message bien ajouté" })
