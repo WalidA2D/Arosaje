@@ -70,7 +70,7 @@ class MessageController {
       if(!record) return res.status(500).json({ success : false, msg:"Message cible introuvable ou déjà supprimé"})
       if(record.dataValues.idUser !== user.dataValues.idUsers) return res.status(413).json({ success: false, msg:"Droits requis" })
       await record.destroy();
-      return res.status(200).json({ success : false, msg:"Message bien supprimé"})
+      return res.status(200).json({ success : true, msg:"Message bien supprimé"})
     } catch (e){
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la suppression du message" });
