@@ -11,16 +11,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function ActuMap() {
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [loading, setLoading] = useState(false);
-  const [markers, setMarkers] = useState<{ latitude: number, longitude: number }[]>([]);
+  const [markers, setMarkers] = useState<{ latitude: number, longitude: number, id: string }[]>([]);
   const mapRef = useRef<any>(null);
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
-  // Add a state to store the selected marker
-  const [selectedMarker, setSelectedMarker] = useState<{ latitude: number, longitude: number } | null>(null);
-
-  // Update the handleMarkerPress function to set the selected marker
-  const handleMarkerPress = (marker: { latitude: number, longitude: number }) => {
-    setSelectedMarker(marker);
+  const handleMarkerPress = (id: string) => {
+    console.log(id);
+    if (id) {
+      navigation.navigate('BlogFocus', { id });
+    }
   };
 
   useEffect(() => {
@@ -55,11 +54,11 @@ export default function ActuMap() {
 
         if (data.success && data.posts) {
             const filteredPosts = data.posts.filter(post => !post.accepted && post.acceptedBy === null);
-            const markersData = await Promise.all(filteredPosts.map(async (post: { address: string, cityName: string }) => {
+            const markersData = await Promise.all(filteredPosts.map(async (post: { address: string, cityName: string, id: string }) => {
                 const address = post.address;
                 const cityName = post.cityName;
                 const coordinates = await fetchCoordinates(address, cityName);
-                return coordinates;
+                return { ...coordinates, id: post.id };
             }));
             setMarkers(markersData);
         } else {
@@ -100,6 +99,24 @@ export default function ActuMap() {
     setLoading(false);
   };
 
+  useEffect(() => {
+    const handleMessage = (event: any) => {
+      const markerId = event.nativeEvent.data;
+      handleMarkerPress(markerId);
+    };
+
+    const currentMapRef = mapRef.current;
+    if (currentMapRef) {
+      currentMapRef.addEventListener('message', handleMessage);
+    }
+
+    return () => {
+      if (currentMapRef) {
+        currentMapRef.removeEventListener('message', handleMessage);
+      }
+    };
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.mapContainer}>
@@ -109,7 +126,7 @@ export default function ActuMap() {
             latitude={location.coords.latitude}
             longitude={location.coords.longitude}
             markers={markers}
-            onMarkerPress={handleMarkerPress} // Pass the handleMarkerPress function to the map component
+            onMarkerPress={handleMarkerPress}
           />
         ) : (
           <Loading />
