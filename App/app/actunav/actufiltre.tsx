@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Modal, Alert, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Modal, Alert, Keyboard, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import RNPickerSelect from 'react-native-picker-select';
 
@@ -13,6 +13,7 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [cities, setCities] = useState<Array<{ label: string, value: string }>>([]);
   const [plantOrigins, setPlantOrigins] = useState<Array<{ label: string, value: string }>>([]);
+  const [loading, setLoading] = useState<boolean>(true); // État pour le loader
 
   useEffect(() => {
     const fetchCities = async () => {
@@ -42,6 +43,8 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
       } catch (error) {
         console.error('Erreur lors de la récupération des origines des plantes:', error);
         Alert.alert('Erreur', 'Impossible de récupérer la liste des origines des plantes.');
+      } finally {
+        setLoading(false); // Arrêter le chargement une fois que les données sont récupérées
       }
     };
 
@@ -75,6 +78,15 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
       setShowEndDatePicker(false);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#668F80" />
+        <Text style={styles.loaderText}>Chargement...</Text>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -239,6 +251,16 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loaderText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#4A6670',
   },
 });
 

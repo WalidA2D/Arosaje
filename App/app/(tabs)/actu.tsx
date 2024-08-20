@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput, RefreshControl  } from 'react-native';
 import { NavigationContainer, useNavigation, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -101,17 +101,21 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string>('');
-  const [saut, setSaut] = useState<number>(0);
-  const quantite = 5;
+  const [quantite] = useState(5);
+  const sautRef = useRef<number>(0);
 
   const fetchPosts = async (isRefreshing: boolean = false) => {
     if (isRefreshing) {
       setRefreshing(true);
+      sautRef.current = 0; // Réinitialiser sautRef lors du rafraîchissement
+      setItems([]); // Réinitialiser les items lors du rafraîchissement
     } else {
       setLoading(true);
     }
-    const queryString = route.params?.queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`;
-    const url = queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${saut}`;
+
+    const currentSaut = isRefreshing ? 0 : sautRef.current;
+    const queryString = route.params?.queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${currentSaut}`;
+    const url = queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${currentSaut}`;
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -140,8 +144,8 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
             };
           });
 
-          setItems((prevItems) => (saut === 0 ? newItems : [...prevItems, ...newItems]));
-          setSaut((prevSaut) => prevSaut + quantite);
+          setItems((prevItems) => (isRefreshing ? newItems : [...prevItems, ...newItems]));
+          sautRef.current = sautRef.current + quantite; // Mettre à jour sautRef
           setError('');
         }
       } else {
@@ -173,11 +177,9 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
   }, []);
 
   const onRefresh = () => {
-    setError('');
-    setSaut(0);
-    setItems([]);
     fetchPosts(true); // Passe `true` pour indiquer un rafraîchissement
   };
+
   return (
     <>
       <View style={styles.container}>
@@ -189,33 +191,33 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
           onChangeText={(text) => setSearchQuery(text)}
         />
         <FlatList
-  refreshing={refreshing}
-  onRefresh={onRefresh}
-  contentContainerStyle={styles.scrollViewContent}
-  data={items}
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => (
-    <ContentItem
-      id={item.id}
-      images={item.images}
-      title={item.title}
-      description={item.description}
-      time={item.time}
-      onPress={blogFocusNavigate}
-    />
-  )}
-  onEndReached={loadMoreItems}
-  onEndReachedThreshold={0.5}
-  ListFooterComponent={loading && !refreshing ? <ActivityIndicator size="large" color="#668F80" /> : null}
-  refreshControl={
-    <RefreshControl
-      refreshing={refreshing}
-      onRefresh={onRefresh}
-      tintColor ={'#668F80'} // Couleur du loader sur iOS
-      colors={['#668F80']} // Couleur du loader sur android
-    />
-  }
-/>
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          contentContainerStyle={styles.scrollViewContent}
+          data={items}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <ContentItem
+              id={item.id}
+              images={item.images}
+              title={item.title}
+              description={item.description}
+              time={item.time}
+              onPress={blogFocusNavigate}
+            />
+          )}
+          onEndReached={loadMoreItems}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={loading && !refreshing ? <ActivityIndicator size="large" color="#668F80" /> : null}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={'#668F80'} // Couleur du loader sur iOS
+              colors={['#668F80']} // Couleur du loader sur android
+            />
+          }
+        />
         {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
     </>
