@@ -14,7 +14,11 @@ class ConversationsController {
 
       const { dateStart, dateEnd, idUser1, idUser2 } = req.body;
 
-
+      if(user.dataValues.idUsers !== idUser1
+        && user.dataValues.idUsers !== idUser2
+      ){
+        return res.status(413).json({ success: false, msg:"Droits requis"})
+      }
 
       // await ConvInstance.findOne({ where : { idUser1 : idUser1, idUser2 : idUser2 } })
 
@@ -106,13 +110,19 @@ class ConversationsController {
       const { id } = req.params
       const record = await ConvInstance.findOne({ where : { idConversations : id }})
       if(!record) return res.status(500).json({ success : false, msg:"Conversation cible introuvable ou déjà supprimé"})
+      
+      if(user.dataValues.idUsers !== record.dataValues.idUser1
+        && user.dataValues.idUsers !== record.dataValues.idUser2
+      ){
+        return res.status(413).json({ success: false, msg:"Droits requis"})
+      }
       await record.destroy();
       
       const messagesConv = await MessageInstance.findAll({ where : { idConversation : record.dataValues.idConversations }})
       for (const message of messagesConv) {
         await message.destroy();
       }
-      return res.status(200).json({ success : false, msg:"Conversation bien supprimé"})
+      return res.status(200).json({ success : true, msg:"Conversation bien supprimée"})
     } catch (e){
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la suppression de la conversation" });
