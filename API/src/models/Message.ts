@@ -7,6 +7,7 @@ interface MessageAttributes {
   publishedAt: Date;
   idConversation: number | null;
   idUser: number;
+  file: string;
 }
 
 export interface MessageCreationAttributes extends Optional<MessageAttributes, 'idMessages'> {}
@@ -20,6 +21,7 @@ MessageInstance.init(
     publishedAt: { type: DataTypes.DATE, allowNull: true, defaultValue: DataTypes.NOW },
     idConversation: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Conversations', key: 'idConversations' } },
     idUser: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Users', key: 'idUsers' } },
+    file: { type:DataTypes.STRING, allowNull: true }
   },
   { sequelize: db, tableName: 'Messages', timestamps: false }
 );
