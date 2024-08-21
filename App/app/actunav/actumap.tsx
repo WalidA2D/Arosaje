@@ -1,26 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import * as Location from 'expo-location';
 import axios from 'axios';
 
 import OpenLayersMap from '../../components/OpenLayersMap';
 import Loading from '../../components/Loading';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+type RootStackParamList = {
+  BlogFocus: { id: string };
+};
+
 export default function ActuMap() {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [loading, setLoading] = useState(false);
   const [markers, setMarkers] = useState<{ latitude: number, longitude: number, id: string }[]>([]);
   const mapRef = useRef<any>(null);
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
-
-  const handleMarkerPress = (id: string) => {
-    console.log(id);
-    if (id) {
-      navigation.navigate('BlogFocus', { id });
-    }
-  };
 
   useEffect(() => {
     (async () => {
@@ -32,8 +30,6 @@ export default function ActuMap() {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
-
-      // Fetch user posts to get markers
       fetchUserPosts();
     })();
   }, []);
@@ -41,31 +37,36 @@ export default function ActuMap() {
   const fetchUserPosts = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': userToken || '',
-        }
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userToken || '',
+      }
     };
 
     try {
-        const response = await fetch(`${apiUrl}/post/read`, options);
-        const data = await response.json();
+      const response = await fetch(`${apiUrl}/post/read`, options);
+      const data = await response.json();
 
-        if (data.success && data.posts) {
-            const filteredPosts = data.posts.filter(post => !post.accepted && post.acceptedBy === null);
-            const markersData = await Promise.all(filteredPosts.map(async (post: { address: string, cityName: string, id: string }) => {
-                const address = post.address;
-                const cityName = post.cityName;
-                const coordinates = await fetchCoordinates(address, cityName);
-                return { ...coordinates, id: post.id };
-            }));
-            setMarkers(markersData);
-        } else {
-            console.error('Failed to fetch posts:', data.message);
-        }
+      if (data.success && data.posts) {
+        const filteredPosts = data.posts.filter((post: { accepted: boolean; acceptedBy: any; address: string; cityName: string; idPosts: string; }) => !post.accepted && post.acceptedBy === null);
+        const markersData = await Promise.all(filteredPosts.map(async (post: { address: string; cityName: string; idPosts: string; }) => {
+          const coordinates = await fetchCoordinates(post.address, post.cityName);
+          if (coordinates) {
+            return { 
+              latitude: Number(coordinates.latitude),
+              longitude: Number(coordinates.longitude),
+              id: post.idPosts
+            };
+          }
+          return null;
+        }));
+        setMarkers(markersData.filter(marker => marker !== null));
+      } else {
+        console.error('Failed to fetch posts:', data.message);
+      }
     } catch (error) {
-        console.error('Error fetching posts:', error);
+      console.error('Error fetching posts:', error);
     }
   };
 
@@ -74,48 +75,19 @@ export default function ActuMap() {
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(formattedAddress)}&format=json`;
 
     try {
-        const response = await axios.get(url);
-        
-        if (response.data && response.data.length > 0) {
-            const { lat, lon } = response.data[0];
-            return { latitude: lat, longitude: lon };
-        } else {
-            console.error('No results found for the address:', formattedAddress);
-            return null;
-        }
-    } catch (error) {
-        console.error('Error fetching coordinates:', error);
+      const response = await axios.get(url);
+      if (response.data && response.data.length > 0) {
+        const { lat, lon } = response.data[0];
+        return { latitude: lat, longitude: lon };
+      } else {
+        console.error('No results found for the address:', formattedAddress);
         return null;
-    }
-  };
-
-  const recenterMap = async () => {
-    setLoading(true);
-    let location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
-    if (mapRef.current) {
-      (mapRef.current as any).setCenter([location.coords.longitude, location.coords.latitude]);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    const handleMessage = (event: any) => {
-      const markerId = event.nativeEvent.data;
-      handleMarkerPress(markerId);
-    };
-
-    const currentMapRef = mapRef.current;
-    if (currentMapRef) {
-      currentMapRef.addEventListener('message', handleMessage);
-    }
-
-    return () => {
-      if (currentMapRef) {
-        currentMapRef.removeEventListener('message', handleMessage);
       }
-    };
-  }, []);
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      return null;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -126,19 +98,15 @@ export default function ActuMap() {
             latitude={location.coords.latitude}
             longitude={location.coords.longitude}
             markers={markers}
-            onMarkerPress={handleMarkerPress}
+            onMarkerPress={(id) => {
+                console.log('Navigating to BlogFocus with ID:', id);
+                navigation.navigate('BlogFocus', { id });
+            }} // Passer la fonction de navigation ici
           />
         ) : (
           <Loading />
         )}
       </View>
-      <TouchableOpacity style={styles.button} onPress={recenterMap} disabled={loading}>
-        {loading ? (
-          <Loading />
-        ) : (
-          <Ionicons name="navigate-outline" size={32} color="#fff" />
-        )}
-      </TouchableOpacity>
     </View>
   );
 }
@@ -149,15 +117,5 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-  },
-  button: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#668F80',
-    padding: 10,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignContent: 'center',
   },
 });

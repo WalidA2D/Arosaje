@@ -132,7 +132,7 @@ class PostController {
       return res.status(200).json({ success: true, record });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ success: false, msg: "Erreur lorsde la lecture" });
+      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture" });
     }
   }
 
@@ -146,6 +146,23 @@ class PostController {
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la recherche d'un post par l'id" });
+    }
+  }
+
+  async readMissions(req: Request, res: Response) {
+    try {
+      const token = req.headers.authorization?.split(" ")[0];
+      if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
+      const user = await UserInstance.findOne({ where: { uid: token } });
+      if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
+
+      const missions = await PostInstance.findAll({ where: { acceptedBy: user.dataValues.idUsers } });
+      if (!missions) return res.status(404).json({ success: false, msg: "Aucune mission trouvée." });
+
+      return res.status(200).json({ success: true, missions });
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ success: false, msg: "Erreur lors de la recherche de missions" });
     }
   }
 

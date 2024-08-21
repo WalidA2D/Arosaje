@@ -1,7 +1,14 @@
 import React, { useImperativeHandle, forwardRef } from 'react';
 import { WebView } from 'react-native-webview';
 
-const OpenLayersMap = forwardRef(({ latitude, longitude, markers, onMarkerPress }, ref) => {
+type OpenLayersMapProps = {
+  latitude: number;
+  longitude: number;
+  markers: Array<{ id: string; latitude: number; longitude: number }>;
+  onMarkerPress: (markerId: string) => void; // Prop for navigation function
+};
+
+const OpenLayersMap = forwardRef(({ latitude, longitude, markers, onMarkerPress }: OpenLayersMapProps, ref) => {
   const markersJSArray = JSON.stringify(markers);
 
   const html = `
@@ -71,10 +78,12 @@ const OpenLayersMap = forwardRef(({ latitude, longitude, markers, onMarkerPress 
 
         var markers = ${markersJSArray};
 
+        console.log('Markers before passing to OpenLayersMap:', markers); // Log des markers
         markers.forEach(function(marker) {
+          console.log('Marker data:', marker); // Log des données du marker
           var iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(ol.proj.fromLonLat([marker.longitude, marker.latitude])),
-            id: marker.id
+            id: marker.id // Assurez-vous que marker.id est bien défini
           });
 
           iconFeature.setStyle(iconStyle);
@@ -85,21 +94,19 @@ const OpenLayersMap = forwardRef(({ latitude, longitude, markers, onMarkerPress 
         map.addInteraction(select);
 
         select.on('select', function(e) {
-          var selectedFeature = e.selected[0];
-          if (selectedFeature) {
-            var markerId = selectedFeature.get('id');
-            console.log('Marker clicked:', markerId); // Added console.log
-            window.ReactNativeWebView.postMessage(markerId); // Pass markerId to the WebView
-            {{ onMarkerPress(markerId) }} // Added onMarkerPress call
+          if (e.selected.length > 0) {
+            var selectedFeature = e.selected[0];
+            var markerId = selectedFeature.get('id'); // Récupérer l'ID du marker
+
+            // Vérifiez si markerId est défini
+            if (markerId) {
+                console.log('Marker clicked:', markerId);
+                window.ReactNativeWebView.postMessage(markerId); // Envoyer l'ID au WebView
+            } else {
+                console.log('Marker ID is undefined or null, navigation aborted.'); // Log pour le débogage
+            }
           }
         });
-
-        useImperativeHandle(ref, () => ({
-          setCenter(coords) {
-            const view = map.getView();
-            view.setCenter(ol.proj.fromLonLat(coords));
-          }
-        }));
       });
     </script>
     </body>
@@ -111,6 +118,13 @@ const OpenLayersMap = forwardRef(({ latitude, longitude, markers, onMarkerPress 
       originWhitelist={['*']}
       source={{ html }}
       style={{ flex: 1 }}
+      onMessage={(event) => {
+        const markerId = event.nativeEvent.data;
+        console.log('Received marker ID:', markerId);
+        if (markerId) {
+          onMarkerPress(markerId); // Appeler la fonction de navigation
+        }
+      }}
     />
   );
 });
