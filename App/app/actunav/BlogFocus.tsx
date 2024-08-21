@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 type RootStackParamList = {
   Actualités: undefined;
   Filtre: undefined;
+  Carte: undefined;
   BlogFocus: { id: string };
 };
 
