@@ -1,36 +1,32 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const cors = require('cors');
+socket.on('sendMessage', async (data) => {
+  const { conversationId, message } = data;
+  console.log(`Message received from ${socket.id} in conversation ${conversationId}:`, message);
 
-const app = express();
-app.use(cors());
+  // Enregistrez le message dans la base de données via votre API REST
+  try {
+    const userToken = await AsyncStorage.getItem('userToken');
+    const response = await fetch(`${apiUrl}/msg/add`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userToken, // Remplacez par le token approprié
+      },
+      body: JSON.stringify({
+        text: message.text,
+        idConversation: conversationId,
+        idUser: message.senderId,
+        file: message.image || null,
+      }),
+    });
 
-const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: '*',
-  },
+    const result = await response.json();
+    if (!result.success) {
+      console.error('Failed to save message to API:', result.msg);
+    }
+  } catch (error) {
+    console.error('Error saving message to API:', error);
+  }
+
+  // Ensuite, envoyez le message aux autres clients connectés à cette conversation
+  io.to(conversationId).emit('receiveMessage', message);
 });
-
-io.on('connection', (socket) => {
-  console.log('New client connected, socket id:', socket.id);
-
-  socket.on('joinConversation', (conversationId) => {
-    socket.join(conversationId);
-    console.log(`Client with socket id ${socket.id} joined conversation: ${conversationId}`);
-  });
-
-  socket.on('sendMessage', (data) => {
-    const { conversationId, message } = data;
-    console.log(`Message received from ${socket.id} in conversation ${conversationId}:`, message);
-    io.to(conversationId).emit('receiveMessage', message);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected, socket id:', socket.id);
-  });
-});
-
-const PORT = 4000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

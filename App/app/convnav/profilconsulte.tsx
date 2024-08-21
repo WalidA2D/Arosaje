@@ -111,18 +111,12 @@ export default function ProfileConsultView() {
           >
             <Text style={[styles.selectorText, selectedTab === 'Posts' && styles.activeText]}>Posts</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.selectorButton, selectedTab === 'Images' && styles.activeButton]}
-            onPress={() => setSelectedTab('Images')}
-          >
-            <Text style={[styles.selectorText, selectedTab === 'Images' && styles.activeText]}>Images</Text>
-          </TouchableOpacity>
+         
         </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.body}>
-          {selectedTab === 'Posts' ? (
             <View>
               {posts.map((post, index) => (
                 <View key={index} style={styles.post}>
@@ -132,19 +126,6 @@ export default function ProfileConsultView() {
                 </View>
               ))}
             </View>
-          ) : (
-            <View>
-              <View style={styles.image}>
-                <Image source={require('@/assets/images/plante1.jpg')} style={styles.imageContent} />
-              </View>
-              <View style={styles.image}>
-                <Image source={require('@/assets/images/plante2.jpg')} style={styles.imageContent} />
-              </View>
-              <View style={styles.image}>
-                <Image source={require('@/assets/images/plante3.jpg')} style={styles.imageContent} />
-              </View>
-            </View>
-          )}
         </View>
       </ScrollView>
     </View>

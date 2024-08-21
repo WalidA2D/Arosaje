@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
-import { useNavigation, NavigationContainer } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 
 import MessageScreen from '../convnav/messages';
 import ChatbotScreen from '../convnav/bot';
@@ -25,87 +26,98 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function ConvScreen() {
   return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator
-        initialRouteName="Conversations"
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#668F80',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            color: '#FFF',
-            fontSize: 24,
-            fontWeight: 'bold',
-          },
-        }}
-      >
-        <Stack.Screen name="Conversations" component={ExploreScreen} />
-        <Stack.Screen name="Message" component={MessageScreen} options={{ headerBackTitleVisible: false }} />
-        <Stack.Screen name="Chatbot" component={ChatbotScreen} options={{ headerBackTitleVisible: false }} />
-        <Stack.Screen name="Histoire" component={Histoire} options={{ headerBackTitleVisible: false }} />
-        <Stack.Screen name="Profil" component={Profil} options={{ headerBackTitleVisible: false }} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator
+      initialRouteName="Conversations"
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#668F80',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          color: '#FFF',
+          fontSize: 24,
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      <Stack.Screen name="Conversations" component={ExploreScreen} />
+      <Stack.Screen name="Message" component={MessageScreen} options={{ headerBackTitleVisible: false }} />
+      <Stack.Screen name="Chatbot" component={ChatbotScreen} options={{ headerBackTitleVisible: false }} />
+      <Stack.Screen name="Histoire" component={Histoire} options={{ headerBackTitleVisible: false }} />
+      <Stack.Screen name="Profil" component={Profil} options={{ headerBackTitleVisible: false }} />
+    </Stack.Navigator>
   );
 }
 
 type User = {
+  id: number;
   userName: string;
   avatar: any;
   initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }>;
 };
 
-const initialUsers: User[] = [
-  {
-    userName: 'Chatbot',
-    avatar: require('../../assets/images/bot.png'),
-    initialMessages: [
-      { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
-    ],
-  },
-  {
-    userName: 'Jean Dupuis',
-    avatar: 'https://picsum.photos/620/300',
-    initialMessages: [],
-  },
-  {
-    userName: 'Marie Curie',
-    avatar: 'https://picsum.photos/620/300',
-    initialMessages: [],
-  },
-  // Add more users here
-];
-
 export function ExploreScreen() {
   const navigation = useNavigation<ExploreScreenNavigationProp>();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useState<User[]>([]);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]); // Changer le type en number[] pour stocker les ID des conversations
+  const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
   useEffect(() => {
-    const loadMessagesForUsers = async () => {
-      const updatedUsers = await Promise.all(users.map(async (user) => {
-        const messages = await loadMessages(user.userName);
-        return { ...user, initialMessages: messages.length ? messages : user.initialMessages };
-      }));
-      setUsers(updatedUsers);
+    const fetchConversations = async () => {
+      const userToken = await AsyncStorage.getItem('userToken');
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': userToken || '',
+        },
+      };
+
+      try {
+        const response = await fetch(`${apiUrl}/conv/read`, options);
+        const data = await response.json();
+
+        if (data.success) {
+          const apiUsers = data.conversations.map((conv: any) => ({
+            id: conv.idConversation, // Utilisez l'ID de la conversation
+            userName: `${conv.firstName} ${conv.lastName}`, 
+            avatar: conv.photo, 
+            initialMessages: [],  
+          }));
+
+          const chatbotUser: User = {
+            id: 0,
+            userName: 'Chatbot',
+            avatar: require('../../assets/images/bot.png'),
+            initialMessages: [
+              { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
+            ],
+          };
+
+          setUsers([chatbotUser, ...apiUsers]);
+        } else {
+          console.error('No conversations found or data.success is false');
+          setUsers([
+            {
+              id: 0,
+              userName: 'Chatbot',
+              avatar: require('../../assets/images/bot.png'),
+              initialMessages: [
+                { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
+              ],
+            }
+          ]);
+        }
+      } catch (error) {
+        console.error('Error fetching conversations:', error);
+      }
     };
 
-    loadMessagesForUsers();
+    fetchConversations();
   }, []);
-
-  const loadMessages = async (userName: string) => {
-    try {
-      const savedMessages = await AsyncStorage.getItem(`messages_${userName}`);
-      return savedMessages ? JSON.parse(savedMessages) : [];
-    } catch (error) {
-      console.error("Failed to load messages:", error);
-      return [];
-    }
-  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -127,24 +139,24 @@ export function ExploreScreen() {
     }
   }, [selectedUsers]);
 
-  const handleLongPressUser = (userName: string) => {
-    if (userName !== 'Chatbot') {
+  const handleLongPressUser = (id: number) => {
+    if (id !== 0) { // Ne pas sélectionner le Chatbot
       setIsSelecting(true);
-      setSelectedUsers([userName]);
+      setSelectedUsers([id]);
     }
   };
 
-  const handleSelectUser = (userName: string) => {
-    if (userName !== 'Chatbot') {
+  const handleSelectUser = (id: number) => {
+    if (id !== 0) {
       setSelectedUsers(prevSelectedUsers =>
-        prevSelectedUsers.includes(userName)
-          ? prevSelectedUsers.filter(name => name !== userName)
-          : [...prevSelectedUsers, userName]
+        prevSelectedUsers.includes(id)
+          ? prevSelectedUsers.filter(convId => convId !== id)
+          : [...prevSelectedUsers, id]
       );
     }
   };
 
-  const handleDeleteSelectedUsers = () => {
+  const handleDeleteSelectedUsers = async () => {
     Alert.alert(
       'Supprimer les conversations',
       `Êtes-vous sûr de vouloir supprimer les conversations sélectionnées ?`,
@@ -156,8 +168,34 @@ export function ExploreScreen() {
         {
           text: 'Supprimer',
           style: 'destructive',
-          onPress: () => {
-            setUsers((prevUsers: User[]) => prevUsers.filter(user => !selectedUsers.includes(user.userName)));
+          onPress: async () => {
+            const userToken = await AsyncStorage.getItem('userToken');
+            
+            for (const convId of selectedUsers) {
+              const options = {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': userToken || '',
+                },
+              };
+
+              try {
+                const response = await fetch(`${apiUrl}/conv/delete/${convId}`, options);
+                const data = await response.json();
+                
+                if (data.success) {
+                  console.log(`Conversation avec l'ID ${convId} supprimée avec succès.`);
+                } else {
+                  console.error(`Échec de la suppression de la conversation avec l'ID ${convId}:`, data.message);
+                }
+              } catch (error) {
+                console.error(`Erreur lors de la suppression de la conversation avec l'ID ${convId}:`, error);
+              }
+            }
+
+            // Mettre à jour la liste des utilisateurs en filtrant ceux qui ont été supprimés
+            setUsers((prevUsers: User[]) => prevUsers.filter(user => !selectedUsers.includes(user.id)));
             setIsSelecting(false);
             setSelectedUsers([]);
           },
@@ -187,15 +225,15 @@ export function ExploreScreen() {
       <ScrollView>
         {filteredUsers.map((user: User) => (
           <TouchableOpacity
-            key={user.userName}
-            onLongPress={() => handleLongPressUser(user.userName)}
-            onPress={() => isSelecting ? handleSelectUser(user.userName) : user.userName === 'Chatbot' ? navigation.navigate('Chatbot') : navigation.navigate('Message', {
+            key={user.id}
+            onLongPress={() => handleLongPressUser(user.id)}
+            onPress={() => isSelecting ? handleSelectUser(user.id) : user.userName === 'Chatbot' ? navigation.navigate('Chatbot') : navigation.navigate('Message', {
               userName: user.userName,
               initialMessages: user.initialMessages,
             })}
             style={[
               styles.chatItemContainer,
-              selectedUsers.includes(user.userName) && styles.userSelected
+              selectedUsers.includes(user.id) && styles.userSelected
             ]}
           >
             <View style={styles.chatItem}>
