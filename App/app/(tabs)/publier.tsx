@@ -123,6 +123,7 @@ function PublierContent() {
   const [planteName, setPlante] = useState('');
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [isSending, setIsSending] = useState(false); // Ajout d'un état pour gérer l'envoi
 
   const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
@@ -143,6 +144,8 @@ function PublierContent() {
 
 
   const handleSend = async () => {
+    if (isSending) return; // Empêche l'envoi si déjà en cours
+    setIsSending(true); // Définit l'état à vrai pour indiquer que l'envoi est en cours
 
     try {
       const userToken = await AsyncStorage.getItem('userToken');
@@ -188,6 +191,8 @@ function PublierContent() {
       }
     } catch (error) {
       Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du post');
+    } finally {
+      setIsSending(false); // Réinitialise l'état après l'envoi
     }
   };
 
@@ -483,9 +488,9 @@ function PublierContent() {
             <Text style={styles.modalText}>Vérifiez attentivement les informations que vous envoyez. La saisie de fausses informations peut entraîner des conséquences indésirables.</Text>
             <View style={styles.fixedDetailsBtnModal}>
               <View style={styles.selectorContainer}>
-                <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => handleSend()}>
+                <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => handleSend()} disabled={isSending}>
                   <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
-                    Envoyer
+                    {isSending ? 'Envoi...' : 'Envoyer'}
                   </Text>
                 </TouchableOpacity>
               </View>

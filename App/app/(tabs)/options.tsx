@@ -112,8 +112,8 @@ function OptionsContent({ }) {
         <View style={styles.separatorDetails}/>
         <ListDash buttonText="Notifications" onPress={() => navigation.navigate('Notifications')} />
         <View style={styles.separatorDetails}/>
-        <ListDash buttonText="Devenir botaniste" onPress={() => navigation.navigate('Devenir botaniste')} />
-        <View style={styles.separatorDetails}/>
+        {/*<ListDash buttonText="Devenir botaniste" onPress={() => navigation.navigate('Devenir botaniste')} />
+        <View style={styles.separatorDetails}/>*/}
         <ListDash buttonText="Questions" onPress={() => navigation.navigate('Questions')} />
         <View style={styles.separatorDetails}/>
         <ListDash buttonText="Mes données" onPress={() => navigation.navigate('Mes données')} />

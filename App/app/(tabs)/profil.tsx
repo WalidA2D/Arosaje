@@ -270,6 +270,17 @@ export function ProfilScreen() {
     }
   };
 
+  const formatDateTime = (dateTimeString: string) => {
+    const date = new Date(dateTimeString);
+    return date.toLocaleString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).replace(',', ' à');
+  };
+
   useEffect(() => {
     fetchProfileData();
     if (route.params?.updated) {
@@ -316,13 +327,14 @@ export function ProfilScreen() {
   };
 
   const renderItem = ({ item }: { item: Post | Favorite }) => {
+    const formattedDate = formatDateTime(item.publishedAt);
     if (selectedTab === 'Posts') {
       // Affichage pour les posts
       return (
         <View style={styles.post}>
           <Text style={styles.postTitle}>{item.title}</Text>
           <Text style={styles.postContent}>{item.description}</Text>
-          <Text style={styles.postContent}>Publié le: {item.publishedAt}</Text>
+          <Text style={styles.postContent}>Publié le: {formattedDate}</Text>
         </View>
       );
     } else if (selectedTab === 'Favorites') {
@@ -332,7 +344,7 @@ export function ProfilScreen() {
           <Text style={styles.postTitle}>{item.title}</Text>
           <Text style={styles.postContent}>{item.description}</Text>
           <Text style={styles.postContent}>
-            Publié le: {item.publishedAt} 
+            Publié le: {formattedDate} 
           </Text>
           <TouchableOpacity
             onPress={() =>

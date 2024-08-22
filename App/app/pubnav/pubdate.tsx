@@ -35,7 +35,7 @@ export default function PubDate() {
       setSelectedEndDate('');
     } else if (new Date(day.dateString) >= new Date(selectedStartDate)) {
       if (day.dateString === selectedStartDate) {
-        setSelectedEndDate(''); // Si la date de début et de fin sont les mêmes, réinitialiser la date de fin
+        setSelectedEndDate(day.dateString); // Si la date de début et de fin sont les mêmes, réinitialiser la date de fin
       } else {
         setSelectedEndDate(day.dateString);
       }
