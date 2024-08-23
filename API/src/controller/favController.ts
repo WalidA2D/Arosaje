@@ -58,6 +58,7 @@ class FavController {
       if ( !favoriPointed ) return res.status(404).json({ success: false, msg:"Favori introuvable"})
       if ( favoriPointed.dataValues.idUser != user.dataValues.idUsers ) return res.status(413).json({ success: false, msg:"Droit requis"})
       await favoriPointed.destroy()
+      return res.status(200).json({ success: true, msg:"Favori bien supprimé"})
     } catch (e){
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la suppression du favori" });
