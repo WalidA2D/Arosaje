@@ -14,8 +14,8 @@ import Profil from '../convnav/profilconsulte';
 
 type RootStackParamList = {
   Conversations: undefined;
-  Message: { userName: string; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }> };
-  Profil: { userName: string };
+  Message: { userName: string; idUser: number, initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }> };
+  Profil: { idUser: number };
   Chatbot: undefined;
   Histoire: undefined;
 };
@@ -51,6 +51,7 @@ function ConvScreen() {
 
 type User = {
   id: number;
+  idUser: number;
   userName: string;
   avatar: any;
   initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }>;
@@ -82,7 +83,8 @@ export function ExploreScreen() {
 
         if (data.success) {
           const apiUsers = data.conversations.map((conv: any) => ({
-            id: conv.idConversation, // Utilisez l'ID de la conversation
+            id: conv.idConversation,
+            idUser: conv.idUser,
             userName: `${conv.firstName} ${conv.lastName}`, 
             avatar: conv.photo, 
             initialMessages: [],  
@@ -90,6 +92,7 @@ export function ExploreScreen() {
 
           const chatbotUser: User = {
             id: 0,
+            idUser:0,
             userName: 'Chatbot',
             avatar: require('../../assets/images/bot.png'),
             initialMessages: [
@@ -103,6 +106,7 @@ export function ExploreScreen() {
           setUsers([
             {
               id: 0,
+              idUser: 0,
               userName: 'Chatbot',
               avatar: require('../../assets/images/bot.png'),
               initialMessages: [
@@ -229,6 +233,7 @@ export function ExploreScreen() {
             onLongPress={() => handleLongPressUser(user.id)}
             onPress={() => isSelecting ? handleSelectUser(user.id) : user.userName === 'Chatbot' ? navigation.navigate('Chatbot') : navigation.navigate('Message', {
               userName: user.userName,
+              idUser: user.idUser,
               initialMessages: user.initialMessages,
             })}
             style={[
@@ -241,7 +246,7 @@ export function ExploreScreen() {
               <Text style={styles.chatName}>{user.userName}</Text>
               {user.userName !== 'Chatbot' && (
                 <TouchableOpacity
-                  onPress={() => navigation.navigate('Profil', { userName: user.userName })}
+                  onPress={() => navigation.navigate('Profil', { idUser: user.idUser })}
                 >
                   <Icon name="user" size={20} color="#668F80" style={{ marginLeft: 10 }} />
                 </TouchableOpacity>

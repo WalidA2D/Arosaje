@@ -13,8 +13,8 @@ const socket = io('http://192.168.1.24:4000');
 
 type RootStackParamList = {
   explore: undefined;
-  message: { userName: string; initialMessages: Array<{ id: string; text: string; sender: string; timestamp: string, image?: string }> };
-  Profil: { userName: string };
+  message: { userName: string; idUser: number; initialMessages: Array<{ id: string; text: string; sender: string; timestamp: string, image?: string }> };
+  Profil: { userName: string, idUser: number };
 };
 
 type MessageScreenNavigationProp = StackNavigationProp<RootStackParamList, 'message'>;
@@ -49,7 +49,7 @@ const formatDate = (timestamp: Date) => {
 export default function MessageScreen() {
   const navigation = useNavigation<MessageScreenNavigationProp>();
   const route = useRoute<MessageScreenRouteProp>();
-  const { userName, initialMessages: initialMessagesRaw } = route.params;
+  const { userName, idUser, initialMessages: initialMessagesRaw } = route.params;
 
   const initialMessages = initialMessagesRaw.map(message => ({
     ...message,
@@ -343,7 +343,7 @@ export default function MessageScreen() {
             <Icon name="search" size={20} color="#668F80" style={styles.searchIcon} />
           </View>
         )}
-        <TouchableOpacity onPress={() => navigation.navigate('Profil', { userName })}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil', { userName, idUser })}>
           <View style={styles.chatHeader}>
             <Image source={{ uri: 'https://picsum.photos/620/300' }} style={styles.avatar} />
             <Text style={styles.chatName}>{userName}</Text>
