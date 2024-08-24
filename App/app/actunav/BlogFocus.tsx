@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, Touchable
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/FontAwesome';  // Import de l'icône d'étoile
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 type RootStackParamList = {
   Actualités: undefined;
@@ -112,14 +112,18 @@ export default function BlogFocus() {
       if (result.success) {
         setIsFav(!isFav); // On inverse l'état du favori après l'opération
       } else {
-        console.error('Erreur dans la gestion des favoris8888:', result.message);
+        console.error('Erreur dans la gestion des favoris:', result.message);
       }
     } catch (error) {
-      console.error('Erreur lors de la gestion des favoris444:', error);
+      console.error('Erreur lors de la gestion des favoris:', error);
     }
   };
 
   const addComment = async () => {
+    if (commentText.length < 1) {
+      Alert.alert("Il n'est pas possible d'ajouter un commentaire vide.");
+      return
+    }
     try {
       const token = await AsyncStorage.getItem('userToken');
       const response = await fetch(`${apiUrl}/comment/create`, {
@@ -136,7 +140,7 @@ export default function BlogFocus() {
       });
   
       const result = await response.json();
-  
+
       if (result.success) {
   
         const newComment = result.record;
@@ -154,7 +158,7 @@ export default function BlogFocus() {
         setCommentText('');
         setCommentNote(0);
       } else {
-        console.error('Erreur lors de l\'ajout du commentaire:', result.message);
+        Alert.alert('Erreur lors de l\'ajout du commentaire:', result.error);
       }
     } catch (error) {
       console.error('Erreur lors de l\'ajout du commentaire:', error);

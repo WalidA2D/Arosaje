@@ -1,24 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Modal, Alert, Keyboard, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
-import { Calendar, DateData } from 'react-native-calendars';
-import RNPickerSelect from 'react-native-picker-select';
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
+  ActivityIndicator,
+} from "react-native";
+import { Calendar, DateData } from "react-native-calendars";
+import RNPickerSelect from "react-native-picker-select";
 
 export default function ActuFiltre({ navigation }: { navigation: any }) {
-  const [cityName, setCityName] = useState<string>('');
+  const [cityName, setCityName] = useState<string>("");
   const [dateStart, setDateStart] = useState<string | undefined>(undefined);
   const [dateEnd, setDateEnd] = useState<string | undefined>(undefined);
-  const [plantOrigin, setPlantOrigin] = useState<string>('');
+  const [plantOrigin, setPlantOrigin] = useState<string>("");
 
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [cities, setCities] = useState<Array<{ label: string, value: string }>>([]);
-  const [plantOrigins, setPlantOrigins] = useState<Array<{ label: string, value: string }>>([]);
-  const [loading, setLoading] = useState<boolean>(true); // État pour le loader
+  const [cities, setCities] = useState<Array<{ label: string; value: string }>>(
+    []
+  );
+  const [plantOrigins, setPlantOrigins] = useState<
+    Array<{ label: string; value: string }>
+  >([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [loadingSelect, setLoadingSelect] = useState<boolean>(false);
+  const [loadingField, setLoadingField] = useState<boolean>(false);
+  const [showPicker, setShowPicker] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCities = async () => {
       try {
-        const response = await fetch('http://api.geonames.org/searchJSON?country=FR&maxRows=1000&username=arosaje');
+        setLoading(true);
+        const response = await fetch(
+          "http://api.geonames.org/searchJSON?country=FR&maxRows=1000&username=arosaje"
+        );
         const data = await response.json();
         const cityOptions = data.geonames.map((city: any) => ({
           label: city.name,
@@ -26,25 +46,38 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
         }));
         setCities(cityOptions);
       } catch (error) {
-        console.error('Erreur lors de la récupération des villes:', error);
-        Alert.alert('Erreur', 'Impossible de récupérer la liste des villes.');
+        console.error("Erreur lors de la récupération des villes:", error);
+        Alert.alert("Erreur", "Impossible de récupérer la liste des villes.");
+      } finally {
+        setLoading(false);
       }
     };
 
     const fetchPlantOrigins = async () => {
       try {
-        const response = await fetch('https://my-api.plantnet.org/v2/species?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF');
+        setLoading(true);
+        const response = await fetch(
+          "https://my-api.plantnet.org/v2/species?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF"
+        );
         const data = await response.json();
         const originOptions = data.map((plant: any) => ({
-          label: plant.commonNames.join(', ') || plant.scientificNameWithoutAuthor,
-          value: plant.commonNames.join(', ') || plant.scientificNameWithoutAuthor,
+          label:
+            plant.commonNames.join(", ") || plant.scientificNameWithoutAuthor,
+          value:
+            plant.commonNames.join(", ") || plant.scientificNameWithoutAuthor,
         }));
         setPlantOrigins(originOptions);
       } catch (error) {
-        console.error('Erreur lors de la récupération des origines des plantes:', error);
-        Alert.alert('Erreur', 'Impossible de récupérer la liste des origines des plantes.');
+        console.error(
+          "Erreur lors de la récupération des origines des plantes:",
+          error
+        );
+        Alert.alert(
+          "Erreur",
+          "Impossible de récupérer la liste des origines des plantes."
+        );
       } finally {
-        setLoading(false); // Arrêter le chargement une fois que les données sont récupérées
+        setLoading(false);
       }
     };
 
@@ -54,7 +87,7 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
 
   const handleSearch = () => {
     if (!cityName && !dateStart && !dateEnd && !plantOrigin) {
-      Alert.alert('Erreur', 'Veuillez renseigner au moins un champ.');
+      Alert.alert("Erreur", "Veuillez renseigner au moins un champ.");
       return;
     }
 
@@ -64,29 +97,43 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
     if (cityName) queryString += `&cityName=${encodeURIComponent(cityName)}`;
     if (dateStart) queryString += `&dateStart=${dateStart}`;
     if (dateEnd) queryString += `&dateEnd=${dateEnd}`;
-    if (plantOrigin) queryString += `&plantOrigin=${encodeURIComponent(plantOrigin)}`;
+    if (plantOrigin)
+      queryString += `&plantOrigin=${encodeURIComponent(plantOrigin)}`;
 
-    navigation.goBack({ queryString });
+    navigation.navigate("Actualités", {
+      cityName,
+      dateStart,
+      dateEnd,
+      plantOrigin,
+    });
   };
 
-  const handleDayPress = (day: DateData, type: 'start' | 'end') => {
-    if (type === 'start') {
+  const handleDayPress = (day: DateData, type: "start" | "end") => {
+    if (type === "start") {
       setDateStart(day.dateString);
       setShowStartDatePicker(false);
-    } else if (type === 'end') {
+    } else if (type === "end") {
       setDateEnd(day.dateString);
       setShowEndDatePicker(false);
     }
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#668F80" />
-        <Text style={styles.loaderText}>Chargement...</Text>
-      </View>
-    );
-  }
+  const handleSelectChange = (value: string | null) => {
+    setLoadingSelect(true);
+    setPlantOrigin(value ?? "");
+    setTimeout(() => setLoadingSelect(false), 3000);
+  };
+
+  const handleFieldClick = () => {
+    if (!loadingField) {
+      setLoadingField(true);
+      setShowPicker(true);
+
+      setTimeout(() => {
+        setLoadingField(false);
+      }, 3000);
+    }
+  };
 
   return (
     <>
@@ -94,9 +141,9 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
         <View style={styles.container}>
           <Text style={styles.label}>Ville</Text>
           <RNPickerSelect
-            placeholder={{ label: 'Sélectionnez une ville', value: null }}
+            placeholder={{ label: "Sélectionnez une Ville", value: null }}
             value={cityName}
-            onValueChange={(value) => setCityName(value)}
+            onValueChange={(value) => setCityName(value ?? "")}
             items={cities}
             style={pickerSelectStyles}
           />
@@ -108,23 +155,39 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
             </Text>
           </TouchableOpacity>
           {showStartDatePicker && (
-            <Modal transparent={true} animationType="fade" visible={showStartDatePicker}>
-              <TouchableWithoutFeedback onPress={() => setShowStartDatePicker(false)}>
+            <Modal
+              transparent={true}
+              animationType="fade"
+              visible={showStartDatePicker}
+            >
+              <TouchableWithoutFeedback
+                onPress={() => setShowStartDatePicker(false)}
+              >
                 <View style={styles.datePickerContainer}>
                   <View style={styles.datePickerWrapper}>
-                    <TouchableOpacity style={styles.closeButton} onPress={() => setShowStartDatePicker(false)}>
+                    <TouchableOpacity
+                      style={styles.closeButton}
+                      onPress={() => setShowStartDatePicker(false)}
+                    >
                       <Text style={styles.closeButtonText}>×</Text>
                     </TouchableOpacity>
 
                     <Calendar
-                      markedDates={{ [dateStart?.toString().split('T')[0] || '']: { selected: true, selectedColor: '#668F80' } }}
-                      onDayPress={(day: DateData) => handleDayPress(day, 'start')}
+                      markedDates={{
+                        [dateStart?.toString().split("T")[0] || ""]: {
+                          selected: true,
+                          selectedColor: "#668F80",
+                        },
+                      }}
+                      onDayPress={(day: DateData) =>
+                        handleDayPress(day, "start")
+                      }
                       theme={{
-                        todayTextColor: '#668F80',
-                        selectedDayBackgroundColor: '#668F80',
-                        arrowColor: '#668F80',
-                        monthTextColor: '#4A6670',
-                        textSectionTitleColor: '#4A6670',
+                        todayTextColor: "#668F80",
+                        selectedDayBackgroundColor: "#668F80",
+                        arrowColor: "#668F80",
+                        monthTextColor: "#4A6670",
+                        textSectionTitleColor: "#4A6670",
                       }}
                     />
                   </View>
@@ -140,23 +203,37 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
             </Text>
           </TouchableOpacity>
           {showEndDatePicker && (
-            <Modal transparent={true} animationType="fade" visible={showEndDatePicker}>
-              <TouchableWithoutFeedback onPress={() => setShowEndDatePicker(false)}>
+            <Modal
+              transparent={true}
+              animationType="fade"
+              visible={showEndDatePicker}
+            >
+              <TouchableWithoutFeedback
+                onPress={() => setShowEndDatePicker(false)}
+              >
                 <View style={styles.datePickerContainer}>
                   <View style={styles.datePickerWrapper}>
-                    <TouchableOpacity style={styles.closeButton} onPress={() => setShowEndDatePicker(false)}>
+                    <TouchableOpacity
+                      style={styles.closeButton}
+                      onPress={() => setShowEndDatePicker(false)}
+                    >
                       <Text style={styles.closeButtonText}>×</Text>
                     </TouchableOpacity>
 
                     <Calendar
-                      markedDates={{ [dateEnd?.toString().split('T')[0] || '']: { selected: true, selectedColor: '#668F80' } }}
-                      onDayPress={(day: DateData) => handleDayPress(day, 'end')}
+                      markedDates={{
+                        [dateEnd?.toString().split("T")[0] || ""]: {
+                          selected: true,
+                          selectedColor: "#668F80",
+                        },
+                      }}
+                      onDayPress={(day: DateData) => handleDayPress(day, "end")}
                       theme={{
-                        todayTextColor: '#668F80',
-                        selectedDayBackgroundColor: '#668F80',
-                        arrowColor: '#668F80',
-                        monthTextColor: '#4A6670',
-                        textSectionTitleColor: '#4A6670',
+                        todayTextColor: "#668F80",
+                        selectedDayBackgroundColor: "#668F80",
+                        arrowColor: "#668F80",
+                        monthTextColor: "#4A6670",
+                        textSectionTitleColor: "#4A6670",
                       }}
                     />
                   </View>
@@ -166,13 +243,30 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
           )}
 
           <Text style={styles.label}>Plante</Text>
-          <RNPickerSelect
-            placeholder={{ label: 'Sélectionnez une Plante', value: null }}
-            value={plantOrigin}
-            onValueChange={(value) => setPlantOrigin(value)}
-            items={plantOrigins}
-            style={pickerSelectStyles}
-          />
+          <View style={styles.pickerContainer}>
+            <TouchableOpacity
+              onPress={handleFieldClick}
+              disabled={loadingField}
+            >
+              <RNPickerSelect
+                placeholder={{ label: "Sélectionnez une Plante", value: null }}
+                value={plantOrigin}
+                onValueChange={handleSelectChange}
+                items={plantOrigins}
+                style={pickerSelectStyles}
+              />
+            </TouchableOpacity>
+            {loadingField && (
+              <View style={styles.loaderOverlay}>
+                <ActivityIndicator size="large" color="#668F80" />
+              </View>
+            )}
+            {loadingSelect && (
+              <View style={styles.loaderOverlay}>
+                <ActivityIndicator size="large" color="#668F80" />
+              </View>
+            )}
+          </View>
 
           <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
             <Text style={styles.searchButtonText}>Rechercher</Text>
@@ -185,107 +279,102 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    flex: 1,
+    padding: 16,
   },
   label: {
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4A6670',
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
   },
-  closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1,
-  },
-  closeButtonText: {
-    fontSize: 24,
-    color: '#4A6670',
-  },
-  input: {
+  dropdown: {
     height: 40,
-    borderColor: '#4A6670',
+    borderColor: "#4A6670",
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 10,
-    paddingHorizontal: 10,
-    color: '#4A6670',
-    textAlignVertical: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'transparent',
+  },
+  pickerContainer: {
+    position: "relative",
+    marginBottom: 10,
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  input: {
+    padding: 10,
+    borderColor: "#4A6670",
+    borderWidth: 1,
+    borderRadius: 5,
   },
   selectedDate: {
-    color: '#668F80',
-  },
-  datePickerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-  },
-  datePickerWrapper: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
+    backgroundColor: "#f0f0f0",
   },
   searchButton: {
-    backgroundColor: '#668F80',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: 'center',
+    backgroundColor: "#668F80",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
     marginTop: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 5,
   },
   searchButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: "#fff",
+    fontSize: 16,
   },
   loaderContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loaderText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#4A6670',
+  },
+  datePickerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  datePickerWrapper: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    width: "80%",
+    maxWidth: 400,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: "#000",
   },
 });
 
 const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
     height: 40,
-    borderColor: '#4A6670',
+    paddingHorizontal: 10,
+    borderColor: "#4A6670",
     borderWidth: 1,
     borderRadius: 5,
-    paddingHorizontal: 10,
-    color: '#4A6670',
-    backgroundColor: 'transparent',
-    marginBottom: 10,
+    backgroundColor: "#fff",
   },
   inputAndroid: {
     height: 40,
-    borderColor: '#4A6670',
+    paddingHorizontal: 10,
+    borderColor: "#4A6670",
     borderWidth: 1,
     borderRadius: 5,
-    paddingHorizontal: 10,
-    color: '#4A6670',
-    backgroundColor: 'transparent',
-    marginBottom: 10,
+    backgroundColor: "#fff",
   },
   placeholder: {
-    color: '#4A6670',
+    color: "#4A6670",
   },
 });
