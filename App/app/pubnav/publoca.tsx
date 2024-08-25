@@ -238,9 +238,9 @@ export default function PubLoca() {
               />*/}
             </>
           )}
-          <View style={styles.mapContainer}>
+          {/*<View style={styles.mapContainer}>
             <OpenLayersMap latitude={region.latitude} longitude={region.longitude} />
-          </View>
+          </View>*/}
           <TouchableOpacity onPress={clearLocalisation} style={styles.clearButtonContainer}>
             <Text style={styles.clearButton}>Vider la localisation</Text>
           </TouchableOpacity>

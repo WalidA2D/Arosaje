@@ -8,6 +8,7 @@ import { Op } from 'sequelize'
 import { PostInstance } from "../models/Post";
 import { UserInstance } from "../models/User";
 import { CommentInstance } from "../models/Comment";
+import { FavInstance } from "../models/Fav";
 
 class PostController {
   async create(req: Request, res: Response) {
@@ -132,20 +133,45 @@ class PostController {
       return res.status(200).json({ success: true, record });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ success: false, msg: "Erreur lorsde la lecture" });
+      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture" });
     }
   }
 
   async readById(req: Request, res: Response) {
     try {
+      const token = req.headers.authorization?.split(" ")[0];
+      if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
+      const user = await UserInstance.findOne({ where: { uid: token } });
+      if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
+
       const { id } = req.params;
       const post = await PostInstance.findOne({ where: { idPosts: id } });
       if (!post) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
       const comments = await CommentInstance.findAll({ where: {idPost : id }, order: [['publishedAt', 'DESC']] })
-      return res.status(200).json({ success: true, post, comments });
+
+      const favoris = await FavInstance.findOne({ where: { idPost : post.dataValues.idPosts, idUser : user.dataValues.idUsers }})
+      const isFav = favoris?true:false;
+      return res.status(200).json({ success: true, isFav, post, comments });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la recherche d'un post par l'id" });
+    }
+  }
+
+  async readMissions(req: Request, res: Response) {
+    try {
+      const token = req.headers.authorization?.split(" ")[0];
+      if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
+      const user = await UserInstance.findOne({ where: { uid: token } });
+      if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
+
+      const missions = await PostInstance.findAll({ where: { acceptedBy: user.dataValues.idUsers } });
+      if (!missions) return res.status(404).json({ success: false, msg: "Aucune mission trouvée." });
+
+      return res.status(200).json({ success: true, missions });
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ success: false, msg: "Erreur lors de la recherche de missions" });
     }
   }
 

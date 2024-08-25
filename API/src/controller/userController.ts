@@ -64,9 +64,12 @@ class UserController {
       if (!user)
         return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
       return res.status(200).json({ success:true, msg: "Lecture du profil OK", user:{
+        idUser:user.dataValues.idUsers,
         lastName:user.dataValues.lastName,
         firstName:user.dataValues.firstName,
         cityName:user.dataValues.cityName,
+        role:user.dataValues.isAdmin?'Administrateur':user.dataValues.isBotanist?'Botaniste':'Utilisateur',
+        profilePic:user.dataValues.photo
       }})
     } catch (e) {
       console.error(e);

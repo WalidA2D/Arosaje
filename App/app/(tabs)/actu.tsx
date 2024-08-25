@@ -98,29 +98,57 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
   const navigation = useNavigation<ActuNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<ContentItemData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Initialiser à false pour ne pas charger par défaut
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string>('');
   const [quantite] = useState(5);
+  const [filters, setFilters] = useState({
+    cityName: route.params?.cityName,
+    dateStart: route.params?.dateStart,
+    dateEnd: route.params?.dateEnd,
+    plantOrigin: route.params?.plantOrigin,
+  });
   const sautRef = useRef<number>(0);
+
+  // Réinitialiser les posts et le saut lors des changements de paramètres de route
+  useEffect(() => {
+    // Mettre à jour les filtres quand les paramètres changent
+    setFilters({
+      cityName: route.params?.cityName,
+      dateStart: route.params?.dateStart,
+      dateEnd: route.params?.dateEnd,
+      plantOrigin: route.params?.plantOrigin,
+    });
+
+    // Réinitialiser les posts et le saut
+    setItems([]);
+    sautRef.current = 0;
+
+    fetchPosts(true); // Passe `true` pour réinitialiser les posts lors du changement de paramètres
+  }, [route.params]);
 
   const fetchPosts = async (isRefreshing: boolean = false) => {
     if (isRefreshing) {
       setRefreshing(true);
-      sautRef.current = 0; // Réinitialiser sautRef lors du rafraîchissement
-      setItems([]); // Réinitialiser les items lors du rafraîchissement
     } else {
       setLoading(true);
     }
 
     const currentSaut = isRefreshing ? 0 : sautRef.current;
-    const queryString = route.params?.queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${currentSaut}`;
-    const url = queryString || `${apiUrl}/post/read?quantite=${quantite}&saut=${currentSaut}`;
+    const { cityName, dateStart, dateEnd, plantOrigin } = filters;
+
+    // Construction de la queryString en fonction des filtres
+    let queryString = `${apiUrl}/post/read?quantite=${quantite}&saut=${currentSaut}`;
+
+    if (cityName) queryString += `&cityName=${encodeURIComponent(cityName)}`;
+    if (dateStart) queryString += `&dateStart=${dateStart}`;
+    if (dateEnd) queryString += `&dateEnd=${dateEnd}`;
+    if (plantOrigin) queryString += `&plantOrigin=${encodeURIComponent(plantOrigin)}`;
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const response = await fetch(url);
+      const response = await fetch(queryString);
       if (!response.ok) {
         throw new Error('Échec de la réponse du serveur');
       }
@@ -172,55 +200,60 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
     navigation.navigate('BlogFocus', { id });
   };
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
   const onRefresh = () => {
+    // Réinitialiser les paramètres de filtre lors du rafraîchissement
+    setFilters({
+      cityName: undefined,
+      dateStart: undefined,
+      dateEnd: undefined,
+      plantOrigin: undefined,
+    });
+
+    // Réinitialiser les posts et le saut avant de lancer le rafraîchissement
+    setItems([]);
+    sautRef.current = 0;
+
     fetchPosts(true); // Passe `true` pour indiquer un rafraîchissement
   };
-
   return (
-    <>
-      <View style={styles.container}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Rechercher..."
-          placeholderTextColor="#888"
-          value={searchQuery}
-          onChangeText={(text) => setSearchQuery(text)}
-        />
-        <FlatList
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          contentContainerStyle={styles.scrollViewContent}
-          data={items}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <ContentItem
-              id={item.id}
-              images={item.images}
-              title={item.title}
-              description={item.description}
-              time={item.time}
-              onPress={blogFocusNavigate}
-            />
-          )}
-          onEndReached={loadMoreItems}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={loading && !refreshing ? <ActivityIndicator size="large" color="#668F80" /> : null}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={'#668F80'} // Couleur du loader sur iOS
-              colors={['#668F80']} // Couleur du loader sur android
-            />
-          }
-        />
-        {error && <Text style={styles.errorText}>{error}</Text>}
-      </View>
-    </>
+    <View style={styles.container}>
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Rechercher..."
+        placeholderTextColor="#888"
+        value={searchQuery}
+        onChangeText={(text) => setSearchQuery(text)}
+      />
+      <FlatList
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        contentContainerStyle={styles.scrollViewContent}
+        data={items}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <ContentItem
+            id={item.id}
+            images={item.images}
+            title={item.title}
+            description={item.description}
+            time={item.time}
+            onPress={blogFocusNavigate}
+          />
+        )}
+        onEndReached={loadMoreItems}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={loading && !refreshing ? <ActivityIndicator size="large" color="#668F80" /> : null}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={'#668F80'}
+            colors={['#668F80']}
+          />
+        }
+      />
+      {error && <Text style={styles.errorText}>{error}</Text>}
+    </View>
   );
 }
 
@@ -234,7 +267,8 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#CCC',
     borderWidth: 1,
-    borderRadius: 20,
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius:20,
     paddingLeft: 15,
     backgroundColor: '#F0F0F0',
     color: '#000',

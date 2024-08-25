@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Button, Alert } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 type RootStackParamList = {
   Actualités: undefined;
   Filtre: undefined;
+  Carte: undefined;
   BlogFocus: { id: string };
 };
 
@@ -36,14 +39,21 @@ export default function BlogFocus() {
   const route = useRoute<BlogFocusRouteProp>();
   const { id } = route.params;
   const apiUrl = process.env.EXPO_PUBLIC_API_IP;
-
   const [blogData, setBlogData] = useState<BlogData>({ post: undefined, comments: [] });
   const [loading, setLoading] = useState<boolean>(true);
+  const [isFav, setIsFav] = useState<boolean>(false);
+  const [commentText, setCommentText] = useState<string>('');
+  const [commentNote, setCommentNote] = useState<number>(0);
 
   useEffect(() => {
     const fetchBlogData = async () => {
       try {
-        const response = await fetch(`${apiUrl}/post/${id}`);
+        const token = await AsyncStorage.getItem('userToken');
+        const response = await fetch(`${apiUrl}/post/${id}`, {
+          headers: {
+            Authorization: `${token}`,
+          },
+        });
         const data = await response.json();
 
         if (data.success) {
@@ -69,6 +79,7 @@ export default function BlogFocus() {
             post: data.post,
             comments: commentsWithUserNames || [],
           });
+          setIsFav(data.isFav); // On initialise l'état du favoris
         } else {
           console.error('Erreur dans la réponse de l\'API:', data);
         }
@@ -82,6 +93,77 @@ export default function BlogFocus() {
     fetchBlogData();
   }, [id]);
 
+  const toggleFavorite = async () => {
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      const url = isFav ? `${apiUrl}/fav/delete/${id}` : `${apiUrl}/fav/add`;
+      const method = isFav ? 'DELETE' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setIsFav(!isFav); // On inverse l'état du favori après l'opération
+      } else {
+        console.error('Erreur dans la gestion des favoris:', result.message);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la gestion des favoris:', error);
+    }
+  };
+
+  const addComment = async () => {
+    if (commentText.length < 1) {
+      Alert.alert("Il n'est pas possible d'ajouter un commentaire vide.");
+      return
+    }
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      const response = await fetch(`${apiUrl}/comment/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({
+          text: commentText,
+          note: commentNote,
+          idPost: id,
+        }),
+      });
+  
+      const result = await response.json();
+
+      if (result.success) {
+  
+        const newComment = result.record;
+        if (newComment) {
+          const userResponse = await fetch(`${apiUrl}/user/read/${newComment.idUser}`);
+          const userData = await userResponse.json();
+          newComment.userName = userData.success ? `${userData.user.firstName} ${userData.user.lastName}` : 'Utilisateur inconnu';
+  
+          setBlogData(prevData => ({
+            ...prevData,
+            comments: [...(prevData.comments || []), newComment],
+          }));
+        }
+  
+        setCommentText('');
+        setCommentNote(0);
+      } else {
+        Alert.alert('Erreur lors de l\'ajout du commentaire:', result.error);
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du commentaire:', error);
+    }
+  };
   if (loading) {
     return (
       <View style={styles.container}>
@@ -98,7 +180,17 @@ export default function BlogFocus() {
       {post ? (
         <>
           <View style={styles.postContainer}>
-            <Text style={styles.title}>{post.title}</Text>
+            <View style={styles.headCardContainer}>
+
+              <Text style={styles.title}>{post.title}</Text>
+              <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteButton}>
+                <Icon
+                  name={isFav ? 'star' : 'star-o'}
+                  size={24}
+                  color={isFav ? '#f1c40f' : '#ccc'}
+                />
+              </TouchableOpacity>
+            </View>
             {post.description && (
               <View style={styles.descriptionContainer}>
                 <Text style={styles.description}>{post.description}</Text>
@@ -124,6 +216,24 @@ export default function BlogFocus() {
               </View>
             )}
           </View>
+          {/* Formulaire d'ajout de commentaire */}
+          <View style={styles.addCommentSection}>
+            <Text style={styles.addCommentHeader}>Ajouter un commentaire :</Text>
+            <TextInput
+              style={styles.commentInput}
+              placeholder="Votre commentaire"
+              value={commentText}
+              onChangeText={setCommentText}
+            />
+            <TextInput
+              style={styles.noteInput}
+              placeholder="Note (0 à 5)"
+              value={commentNote.toString()}
+              onChangeText={(text) => setCommentNote(Number(text))}
+              keyboardType="numeric"
+            />
+            <Button title="Envoyer" onPress={addComment} />
+          </View>
           <View style={styles.commentsSection}>
             <Text style={styles.commentsHeader}>Commentaires:</Text>
             {comments.length > 0 ? (
@@ -131,7 +241,7 @@ export default function BlogFocus() {
                 const datePart = comment.publishedAt.slice(0, 10);
                 const timePart = comment.publishedAt.slice(11, 16);
                 const formattedDate = `${datePart} à ${timePart}`;
-  
+
                 return (
                   <View key={index} style={styles.commentCard}>
                     <View style={styles.commentHeader}>
@@ -157,11 +267,23 @@ export default function BlogFocus() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#f5f7f9',
+  },
+  favoriteButton: {
+    padding: 10,
+    borderRadius: 5,
+    alignSelf: 'flex-end',
+    marginBottom: 16,
+  },
+  headCardContainer : {
+    display: 'flex',
+    flexDirection : 'row',
+    justifyContent : 'space-between',
   },
   postContainer: {
     marginBottom: 20,
@@ -277,6 +399,41 @@ const styles = StyleSheet.create({
     marginTop: 16,
     fontSize: 18,
     color: '#2d3436',
+  },
+  addCommentSection: {
+    marginTop: 30,
+    padding: 20,
+    backgroundColor: '#ffffff',
+    borderRadius: 10,
+    shadowColor: '#2d3436',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  addCommentHeader: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 15,
+    color: '#1e272e',
+  },
+  commentInput: {
+    height: 40,
+    borderColor: '#dfe6e9',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: '#f1f3f6',
+  },
+  noteInput: {
+    height: 40,
+    borderColor: '#dfe6e9',
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: '#f1f3f6',
   },
 });
 

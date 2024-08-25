@@ -53,7 +53,8 @@ class MessageController {
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
       
       const record = await MessageInstance.findAll({ where : { idUser : user.dataValues.idUsers }})
-      return res.status(200).json({ success: true, msg: record?"Messages bien trouvés":"Aucun message répertorié", record})
+      if(!record) return res.status(404).json({ success: false, msg:"Aucun message trouvé"})
+      return res.status(200).json({ success: true, msg:"Messages trouvés", record})
     } catch (e){
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des messages" });

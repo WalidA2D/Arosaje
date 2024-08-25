@@ -1,15 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import * as Location from 'expo-location';
+import axios from 'axios';
 
 import OpenLayersMap from '../../components/OpenLayersMap';
 import Loading from '../../components/Loading';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+type RootStackParamList = {
+  BlogFocus: { id: string };
+};
 
 export default function ActuMap() {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [loading, setLoading] = useState(false); // Ajout de l'état de chargement
+  const [markers, setMarkers] = useState<{ latitude: number, longitude: number, id: string }[]>([]);
   const mapRef = useRef<any>(null);
+  const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
   useEffect(() => {
     (async () => {
@@ -21,17 +30,63 @@ export default function ActuMap() {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
+      fetchUserPosts();
     })();
   }, []);
 
-  const recenterMap = async () => {
-    setLoading(true); // Début du chargement
-    let location = await Location.getCurrentPositionAsync({});
-    setLocation(location);
-    if (mapRef.current) {
-      (mapRef.current as any).setCenter([location.coords.longitude, location.coords.latitude]);
+  const fetchUserPosts = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userToken || '',
+      }
+    };
+
+    try {
+      const response = await fetch(`${apiUrl}/post/read`, options);
+      const data = await response.json();
+
+      if (data.success && data.posts) {
+        const filteredPosts = data.posts.filter((post: { accepted: boolean; acceptedBy: any; address: string; cityName: string; idPosts: string; }) => !post.accepted && post.acceptedBy === null);
+        const markersData = await Promise.all(filteredPosts.map(async (post: { address: string; cityName: string; idPosts: string; }) => {
+          const coordinates = await fetchCoordinates(post.address, post.cityName);
+          if (coordinates) {
+            return { 
+              latitude: Number(coordinates.latitude),
+              longitude: Number(coordinates.longitude),
+              id: post.idPosts
+            };
+          }
+          return null;
+        }));
+        setMarkers(markersData.filter(marker => marker !== null));
+      } else {
+        console.error('Failed to fetch posts:', data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
     }
-    setLoading(false); // Fin du chargement
+  };
+
+  const fetchCoordinates = async (address: string, cityName: string) => {
+    const formattedAddress = `${address}, ${cityName}`;
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(formattedAddress)}&format=json`;
+
+    try {
+      const response = await axios.get(url);
+      if (response.data && response.data.length > 0) {
+        const { lat, lon } = response.data[0];
+        return { latitude: lat, longitude: lon };
+      } else {
+        console.error('No results found for the address:', formattedAddress);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      return null;
+    }
   };
 
   return (
@@ -42,19 +97,16 @@ export default function ActuMap() {
             ref={mapRef}
             latitude={location.coords.latitude}
             longitude={location.coords.longitude}
-            forwardRef={mapRef}
+            markers={markers}
+            onMarkerPress={(id) => {
+                console.log('Navigating to BlogFocus with ID:', id);
+                navigation.navigate('BlogFocus', { id });
+            }} // Passer la fonction de navigation ici
           />
         ) : (
           <Loading />
         )}
       </View>
-      <TouchableOpacity style={styles.button} onPress={recenterMap} disabled={loading}>
-        {loading ? (
-          <Loading /> // Affichage du composant de chargement
-        ) : (
-          <Ionicons name="navigate-outline" size={32} color="#fff" />
-        )}
-      </TouchableOpacity>
     </View>
   );
 }
@@ -65,15 +117,5 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-  },
-  button: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: '#668F80',
-    padding: 10,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignContent: 'center',
   },
 });

@@ -13,8 +13,8 @@ const socket = io('http://192.168.1.24:4000');
 
 type RootStackParamList = {
   explore: undefined;
-  message: { userName: string; initialMessages: Array<{ id: string; text: string; sender: string; timestamp: string, image?: string }> };
-  Profil: { userName: string };
+  message: { userName: string; idUser: number; initialMessages: Array<{ id: string; text: string; sender: string; timestamp: string, image?: string }> };
+  Profil: { userName: string, idUser: number };
 };
 
 type MessageScreenNavigationProp = StackNavigationProp<RootStackParamList, 'message'>;
@@ -49,7 +49,7 @@ const formatDate = (timestamp: Date) => {
 export default function MessageScreen() {
   const navigation = useNavigation<MessageScreenNavigationProp>();
   const route = useRoute<MessageScreenRouteProp>();
-  const { userName, initialMessages: initialMessagesRaw } = route.params;
+  const { userName, idUser, initialMessages: initialMessagesRaw } = route.params;
 
   const initialMessages = initialMessagesRaw.map(message => ({
     ...message,
@@ -113,18 +113,59 @@ export default function MessageScreen() {
       console.error("Failed to save messages:", error);
     }
   };
-
+  
+  const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
+  const isValidDate = (date: Date) => {
+    return date instanceof Date && !isNaN(date.getTime());
+  };
+  
   const loadMessages = async (conversationId: string) => {
     try {
+      // Vérifier si les messages sont déjà stockés localement
       const savedMessages = await AsyncStorage.getItem(`messages_${conversationId}`);
       if (savedMessages) {
         setMessages(JSON.parse(savedMessages));
-        console.log(`Messages loaded for conversation ${conversationId}`);
+        console.log(`Messages loaded from local storage for conversation ${conversationId}`);
+        return; // Sortir de la fonction pour éviter de recharger depuis l'API
+      }
+  
+      const userToken = await AsyncStorage.getItem('userToken');
+      const options = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': userToken || '',
+        },
+      };
+  
+      const response = await fetch(`${apiUrl}/msg/read?conversationId=${conversationId}`, options);
+      const data = await response.json();
+  
+      if (data.success) {
+        const fetchedMessages = data.record.map((msg: any) => ({
+          id: msg.idMessages.toString(),
+          text: msg.text,
+          sender: msg.idUser === currentUserId ? 'right' : 'left',
+          timestamp: new Date(msg.publishedAt),
+          image: msg.file,
+        }));
+  
+        // Stocker les messages en mémoire
+        setMessages(fetchedMessages);
+        console.log(`Messages loaded from API for conversation ${conversationId}`);
+  
+        // Sauvegarder les messages en local
+        await AsyncStorage.setItem(`messages_${conversationId}`, JSON.stringify(fetchedMessages));
+      } else {
+        console.error('Failed to load messages from API:', data.msg);
       }
     } catch (error) {
-      console.error("Failed to load messages:", error);
+      console.error('Error fetching messages from API:', error);
     }
   };
+  
+  
+  
 
   const filteredMessages = messages
     .filter(message => message.text?.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -140,7 +181,7 @@ export default function MessageScreen() {
     });
   }, [navigation, showSearchBar]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim()) {
       const newMessageData = {
         id: uuidv4(),
@@ -149,11 +190,44 @@ export default function MessageScreen() {
         timestamp: new Date(),
         senderId: currentUserId,
       };
-      console.log('Sending message:', newMessageData);
+  
       const updatedMessages = [...messages, newMessageData];
       setMessages(updatedMessages);
+  
+      // Envoyer le message via Socket.IO
       socket.emit('sendMessage', { conversationId: userName, message: newMessageData });
       saveMessages(userName, updatedMessages);
+  
+      // Envoyer le message à l'API
+      try {
+        const userToken = await AsyncStorage.getItem('userToken');
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': userToken || '',
+          },
+          body: JSON.stringify({
+            text: newMessage,
+            idConversation: userName, // Assurez-vous que c'est bien l'ID de la conversation
+            idUser: currentUserId, // Remplacez par l'ID utilisateur réel si nécessaire
+            file: '', 
+          }),
+        };
+  
+        const response = await fetch(`${apiUrl}/msg/add`, options);
+        const data = await response.json();
+  
+        if (!data.success) {
+          console.error('Failed to send message to API:', data.msg);
+          console.log('API Response:', data); // Affichez toute la réponse pour plus de détails
+        } else {
+          console.log('Message successfully sent to API');
+        }
+      } catch (error) {
+        console.error('Error sending message to API:', error);
+      }
+  
       setNewMessage('');
       setHasSentMessage(true);
       setTimeout(() => {
@@ -161,6 +235,8 @@ export default function MessageScreen() {
       }, 100);
     }
   };
+  
+  
 
   const handleSendImage = (uri: string) => {
     const newMessageData = {
@@ -267,7 +343,7 @@ export default function MessageScreen() {
             <Icon name="search" size={20} color="#668F80" style={styles.searchIcon} />
           </View>
         )}
-        <TouchableOpacity onPress={() => navigation.navigate('Profil', { userName })}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profil', { userName, idUser })}>
           <View style={styles.chatHeader}>
             <Image source={{ uri: 'https://picsum.photos/620/300' }} style={styles.avatar} />
             <Text style={styles.chatName}>{userName}</Text>

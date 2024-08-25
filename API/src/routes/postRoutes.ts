@@ -34,6 +34,13 @@ router.get(
 );
 
 router.get(
+  "/missions",
+  Middleware.handleValidationError,
+  Middleware.authMiddleware({ roles: ['utilisateur']}),
+  PostController.readMissions
+)
+
+router.get(
   "/:id",
   postValidator.checkIdParam(),
   Middleware.handleValidationError,
