@@ -10,7 +10,7 @@ import { UserInstance } from "../models/User";
 
 dotenv.config();
 
-const defaultPP = "https://firebasestorage.googleapis.com/v0/b/api-arosa-je.appspot.com/o/profilepictures%2Fdefault_pp.png?alt=media&token=2415598b-9c6f-45a1-a9ad-c555cec6c3c6";
+const defaultPP = "https://firebasestorage.googleapis.com/v0/b/api-arosa-je.appspot.com/o/constants%2Fdefault_pp.jpeg?alt=media&token=c777b8c6-7342-4165-9c0f-7ad9ed91ca3b";
 
 class ImageController {
   async uploadPP(req: Request, res: Response) {

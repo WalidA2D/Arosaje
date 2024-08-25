@@ -1,5 +1,5 @@
 import express from "express";
-
+import cors from "cors"; // Importez le package cors
 import db from "./config/database.config";
 import dotenv from "dotenv";
 
@@ -14,6 +14,13 @@ import convRouteur from "./routes/conversationRoutes"
 dotenv.config();
 
 const app = express();
+
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'DELETE', 'PUT'],
+    allowedHeaders: ['Content-Type','Authorization'],
+    credentials: true
+}));
 
 app.use(express.json());
 // app.use(express.urlencoded({extended:true}))
