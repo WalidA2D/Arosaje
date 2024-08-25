@@ -26,6 +26,13 @@ router.get(
   messageController.readByUser
 );
 
+router.get(
+  "/messages/:id",
+  Middleware.authMiddleware({ roles: ["utilisateur"] }),
+  Middleware.handleValidationError,
+  messageController.readByConv
+);
+
 router.delete(
   "/delete/:id",
   postValidator.checkIdParam(),

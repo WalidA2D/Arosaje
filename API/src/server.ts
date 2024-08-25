@@ -1,5 +1,5 @@
 import express from "express";
-import cors from "cors"; // Importez le package cors
+import cors from "cors";
 import db from "./config/database.config";
 import dotenv from "dotenv";
 

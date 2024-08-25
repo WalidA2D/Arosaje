@@ -61,6 +61,22 @@ class MessageController {
     }
   }
 
+  async readByConv(req: Request, res: Response) {
+    try{
+      const token = req.headers.authorization?.split(" ")[0];
+      const user = await UserInstance.findOne({ where: { uid: token } });
+      if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
+      const { id } = req.params;
+      
+      const record = await MessageInstance.findAll({ where : { idConversation : id }})
+      if(!record) return res.status(404).json({ success: false, msg:"Aucun message trouvé"})
+      return res.status(200).json({ success: true, msg:"Messages trouvés", record})
+    } catch (e){
+      console.error(e);
+      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des messages" });
+    }
+  }
+  
   async delete(req: Request, res: Response) {
     try{
       const token = req.headers.authorization?.split(" ")[0];
