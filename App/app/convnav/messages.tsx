@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform, Keyboard, Modal } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform, Keyboard, Modal, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -8,12 +8,23 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import io from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { v4 as uuidv4 } from 'uuid';
+import mime from 'mime';
+import Load from '../../components/Loading';
 
-const socket = io('http://192.168.1.24:4000');
+type MessageType = {
+  id: string;
+  text: string;
+  sender: 'left' | 'right';
+  timestamp: Date;
+  image?: string;
+};
+
+const socketUrl = process.env.EXPO_PUBLIC_SOCKET_IP || '';
+const socket = io(`${socketUrl}`);
 
 type RootStackParamList = {
   explore: undefined;
-  message: { userName: string; idUser: number; initialMessages: Array<{ id: string; text: string; sender: string; timestamp: string, image?: string }> };
+  message: { userName: string; idUser: number; conversationId: number; initialMessages: Array<{ id: string; text: string; sender: string; timestamp: string, image?: string }> };
   Profil: { userName: string, idUser: number };
 };
 
@@ -49,55 +60,52 @@ const formatDate = (timestamp: Date) => {
 export default function MessageScreen() {
   const navigation = useNavigation<MessageScreenNavigationProp>();
   const route = useRoute<MessageScreenRouteProp>();
-  const { userName, idUser, initialMessages: initialMessagesRaw } = route.params;
-
-  const initialMessages = initialMessagesRaw.map(message => ({
-    ...message,
-    id: message.id || uuidv4(),
-    timestamp: new Date(message.timestamp)
-  }));
+  const { userName, idUser, conversationId, initialMessages: initialMessagesRaw } = route.params;
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [newMessage, setNewMessage] = useState<string>('');
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [selectedMessages, setSelectedMessages] = useState<string[]>([]);
-  const [hasSentMessage, setHasSentMessage] = useState<boolean>(false);
   const [isImageViewerVisible, setIsImageViewerVisible] = useState<boolean>(false);
   const [imageToView, setImageToView] = useState<{ url: string }[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const inputRef = useRef<TextInput>(null);
   const currentUserId = socket.id;
 
   useEffect(() => {
-    const conversationId = userName;
     socket.emit('joinConversation', conversationId);
     console.log(`Joining conversation: ${conversationId}`);
 
     loadMessages(conversationId);
 
     socket.on('receiveMessage', (message) => {
-      if (message.senderId !== currentUserId) {
-        const newMessage = { id: uuidv4(), text: message.text, sender: 'left', timestamp: new Date(), senderId: message.senderId, image: message.image };
-        console.log('Received message:', newMessage);
-        setMessages((prevMessages) => {
-          const updatedMessages = [...prevMessages, newMessage];
-          saveMessages(conversationId, updatedMessages);
-          return updatedMessages;
-        });
-        setTimeout(() => {
-          scrollViewRef.current?.scrollToEnd({ animated: true });
-        }, 100);
-      }
+        if (message.idUser !== idUser) {
+            const newMessage: MessageType = { 
+                id: uuidv4(), 
+                text: message.text, 
+                sender: 'left', 
+                timestamp: new Date(), 
+                image: message.image || undefined 
+            };
+
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+
+            setTimeout(() => {
+                scrollViewRef.current?.scrollToEnd({ animated: true });
+            }, 100);
+        }
     });
 
     return () => {
-      socket.off('receiveMessage');
-      socket.emit('leaveConversation', conversationId);
-      console.log(`Leaving conversation: ${conversationId}`);
+        socket.off('receiveMessage');
+        socket.emit('leaveConversation', conversationId);
+        console.log(`Leaving conversation: ${conversationId}`);
     };
-  }, [userName]);
+}, [conversationId]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -105,67 +113,52 @@ export default function MessageScreen() {
     }, 100);
   }, [messages]);
 
-  const saveMessages = async (conversationId: string, messages: any[]) => {
-    try {
-      await AsyncStorage.setItem(`messages_${conversationId}`, JSON.stringify(messages));
-      console.log(`Messages saved for conversation ${conversationId}`);
-    } catch (error) {
-      console.error("Failed to save messages:", error);
-    }
-  };
-  
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
-  const isValidDate = (date: Date) => {
-    return date instanceof Date && !isNaN(date.getTime());
-  };
-  
-  const loadMessages = async (conversationId: string) => {
-    try {
-      // Vérifier si les messages sont déjà stockés localement
-      const savedMessages = await AsyncStorage.getItem(`messages_${conversationId}`);
-      if (savedMessages) {
-        setMessages(JSON.parse(savedMessages));
-        console.log(`Messages loaded from local storage for conversation ${conversationId}`);
-        return; // Sortir de la fonction pour éviter de recharger depuis l'API
-      }
-  
-      const userToken = await AsyncStorage.getItem('userToken');
-      const options = {
+
+  const loadMessages = async (conversationId: number) => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    const options = {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': userToken || '',
-        },
-      };
-  
-      const response = await fetch(`${apiUrl}/msg/read?conversationId=${conversationId}`, options);
-      const data = await response.json();
-  
-      if (data.success) {
-        const fetchedMessages = data.record.map((msg: any) => ({
-          id: msg.idMessages.toString(),
-          text: msg.text,
-          sender: msg.idUser === currentUserId ? 'right' : 'left',
-          timestamp: new Date(msg.publishedAt),
-          image: msg.file,
-        }));
-  
-        // Stocker les messages en mémoire
-        setMessages(fetchedMessages);
-        console.log(`Messages loaded from API for conversation ${conversationId}`);
-  
-        // Sauvegarder les messages en local
-        await AsyncStorage.setItem(`messages_${conversationId}`, JSON.stringify(fetchedMessages));
-      } else {
-        console.error('Failed to load messages from API:', data.msg);
-      }
+            'Content-Type': 'application/json',
+            'Authorization': userToken || '',
+        }
+    };
+
+    try {
+        const response = await fetch(`${apiUrl}/msg/messages/${conversationId}`, options);
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            const apiMessages: MessageType[] = [];
+
+            for (const msg of data.record) {
+                let formattedTimestamp = msg.publishedAt.replace(' ', 'T');
+                formattedTimestamp = formattedTimestamp.replace(' +00:00', '+00:00');
+                const timestamp = new Date(formattedTimestamp);
+
+                if (isNaN(timestamp.getTime())) {
+                    console.warn(`Invalid timestamp for message ID: ${msg.idMessages}`);
+                    continue;
+                }
+
+                apiMessages.push({
+                    id: msg.idMessages.toString(),
+                    text: msg.text,
+                    sender: msg.idUser === idUser ? 'left' : 'right',
+                    timestamp,
+                    image: msg.file || undefined,
+                });
+            }
+
+            setMessages(apiMessages);
+        } else {
+            console.error('Failed to load messages from API:', data.msg || 'Unknown error');
+        }
     } catch (error) {
-      console.error('Error fetching messages from API:', error);
+        console.error('Error fetching messages from API:', error);
     }
-  };
-  
-  
-  
+};
 
   const filteredMessages = messages
     .filter(message => message.text?.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -182,110 +175,138 @@ export default function MessageScreen() {
   }, [navigation, showSearchBar]);
 
   const handleSendMessage = async () => {
-    if (newMessage.trim()) {
-      const newMessageData = {
-        id: uuidv4(),
-        text: newMessage,
-        sender: 'right',
-        timestamp: new Date(),
-        senderId: currentUserId,
-      };
-  
-      const updatedMessages = [...messages, newMessageData];
-      setMessages(updatedMessages);
-  
-      // Envoyer le message via Socket.IO
-      socket.emit('sendMessage', { conversationId: userName, message: newMessageData });
-      saveMessages(userName, updatedMessages);
-  
-      // Envoyer le message à l'API
-      try {
-        const userToken = await AsyncStorage.getItem('userToken');
-        const options = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': userToken || '',
-          },
-          body: JSON.stringify({
+    if (newMessage.trim() || selectedImage) {
+        const newMessageData: MessageType = {
+            id: uuidv4(),
             text: newMessage,
-            idConversation: userName, // Assurez-vous que c'est bien l'ID de la conversation
-            idUser: currentUserId, // Remplacez par l'ID utilisateur réel si nécessaire
-            file: '', 
-          }),
+            sender: 'right',  
+            timestamp: new Date(),
+            image: selectedImage,  
         };
-  
-        const response = await fetch(`${apiUrl}/msg/add`, options);
-        const data = await response.json();
-  
-        if (!data.success) {
-          console.error('Failed to send message to API:', data.msg);
-          console.log('API Response:', data); // Affichez toute la réponse pour plus de détails
-        } else {
-          console.log('Message successfully sent to API');
+
+        setMessages(prevMessages => [...prevMessages, newMessageData]);
+
+        socket.emit('sendMessage', { conversationId, message: newMessageData, idUser });
+
+        try {
+            const userToken = await AsyncStorage.getItem('userToken');
+            const formData = new FormData();
+
+            if (selectedImage) {
+                const fileName = selectedImage.split('/').pop();
+                const fileType = mime.getType(selectedImage);
+
+                formData.append('file', {
+                    uri: selectedImage,
+                    name: fileName || 'image.jpg',
+                    type: fileType || 'image/jpeg',
+                } as any);
+                formData.append('text', '');
+            } else {
+                formData.append('text', newMessage);
+            }
+
+            formData.append('idConversation', conversationId.toString());
+            formData.append('idUser', idUser.toString());
+
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Authorization': userToken || '',
+                },
+                body: formData,
+            };
+
+            const response = await fetch(`${apiUrl}/msg/add`, options);
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('Failed to send message to API:', data.msg);
+            } else {
+                console.log('Message successfully sent to API');
+
+                if (data.imageUrl) {
+                    setMessages(prevMessages =>
+                        prevMessages.map(msg =>
+                            msg.id === newMessageData.id ? { ...msg, image: data.imageUrl } : msg
+                        )
+                    );
+                }
+            }
+        } catch (error) {
+            console.error('Error sending message to API:', error);
         }
-      } catch (error) {
-        console.error('Error sending message to API:', error);
-      }
-  
-      setNewMessage('');
-      setHasSentMessage(true);
-      setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-      }, 100);
+
+        setNewMessage('');
+        setSelectedImage(undefined); 
+        setTimeout(() => {
+            scrollViewRef.current?.scrollToEnd({ animated: true });
+        }, 100);
     }
-  };
-  
-  
+};
 
   const handleSendImage = (uri: string) => {
-    const newMessageData = {
-      id: uuidv4(),
-      text: '',
-      image: uri,
-      sender: 'right',
-      timestamp: new Date(),
-      senderId: currentUserId,
+    setSelectedImage(uri);
+    handleSendMessage();
+  };
+
+  const handleLongPressMessage = (id: string, sender: 'left' | 'right') => {
+    if (sender === 'right') {  // Seuls les messages à droite peuvent être sélectionnés
+      setIsSelecting(true);
+      setSelectedMessages([id]);
+      console.log('Long pressed message with id:', id);
+    }
+  };
+
+  const handleSelectMessage = (id: string, sender: 'left' | 'right') => {
+    if (sender === 'right') {  // Seuls les messages à droite peuvent être sélectionnés
+      setSelectedMessages(prevSelectedMessages =>
+        prevSelectedMessages.includes(id)
+          ? prevSelectedMessages.filter(messageId => messageId !== id)
+          : [...prevSelectedMessages, id]
+      );
+      console.log('Selected message with id:', id);
+    }
+  };
+
+  const deleteMessage = async (idMessage: string) => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    const options = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userToken || '',
+      },
     };
-    console.log('Sending image message:', newMessageData);
-    const updatedMessages = [...messages, newMessageData];
-    setMessages(updatedMessages);
-    socket.emit('sendMessage', { conversationId: userName, message: newMessageData });
-    saveMessages(userName, updatedMessages);
-    setHasSentMessage(true);
-    setTimeout(() => {
-      scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 100);
+
+    try {
+      const response = await fetch(`${apiUrl}/msg/delete/${idMessage}`, options);
+      const data = await response.json();
+
+      if (!data.success) {
+        console.error('Failed to delete message:', data.msg);
+      }
+    } catch (error) {
+      console.error('Error deleting message:', error);
+    }
   };
 
-  const handleLongPressMessage = (id: string) => {
-    setIsSelecting(true);
-    setSelectedMessages([id]);
-    console.log('Long pressed message with id:', id);
-  };
+  const handleDeleteMessages = async () => {
+    setLoading(true);
+    for (const idMessage of selectedMessages) {
+      await deleteMessage(idMessage);
+    }
 
-  const handleSelectMessage = (id: string) => {
-    setSelectedMessages(prevSelectedMessages =>
-      prevSelectedMessages.includes(id)
-        ? prevSelectedMessages.filter(messageId => messageId !== id)
-        : [...prevSelectedMessages, id]
-    );
-    console.log('Selected message with id:', id);
-  };
-
-  const handleDeleteMessages = () => {
     const updatedMessages = messages.filter(message => !selectedMessages.includes(message.id));
     setMessages(updatedMessages);
-    saveMessages(userName, updatedMessages);
     setIsSelecting(false);
     setSelectedMessages([]);
-    console.log('Deleted selected messages');
+    setLoading(false);
   };
 
   const handleCancelSelection = () => {
     setIsSelecting(false);
     setSelectedMessages([]);
-    console.log('Cancelled selection');
   };
 
   const openImagePicker = async () => {
@@ -298,7 +319,6 @@ export default function MessageScreen() {
     const pickerResult = await ImagePicker.launchImageLibraryAsync();
     if (!pickerResult.canceled) {
       handleSendImage(pickerResult.assets[0].uri);
-      console.log('Image picked:', pickerResult.assets[0].uri);
     }
   };
 
@@ -333,6 +353,9 @@ export default function MessageScreen() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={90}>
       <View style={styles.container}>
+        {loading && (
+          <Load></Load>
+        )}
         {showSearchBar && (
           <View style={styles.searchContainer}>
             <TextInput
@@ -357,8 +380,8 @@ export default function MessageScreen() {
           {filteredMessages.map(message => (
             <TouchableOpacity
               key={message.id}
-              onLongPress={() => handleLongPressMessage(message.id)}
-              onPress={() => isSelecting && handleSelectMessage(message.id)}
+              onLongPress={() => handleLongPressMessage(message.id, message.sender)}
+              onPress={() => isSelecting && handleSelectMessage(message.id, message.sender)}
               style={[
                 styles.messageContainer,
                 message.sender === 'right' && styles.messageContainerRight,
@@ -486,6 +509,18 @@ const styles = StyleSheet.create({
     color: '#FFF',
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -50 }, { translateY: -50 }],
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    padding: 20,
+    borderRadius: 10,
+    zIndex: 1,
   },
   chatHeader: {
     flexDirection: 'row',
