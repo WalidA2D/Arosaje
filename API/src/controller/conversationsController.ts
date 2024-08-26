@@ -28,7 +28,7 @@ class ConversationsController {
           ]
         }
       })
-      if (convExist) return res.status(413).json({ success: false, msg:"Conversation déjà existante"})
+      if (convExist) return res.status(413).json({ success: true, msg:"Conversation déjà existante"})
 
       await ConvInstance.create({
         dateStart,
