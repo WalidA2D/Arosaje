@@ -1,15 +1,19 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, Text, Pressable, Image } from 'react-native';
-import { DevSettings } from 'react-native';
+import { StyleSheet, View, Text, Pressable, Image, DevSettings, Platform } from 'react-native';
 
 interface Restart {
   setIsModalVisible: (isVisible: boolean, type: string) => void;
 }
 
 export default function App({ setIsModalVisible }: Restart) {
+
   const handleRestart = () => {
+    if (Platform.OS === 'web') {
+      window.location.href = 'http://localhost:8081';
+    } else {
     setIsModalVisible(false, 'index');
     DevSettings.reload();
+    }
   };
   return (
     <View style={styles.container}>

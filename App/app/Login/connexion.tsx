@@ -11,7 +11,6 @@ import HeaderTitle from '../../components/HeaderTitle';
 }
 
 type RootStackParamList = {
-  // Définissez vos routes ici, par exemple :
   'connexion': undefined;
   '(tabs)': undefined;
   'support': undefined;

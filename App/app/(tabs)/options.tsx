@@ -17,7 +17,7 @@ import Question from '../optnav/question';
 import Donnees from '../optnav/donnees';
 import InfoLeg from '../optnav/infoleg';
 
-import Restart from './index'
+import Restart from './logout'
 
 const Stack = createNativeStackNavigator();
 
