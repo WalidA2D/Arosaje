@@ -20,7 +20,15 @@ class ConversationsController {
         return res.status(413).json({ success: false, msg:"Droits requis"})
       }
 
-      // await ConvInstance.findOne({ where : { idUser1 : idUser1, idUser2 : idUser2 } })
+      const convExist = await ConvInstance.findOne({
+        where: {
+          [Op.or]: [
+            { idUser1: idUser1, idUser2: idUser2 },
+            { idUser1: idUser2, idUser2: idUser1 }
+          ]
+        }
+      })
+      if (convExist) return res.status(413).json({ success: false, msg:"Conversation déjà existante"})
 
       await ConvInstance.create({
         dateStart,

@@ -16,7 +16,7 @@ class UserController {
       req.body.password = await encryptMethod(req.body.password);
       const u = (await UserInstance.create({ ...req.body, uid, photo: defaultPP })).dataValues;
       return res.status(201).json({ success: true, record : {
-        "idUsers":u.idUsers,
+        "idUsers": u.idUsers.toString(),
         "lastName": u.lastName,
         "firstName": u.firstName,
         "email": u.email,
