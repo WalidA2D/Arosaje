@@ -14,8 +14,22 @@ class UserController {
       const email = await UserInstance.findOne({ where: { email: req.body.email } });
       if (email != null) return res.status(417).json({ success: false, msg: "Email déjà existant" });
       req.body.password = await encryptMethod(req.body.password);
-      const record = await UserInstance.create({ ...req.body, uid, photo: defaultPP });
-      return res.status(201).json({ success: true, record, msg: "Création utilisateur ok" });
+      const u = (await UserInstance.create({ ...req.body, uid, photo: defaultPP })).dataValues;
+      return res.status(201).json({ success: true, record : {
+        "idUsers":u.idUsers,
+        "lastName": u.lastName,
+        "firstName": u.firstName,
+        "email": u.email,
+        "address": u.address,
+        "phone": u.phone,
+        "cityName": u.cityName,
+        "password": u.password,
+        "photo": u.photo,
+        "role": u.isBotanist?"Botaniste":u.isAdmin?"Administrateur":"Utilisateur",
+        "isBan": u.isBan?true:false,
+        "note": u.note,
+        "uid": u.uid
+      }, msg: "Création utilisateur ok" });
     } catch (e) {
       console.error(e);
       return res.status(417).json({ success: false, msg: "Création utilisateur échouée" });
