@@ -57,7 +57,7 @@ class MessageController {
       return res.status(200).json({ success: true, msg:"Messages trouvés", record})
     } catch (e){
       console.error(e);
-      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des messages" });
+      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des messages d'un user" });
     }
   }
 
@@ -73,7 +73,7 @@ class MessageController {
       return res.status(200).json({ success: true, msg:"Messages trouvés", record})
     } catch (e){
       console.error(e);
-      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des messages" });
+      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des messages d'un conv" });
     }
   }
   
