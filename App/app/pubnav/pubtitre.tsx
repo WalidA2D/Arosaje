@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -89,13 +89,13 @@ const PubTitre = () => {
           </>
         )}
         {!isEditing && (
-          <TouchableOpacity onPress={editTitre}>
+          <Pressable onPress={editTitre}>
             <Text style={styles.editButton}>Modifier le titre</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
-        <TouchableOpacity onPress={clearTitre}>
+        <Pressable onPress={clearTitre}>
           <Text style={styles.clearButton}>Vider le titre</Text>
-        </TouchableOpacity>
+        </Pressable>
         <BigButtonDown buttonText="Valider" onPress={handleValidation} />
       </View>
   );

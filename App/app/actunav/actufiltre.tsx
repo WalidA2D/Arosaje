@@ -3,7 +3,7 @@ import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   Modal,
   Alert,
   Keyboard,
@@ -149,11 +149,11 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
           />
 
           <Text style={styles.label}>Date de début</Text>
-          <TouchableOpacity onPress={() => setShowStartDatePicker(true)}>
+          <Pressable onPress={() => setShowStartDatePicker(true)}>
             <Text style={[styles.input, dateStart ? styles.selectedDate : {}]}>
               {dateStart ? dateStart.toString() : "Sélectionnez une date"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
           {showStartDatePicker && (
             <Modal
               transparent={true}
@@ -165,12 +165,12 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
               >
                 <View style={styles.datePickerContainer}>
                   <View style={styles.datePickerWrapper}>
-                    <TouchableOpacity
+                    <Pressable
                       style={styles.closeButton}
                       onPress={() => setShowStartDatePicker(false)}
                     >
                       <Text style={styles.closeButtonText}>×</Text>
-                    </TouchableOpacity>
+                    </Pressable>
 
                     <Calendar
                       markedDates={{
@@ -197,11 +197,11 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
           )}
 
           <Text style={styles.label}>Date de fin</Text>
-          <TouchableOpacity onPress={() => setShowEndDatePicker(true)}>
+          <Pressable onPress={() => setShowEndDatePicker(true)}>
             <Text style={[styles.input, dateEnd ? styles.selectedDate : {}]}>
               {dateEnd ? dateEnd.toString() : "Sélectionnez une date"}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
           {showEndDatePicker && (
             <Modal
               transparent={true}
@@ -213,12 +213,12 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
               >
                 <View style={styles.datePickerContainer}>
                   <View style={styles.datePickerWrapper}>
-                    <TouchableOpacity
+                    <Pressable
                       style={styles.closeButton}
                       onPress={() => setShowEndDatePicker(false)}
                     >
                       <Text style={styles.closeButtonText}>×</Text>
-                    </TouchableOpacity>
+                    </Pressable>
 
                     <Calendar
                       markedDates={{
@@ -244,7 +244,7 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
 
           <Text style={styles.label}>Plante</Text>
           <View style={styles.pickerContainer}>
-            <TouchableOpacity
+            <Pressable
               onPress={handleFieldClick}
               disabled={loadingField}
             >
@@ -255,7 +255,7 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
                 items={plantOrigins}
                 style={pickerSelectStyles}
               />
-            </TouchableOpacity>
+            </Pressable>
             {loadingField && (
               <View style={styles.loaderOverlay}>
                 <ActivityIndicator size="large" color="#668F80" />
@@ -268,9 +268,9 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
             )}
           </View>
 
-          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <Pressable style={styles.searchButton} onPress={handleSearch}>
             <Text style={styles.searchButtonText}>Rechercher</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </TouchableWithoutFeedback>
     </>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -91,13 +91,13 @@ export default function PubDesc() {
           </>
         )}
         {!isEditing && (
-          <TouchableOpacity onPress={editDescription}>
+          <Pressable onPress={editDescription}>
             <Text style={styles.editButton}>Modifier la description</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
-        <TouchableOpacity onPress={clearDescription}>
+        <Pressable onPress={clearDescription}>
           <Text style={styles.clearButton}>Vider la description</Text>
-        </TouchableOpacity>
+        </Pressable>
         <BigButtonDown buttonText="Valider" onPress={handleValidation} />
       </View>
     </TouchableWithoutFeedback>

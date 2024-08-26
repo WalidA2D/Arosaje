@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, Pressable, Image, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -170,16 +170,16 @@ export default function PubPhoto() {
       {!loading ? ( 
         <>
       <Text style={styles.plantName}>Plante : {plantName}</Text>
-      <TouchableOpacity style={styles.button} onPress={handleAddPhoto}>
+      <Pressable style={styles.button} onPress={handleAddPhoto}>
         <Text style={styles.buttonText}>Ajouter une photo</Text>
-      </TouchableOpacity>
+      </Pressable>
         <View>
-          <TouchableOpacity style={styles.button} onPress={handlePlantPhoto}>
-            <Text style={styles.buttonText}>Vérification automatique</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleDeletePhoto}>
+          <Pressable style={styles.button} onPress={handlePlantPhoto}>
+            <Text style={styles.buttonText}>Vérification de la plante</Text>
+          </Pressable>
+          <Pressable style={styles.button} onPress={handleDeletePhoto}>
             <Text style={styles.buttonText}>Supprimer la photo</Text>
-          </TouchableOpacity>
+          </Pressable>
           {photo && <Image source={{ uri: photo }} style={styles.photo} />}
         </View>      
       <BigButtonDown buttonText="Valider" onPress={handleValidatePhoto} />

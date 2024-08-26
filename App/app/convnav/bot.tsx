@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Keyboard, Alert, Linking } from 'react-native';
+import { StyleSheet, View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform, Keyboard, Alert, Linking } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -34,9 +34,9 @@ export default function ChatbotScreen() {
     React.useCallback(() => {
       navigation.setOptions({
         headerRight: () => (
-          <TouchableOpacity onPress={resetConversation} style={{ marginRight: 10 }}>
+          <Pressable onPress={resetConversation} style={{ marginRight: 10 }}>
             <Icon name="redo" size={20} color="#fff" />
-          </TouchableOpacity>
+          </Pressable>
         ),
       });
     }, [navigation])
@@ -154,7 +154,7 @@ export default function ChatbotScreen() {
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}
         >
           {messages.map(message => (
-            <TouchableOpacity
+            <Pressable
               key={message.id}
               onPress={() => message.sender === 'bot' && handleLinkPress(message.text)}
               style={[
@@ -168,7 +168,7 @@ export default function ChatbotScreen() {
                 </Text>
               </View>
               <Text style={styles.timestamp}>{new Date(message.timestamp).toLocaleTimeString()}</Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </ScrollView>
         <View style={styles.optionsWrapper}>
@@ -179,9 +179,9 @@ export default function ChatbotScreen() {
             showsHorizontalScrollIndicator={false}
           >
             {chatbotPrompts.map(option => (
-              <TouchableOpacity key={option} style={styles.optionButton} onPress={() => handleUserSelection(option)}>
+              <Pressable key={option} style={styles.optionButton} onPress={() => handleUserSelection(option)}>
                 <Text style={styles.optionButtonText}>{option}</Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </ScrollView>
         </View>

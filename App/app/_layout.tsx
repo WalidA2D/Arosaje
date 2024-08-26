@@ -25,11 +25,15 @@ export default function RootLayout() {
   }
 
   const checkToken = async () => {
-    const userToken = await AsyncStorage.getItem('userToken');
-    console.log(userToken);
+    try {
+      const userToken = await AsyncStorage.getItem('userToken');
+      console.log(userToken);
 
-    if (!userToken) {
-      return <Stack.Screen name="index" options={{ headerShown: false }} />;
+      if (!userToken) {
+        return <Stack.Screen name="index" options={{ headerShown: false }} />;
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 

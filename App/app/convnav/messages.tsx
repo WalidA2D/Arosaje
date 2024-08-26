@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform, Keyboard, Modal, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform, Keyboard, Modal, ActivityIndicator } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -167,9 +167,9 @@ export default function MessageScreen() {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => setShowSearchBar(!showSearchBar)} style={{ marginRight: 10 }}>
+        <Pressable onPress={() => setShowSearchBar(!showSearchBar)} style={{ marginRight: 10 }}>
           <Icon name="filter" size={20} color="#fff" />
-        </TouchableOpacity>
+        </Pressable>
       ),
     });
   }, [navigation, showSearchBar]);
@@ -366,19 +366,19 @@ export default function MessageScreen() {
             <Icon name="search" size={20} color="#668F80" style={styles.searchIcon} />
           </View>
         )}
-        <TouchableOpacity onPress={() => navigation.navigate('Profil', { userName, idUser })}>
+        <Pressable onPress={() => navigation.navigate('Profil', { userName, idUser })}>
           <View style={styles.chatHeader}>
             <Image source={{ uri: 'https://picsum.photos/620/300' }} style={styles.avatar} />
             <Text style={styles.chatName}>{userName}</Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
         <ScrollView
           style={styles.messagesContainer}
           ref={scrollViewRef}
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}
         >
           {filteredMessages.map(message => (
-            <TouchableOpacity
+            <Pressable
               key={message.id}
               onLongPress={() => handleLongPressMessage(message.id, message.sender)}
               onPress={() => isSelecting && handleSelectMessage(message.id, message.sender)}
@@ -390,25 +390,25 @@ export default function MessageScreen() {
             >
               <View style={message.sender === 'left' ? styles.messageBubbleLeft : styles.messageBubbleRight}>
                 {message.image ? (
-                  <TouchableOpacity onPress={() => handleImagePress(message.image)}>
+                  <Pressable onPress={() => handleImagePress(message.image)}>
                     <Image source={{ uri: message.image }} style={styles.messageImage} />
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : (
                   <Text style={message.sender === 'left' ? styles.messageText : styles.messageTextRight}>{message.text}</Text>
                 )}
               </View>
               <Text style={styles.timestamp}>{formatDate(new Date(message.timestamp))}</Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </ScrollView>
         {isSelecting && selectedMessages.length > 0 && (
           <View style={styles.selectionButtonsContainer}>
-            <TouchableOpacity style={styles.cancelButton} onPress={handleCancelSelection}>
+            <Pressable style={styles.cancelButton} onPress={handleCancelSelection}>
               <Text style={styles.cancelButtonText}>Annuler</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteMessages}>
+            </Pressable>
+            <Pressable style={styles.deleteButton} onPress={handleDeleteMessages}>
               <Text style={styles.deleteButtonText}>Supprimer</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         )}
         {!hasUserMessages && (
@@ -417,9 +417,9 @@ export default function MessageScreen() {
           </View>
         )}
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.attachmentButton} onPress={openImagePicker}>
+          <Pressable style={styles.attachmentButton} onPress={openImagePicker}>
             <Icon name="paperclip" size={24} color="#668F80" />
-          </TouchableOpacity>
+          </Pressable>
           <TextInput
             ref={inputRef}
             style={styles.input}
@@ -428,9 +428,9 @@ export default function MessageScreen() {
             onChangeText={setNewMessage}
             onFocus={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
           />
-          <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+          <Pressable style={styles.sendButton} onPress={handleSendMessage}>
             <Icon name="arrow-up" size={15} color="#FFF" />
-          </TouchableOpacity>
+          </Pressable>
         </View>
         {isImageViewerVisible && (
           <Modal visible={isImageViewerVisible} transparent={true}>
