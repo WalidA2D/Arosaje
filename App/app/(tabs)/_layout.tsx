@@ -56,9 +56,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="index"
+        name="logout"
         options={{
-          title: 'Index',
+          title: 'Deconnection',
           tabBarStyle: { display: 'none' },
           tabBarButton: () => null,
         }}

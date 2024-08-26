@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import type { TextProps, GestureResponderEvent } from 'react-native';
 
 export namespace ExpoRouter {
-  type StaticRoutes = `/` | `/(tabs)` | `/Login/connexion` | `/Login/inscription` | `/Login/mdpoublie` | `/_sitemap` | `/actu` | `/actunav/BlogFocus` | `/actunav/actufiltre` | `/actunav/actumap` | `/conversation` | `/convnav/bot` | `/convnav/botnav/histoire` | `/convnav/messages` | `/convnav/profilconsulte` | `/options` | `/optnav/botaniste` | `/optnav/donnees` | `/optnav/infoleg` | `/optnav/infoperso` | `/optnav/notif` | `/optnav/question` | `/optnav/secucompte` | `/profil` | `/profilnav/ProfileImagePopup` | `/profilnav/calendar` | `/profilnav/updateProfil` | `/publier` | `/pubnav/pubdate` | `/pubnav/pubdesc` | `/pubnav/pubentretien` | `/pubnav/pubespece` | `/pubnav/publoca` | `/pubnav/pubphoto` | `/pubnav/pubplante` | `/pubnav/pubtitre`;
+  type StaticRoutes = `/` | `/(tabs)` | `/(tabs)\logout` | `/Login/connexion` | `/Login/inscription` | `/Login/mdpoublie` | `/_sitemap` | `/actu` | `/actunav/BlogFocus` | `/actunav/actufiltre` | `/actunav/actumap` | `/conversation` | `/convnav/bot` | `/convnav/botnav/histoire` | `/convnav/messages` | `/convnav/profilconsulte` | `/options` | `/optnav/botaniste` | `/optnav/donnees` | `/optnav/infoleg` | `/optnav/infoperso` | `/optnav/notif` | `/optnav/question` | `/optnav/secucompte` | `/profil` | `/profilnav/ProfileImagePopup` | `/profilnav/calendar` | `/profilnav/updateProfil` | `/publier` | `/pubnav/pubdate` | `/pubnav/pubdesc` | `/pubnav/pubentretien` | `/pubnav/pubespece` | `/pubnav/publoca` | `/pubnav/pubphoto` | `/pubnav/pubplante` | `/pubnav/pubtitre`;
   type DynamicRoutes<T extends string> = never;
   type DynamicRouteTemplate = never;
 
