@@ -11,6 +11,7 @@ import {
   Button,
   Alert,
   Platform,
+  Modal,
 } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -43,6 +44,7 @@ interface BlogData {
     image1?: string;
     image2?: string;
     image3?: string;
+    idUser?: number;
   };
   comments?: Array<CommentData>;
 }
@@ -59,11 +61,14 @@ export default function BlogFocus() {
   const [isFav, setIsFav] = useState<boolean>(false);
   const [commentText, setCommentText] = useState<string>("");
   const [commentNote, setCommentNote] = useState<number>(0);
+  const [showMessageInput, setShowMessageInput] = useState<boolean>(false);
+  const [messageText, setMessageText] = useState<string>("");
 
   useEffect(() => {
     const fetchBlogData = async () => {
       try {
         const token = await AsyncStorage.getItem("userToken");
+        const userId = await AsyncStorage.getItem("userId");
         const response = await fetch(`${apiUrl}/post/${id}`, {
           headers: {
             Authorization: `${token}`,
@@ -93,10 +98,13 @@ export default function BlogFocus() {
           );
 
           setBlogData({
-            post: data.post,
+            post: {
+              ...data.post,
+              idUser: data.post.idUser,
+            },
             comments: commentsWithUserNames || [],
           });
-          setIsFav(data.isFav); // On initialise l'état du favoris
+          setIsFav(data.isFav);
         } else {
           console.error("Erreur dans la réponse de l'API:", data);
         }
@@ -127,7 +135,7 @@ export default function BlogFocus() {
 
       const result = await response.json();
       if (result.success) {
-        setIsFav(!isFav); // On inverse l'état du favori après l'opération
+        setIsFav(!isFav);
       } else {
         console.error("Erreur dans la gestion des favoris:", result.message);
       }
@@ -155,9 +163,7 @@ export default function BlogFocus() {
           idPost: id,
         }),
       });
-
       const result = await response.json();
-
       if (result.success) {
         const newComment = result.record;
         if (newComment) {
@@ -184,6 +190,74 @@ export default function BlogFocus() {
       console.error("Erreur lors de l'ajout du commentaire:", error);
     }
   };
+
+
+  const handleSendMessage = async () => {
+    try {
+      const token = await AsyncStorage.getItem("userToken");
+      const userId = await AsyncStorage.getItem("userId");
+  
+      if (!userId || !blogData.post?.idUser) {
+        Alert.alert(
+          "Erreur",
+          "Impossible d'envoyer le message. Informations manquantes."
+        );
+        return;
+      }
+  
+      const convResponse = await fetch(`${apiUrl}/conv/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({
+          idUser1: userId,
+          idUser2: blogData.post.idUser
+        }),
+      });
+  
+      const convResult = await convResponse.json();
+  
+      if (!convResult.success) {
+        Alert.alert("Erreur lors de la création de la conversation", convResult.msg);
+        return;
+      }
+  
+      const idConversation = convResult.idConv;
+  
+      if (!idConversation) {
+        Alert.alert("Erreur", "Impossible de récupérer l'id de la conversation.");
+        return;
+      }
+
+      const msgResponse = await fetch(`${apiUrl}/msg/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${token}`,
+        },
+        body: JSON.stringify({
+          text: messageText,
+          idConversation: idConversation,
+        }),
+      });
+  
+      const msgResult = await msgResponse.json();
+  
+      if (msgResult.success) {
+        Alert.alert("Message envoyé avec succès !");
+        setMessageText("");
+        setShowMessageInput(false);
+      } else {
+        Alert.alert("Erreur lors de l'envoi du message", msgResult.msg);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message:", error);
+    }
+  };
+  
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -232,9 +306,38 @@ export default function BlogFocus() {
                     <Image source={{ uri: post.image3 }} style={styles.image} />
                   )}
                 </ScrollView>
+                <Button
+                  title="Contacter"
+                  onPress={() => setShowMessageInput(true)}
+                />
               </View>
             )}
           </View>
+          <Modal
+            visible={showMessageInput}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setShowMessageInput(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Message</Text>
+                <TextInput
+                  style={styles.messageInput}
+                  placeholder="Votre message"
+                  value={messageText}
+                  onChangeText={setMessageText}
+                  multiline={true}
+                />
+                <Button title="Envoyer" onPress={handleSendMessage} />
+                <Button
+                  title="Annuler"
+                  onPress={() => setShowMessageInput(false)}
+                />
+              </View>
+            </View>
+          </Modal>
+
           <View style={styles.addCommentSection}>
             <Text style={styles.addCommentHeader}>
               Ajouter un commentaire :
@@ -311,11 +414,50 @@ export default function BlogFocus() {
 }
 
 const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  messageInput: {
+    borderWidth: 1,
+    borderColor: "#dfe6e9",
+    borderRadius: 4,
+    padding: 8,
+    fontSize: 16,
+    marginBottom: 12,
+    minHeight: 100,
+  },
   inputLabel: {
     fontSize: 16,
     fontWeight: "500",
     marginBottom: 6,
     color: "#1e272e",
+  },
+  messageInputContainer: {
+    padding: 16,
+    backgroundColor: "#f1f2f6",
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  messageInputLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#2d3436",
+    marginBottom: 8,
   },
   container: {
     flexGrow: 1,

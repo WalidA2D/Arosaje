@@ -97,7 +97,7 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
   const navigation = useNavigation<ActuNavigationProp>();
   const [searchQuery, setSearchQuery] = useState('');
   const [items, setItems] = useState<ContentItemData[]>([]);
-  const [loading, setLoading] = useState(false); // Initialiser à false pour ne pas charger par défaut
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string>('');
   const [quantite] = useState(5);
@@ -109,9 +109,7 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
   });
   const sautRef = useRef<number>(0);
 
-  // Réinitialiser les posts et le saut lors des changements de paramètres de route
   useEffect(() => {
-    // Mettre à jour les filtres quand les paramètres changent
     setFilters({
       cityName: route.params?.cityName,
       dateStart: route.params?.dateStart,
@@ -119,11 +117,10 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
       plantOrigin: route.params?.plantOrigin,
     });
 
-    // Réinitialiser les posts et le saut
     setItems([]);
     sautRef.current = 0;
 
-    fetchPosts(true); // Passe `true` pour réinitialiser les posts lors du changement de paramètres
+    fetchPosts(true);
   }, [route.params]);
 
   const fetchPosts = async (isRefreshing: boolean = false) => {
@@ -136,7 +133,6 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
     const currentSaut = isRefreshing ? 0 : sautRef.current;
     const { cityName, dateStart, dateEnd, plantOrigin } = filters;
 
-    // Construction de la queryString en fonction des filtres
     let queryString = `${apiUrl}/post/read?quantite=${quantite}&saut=${currentSaut}`;
 
     if (cityName) queryString += `&cityName=${encodeURIComponent(cityName)}`;
@@ -200,7 +196,6 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
   };
 
   const onRefresh = () => {
-    // Réinitialiser les paramètres de filtre lors du rafraîchissement
     setFilters({
       cityName: undefined,
       dateStart: undefined,
@@ -208,11 +203,10 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
       plantOrigin: undefined,
     });
 
-    // Réinitialiser les posts et le saut avant de lancer le rafraîchissement
     setItems([]);
     sautRef.current = 0;
 
-    fetchPosts(true); // Passe `true` pour indiquer un rafraîchissement
+    fetchPosts(true);
   };
   return (
     <View style={styles.container}>
