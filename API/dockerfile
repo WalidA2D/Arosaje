@@ -1,0 +1,26 @@
+# Utiliser l'image Node.js
+FROM node:18
+
+# Créer un répertoire pour l'application
+WORKDIR /usr/src/app
+
+# Copier les fichiers package.json et package-lock.json
+COPY package*.json ./
+
+# Installer les dépendances
+RUN npm install
+
+# Copier le reste du code source
+COPY . .
+
+# Construire l'application TypeScript
+RUN npm run build
+
+# Exposer le port sur lequel l'application sera accessible
+EXPOSE 3000
+
+# Lancer l'application
+CMD ["node", "dist/server.js"]
+
+# Optionnel: Commande pour exécuter les tests
+# CMD ["npm", "test"]
