@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TextInput, Text, Alert, TouchableOpacity, FlatList, Pressable } from 'react-native';
+import { StyleSheet, View, TextInput, Text, Alert, Pressable, FlatList } from 'react-native';
 import HeaderTitle from '../../components/HeaderTitle';
 import * as Location from 'expo-location';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AnimatedCheckbox from 'react-native-checkbox-reanimated';
 import Load from '../../components/Loading';
+import axios from 'axios';
 
 interface InscriptionScreenProps {
     setIsModalVisible: (isVisible: boolean, type: string) => void;
@@ -93,48 +94,52 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
         }
     };
 
-    const fetchSuggestions = async (input: string, type: string) => {
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&countrycodes=fr&namedetails=1`);
-        const data = await response.json();
-        const suggestions = data
-            .filter((item: any) => (item.address.street) && (item.address.city) && item.address.postcode)
-            .map((item: any) => ({
-                place_id: item.place_id,
-                display_name: `${item.address.street}, ${item.address.city}, ${item.address.postcode}`,
-                lat: item.lat,
-                lon: item.lon
-            }));
-        if (type === 'address') {
-            setAddressSuggestions(suggestions);
-        } else {
-            setCitySuggestions(suggestions);
-        }
-        console.log(suggestions)
-    };
-
     const handleAutoLocation = async () => {
         setIsLoading(true);
-        try {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                console.error('Permission to access location was denied');
-                setIsLoading(false);
-                return;
-            }
-
-            let location = await Location.getCurrentPositionAsync({});
-            const { latitude, longitude } = location.coords;
-
-            let address = await Location.reverseGeocodeAsync({ latitude, longitude });
-            if (address.length > 0) {
-                const { streetNumber, street, city, postalCode } = address[0];
-                setAddress(`${streetNumber} ${street}`);
-                setCityName(`${city}, ${postalCode}`);
-            }
-        } catch (error) {
-            console.error('Erreur lors de la récupération de la localisation :', error);
-        } finally {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            console.error('Permission to access location was denied');
             setIsLoading(false);
+            return;
+        }
+
+        let location = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = location.coords;
+
+        let address = await Location.reverseGeocodeAsync({ latitude, longitude });
+        if (address.length > 0) {
+            const { street, city, region, postalCode } = address[0];
+            const fullAddress = `${street}, ${city}, ${postalCode}, ${region}`;
+            const parts = fullAddress.split(', ');
+            let addressPart = parts[0];
+            let cityPart = `${parts[1]}, ${parts[2]}`;
+
+            if (/\d/.test(parts[0][0])) {
+                addressPart = `${parts[0]} ${parts[1]}`;
+                cityPart = `${parts[2]}, ${parts[3]}`;
+            }
+
+            setAddress(addressPart);
+            setCityName(cityPart);
+            setAddressValid(true);
+            setCityValid(true);
+        }
+        setIsLoading(false);
+    };
+
+    const fetchSuggestions = async (input: string, type: string) => {
+        const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&countrycodes=fr`);
+        const data = response.data.map((item: any) => ({
+            place_id: item.place_id,
+            display_name: item.display_name,
+            lat: item.lat,
+            lon: item.lon
+        }));
+
+        if (type === 'address') {
+            setAddressSuggestions(data);
+        } else {
+            setCitySuggestions(data);
         }
     };
 
@@ -155,7 +160,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
     };
 
     const renderSuggestion = ({ item }: { item: AddressSuggestion }) => (
-        <TouchableOpacity
+        <Pressable
             style={styles.suggestion}
             onPress={() => {
                 const parts = item.display_name.split(', ');
@@ -175,7 +180,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             }}
         >
             <Text>{item.display_name}</Text>
-        </TouchableOpacity>
+        </Pressable>
     );
 
     return (
@@ -187,9 +192,9 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                 <>
                     <View style={styles.textInput}>
                         <Text style={styles.textSizeInput}>Nom:</Text>
-                        <TextInput placeholder="Last Name" value={lastName} onChangeText={setLastName} style={styles.input} />
+                        <TextInput placeholder="Nom" value={lastName} onChangeText={setLastName} style={styles.input} />
                         <Text style={styles.textSizeInput}>Prénom:</Text>
-                        <TextInput placeholder="First Name" value={firstName} onChangeText={setFirstName} style={styles.input} />
+                        <TextInput placeholder="Prénom" value={firstName} onChangeText={setFirstName} style={styles.input} />
                         <Text style={styles.textSizeInput}>Email:</Text>
                         <TextInput
                             value={email}
@@ -209,9 +214,9 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={styles.selectorButton} onPress={handleNext}>
+                            <Pressable style={styles.selectorButton} onPress={handleNext}>
                                 <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     </View>
                 </>
@@ -240,9 +245,9 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={styles.selectorButton} onPress={handleNext}>
+                            <Pressable style={styles.selectorButton} onPress={handleNext}>
                                 <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     </View>
                 </>
@@ -267,9 +272,9 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={styles.selectorButton} onPress={handleNext}>
+                            <Pressable style={styles.selectorButton} onPress={handleNext}>
                                 <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     </View>
                 </>
@@ -318,15 +323,15 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={styles.autoLocationButton} onPress={handleAutoLocation} disabled={isLoading}>
+                            <Pressable style={styles.autoLocationButton} onPress={handleAutoLocation} disabled={isLoading}>
                                 <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Localisation automatique</Text>
                                 <Ionicons name="search-outline" size={24} color="white" />
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={styles.selectorButton} onPress={handleNext} disabled={isLoading}>
+                            <Pressable style={styles.selectorButton} onPress={handleNext} disabled={isLoading}>
                                 <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     </View>
                 </>
@@ -354,14 +359,14 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setStep(1)}>
+                            <Pressable style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setStep(1)}>
                                 <Text style={{ color: '#668F80', fontSize: 18, fontWeight: 'bold', }}>Modifier</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                         <View style={styles.selectorContainer}>
-                            <TouchableOpacity style={styles.selectorButton} onPress={handleConfirm}>
+                            <Pressable style={styles.selectorButton} onPress={handleConfirm}>
                                 <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Confirmer</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     </View>
                 </>

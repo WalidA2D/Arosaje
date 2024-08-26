@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -207,9 +207,9 @@ export default function CalendarScreen() {
         />
       )}
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <TouchableOpacity onPress={() => setShowPastEvents(!showPastEvents)} style={styles.historyButton}>
+        <Pressable onPress={() => setShowPastEvents(!showPastEvents)} style={styles.historyButton}>
           <Text style={styles.historyButtonText}>{showPastEvents ? 'Retour aux missions' : 'Historique des missions'}</Text>
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.eventsList}>
           {sortedEvents.length === 0 ? (
             <Text style={styles.noEventsText}>
@@ -221,14 +221,14 @@ export default function CalendarScreen() {
               if (!showPastEvents && eventStatus === "") return null;
               return (
                 <View key={index}>
-                  <TouchableOpacity
+                  <Pressable
                     style={[styles.eventItem, selectedEvent === event.name && styles.selectedEventItem]}
                     onPress={() => onEventPress(event)}
                   >
                     <View style={[styles.eventIndicator, { backgroundColor: getEventColor(index) }]} />
                     <Text style={styles.eventText}>{event.name}</Text>
                     <Text style={styles.eventDuration}>{eventStatus}</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                   {index < sortedEvents.length - 1 && <View style={styles.separatorDetails} />}
                 </View>
               );

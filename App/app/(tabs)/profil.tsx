@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, Linking } from 'react-native';
+import { StyleSheet, View, Text, FlatList, Pressable, Alert, Linking } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NavigationContainer, useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -36,9 +36,9 @@ function ProfScreen() {
           component={ProfilScreen} 
           options={({ navigation }) => ({
             headerRight: () => (
-              <TouchableOpacity onPress={() => navigation.navigate('Calendrier')} style={{ marginRight: 10 }}>
+              <Pressable onPress={() => navigation.navigate('Calendrier')} style={{ marginRight: 10 }}>
                 <Ionicons name="today" size={24} color="#fff" />
-              </TouchableOpacity>
+              </Pressable>
             ),
           })}
         />
@@ -346,7 +346,7 @@ export function ProfilScreen() {
           <Text style={styles.postContent}>
             Publié le: {formattedDate} 
           </Text>
-          <TouchableOpacity
+          <Pressable
             onPress={() =>
               isFavorite ? handleRemoveFavorite(item.idPosts) : handleAddFavorite(item.idPosts)
             }
@@ -357,7 +357,7 @@ export function ProfilScreen() {
               color={isFavorite ? '#668F80' : '#A9A9A9'}
               style={styles.postIcon}
             />
-          </TouchableOpacity>
+          </Pressable>
         </View>
       );
     }
@@ -379,12 +379,12 @@ export function ProfilScreen() {
 
       <View style={styles.profileImageContainer}>
         {profileData.profilePic ? (
-          <TouchableOpacity onPress={() => popupRef.current.showPopup()}>
+          <Pressable onPress={() => popupRef.current.showPopup()}>
             <Image
               source={{ uri: profileData.profilePic }}
               style={styles.profileImage}
             />
-          </TouchableOpacity>
+          </Pressable>
         ) : (
           <Load></Load>
         )}
@@ -393,26 +393,26 @@ export function ProfilScreen() {
       <View style={styles.fixedDetails}>
         <View style={styles.profileDetails}>
           <Text style={styles.profileName}>{`${profileData.firstName} ${profileData.lastName}`}
-            <TouchableOpacity onPress={() => navigation.navigate('Modification', profileData)}><Ionicons name="pencil" size={25} color="#668F80" /></TouchableOpacity></Text>
+            <Pressable onPress={() => navigation.navigate('Modification', profileData)}><Ionicons name="pencil" size={25} color="#668F80" /></Pressable></Text>
           
-          <TouchableOpacity onPress={() => openMap(profileData.cityName)}>
+          <Pressable onPress={() => openMap(profileData.cityName)}>
             <Text style={styles.profileRole}>{profileData.role} | {profileData.cityName}</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.selectorContainer}>
-          <TouchableOpacity
+          <Pressable
             style={[styles.selectorButton, selectedTab === 'Posts' && styles.activeButton]}
             onPress={() => setSelectedTab('Posts')}
           >
             <Text style={[styles.selectorText, selectedTab === 'Posts' && styles.activeText]}>Posts</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             style={[styles.selectorButton, selectedTab === 'Favorites' && styles.activeButton]}
             onPress={() => setSelectedTab('Favorites')}
           >
             <Text style={[styles.selectorText, selectedTab === 'Favorites' && styles.activeText]}>Favoris</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
 

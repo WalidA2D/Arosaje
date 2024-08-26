@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Image, View, Text, TouchableOpacity, Modal, Alert } from 'react-native';
+import { StyleSheet, Image, View, Text, Pressable, Modal, Alert } from 'react-native';
 import { NavigationContainer, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -464,15 +464,15 @@ function PublierContent() {
         <View style={styles.separatorDetails} />
       </View>
       <View style={styles.fixedDetailsBtn}>
-        <TouchableOpacity onPress={() => resetPost()} style={styles.clearButtonContainer}>
+        <Pressable onPress={() => resetPost()} style={styles.clearButtonContainer}>
           <Text style={styles.clearButton}>Recommencez</Text>
-        </TouchableOpacity>
+        </Pressable>
         <View style={styles.selectorContainer}>
-          <TouchableOpacity style={[styles.selectorButton, { backgroundColor: isValid ? '#668F80' : '#828282' }]} disabled={!isValid} onPress={() => setModalVisible(true)}>
+          <Pressable style={[styles.selectorButton, { backgroundColor: isValid ? '#668F80' : '#828282' }]} disabled={!isValid} onPress={() => setModalVisible(true)}>
             <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
               Valider
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <Modal
@@ -488,18 +488,18 @@ function PublierContent() {
             <Text style={styles.modalText}>Vérifiez attentivement les informations que vous envoyez. La saisie de fausses informations peut entraîner des conséquences indésirables.</Text>
             <View style={styles.fixedDetailsBtnModal}>
               <View style={styles.selectorContainer}>
-                <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => handleSend()} disabled={isSending}>
+                <Pressable style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => handleSend()} disabled={isSending}>
                   <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
                     {isSending ? 'Envoi...' : 'Envoyer'}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
               <View style={styles.selectorContainer}>
-                <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
+                <Pressable style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
                   <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
                     Modifier
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           </View>

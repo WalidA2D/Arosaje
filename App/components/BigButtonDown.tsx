@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Pressable, Text, StyleSheet, Dimensions } from 'react-native';
 
 const screenHeight = Dimensions.get('window').height;
 
@@ -7,11 +7,11 @@ const BigButtonDown = ({ buttonText, onPress, disabled, bgColor }: { buttonText:
   return (
     <View style={styles.fixedDetailsBtn}>
     <View style={[styles.selectorContainer, { backgroundColor: bgColor || '#E0E0E0' }]}>
-      <TouchableOpacity style={styles.selectorButton} onPress={onPress} disabled={disabled}>
+      <Pressable style={styles.selectorButton} onPress={onPress} disabled={disabled}>
         <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
             {buttonText}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
     </View>
   );

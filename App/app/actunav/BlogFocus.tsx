@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Button, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, Pressable, TextInput, Button, Alert, Platform } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -183,13 +183,13 @@ export default function BlogFocus() {
             <View style={styles.headCardContainer}>
 
               <Text style={styles.title}>{post.title}</Text>
-              <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteButton}>
+              <Pressable onPress={toggleFavorite} style={styles.favoriteButton}>
                 <Icon
                   name={isFav ? 'star' : 'star-o'}
                   size={24}
                   color={isFav ? '#f1c40f' : '#ccc'}
                 />
-              </TouchableOpacity>
+              </Pressable>
             </View>
             {post.description && (
               <View style={styles.descriptionContainer}>
@@ -289,11 +289,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: '#ffffff',
     borderRadius: 10,
-    shadowColor: '#2d3436',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#2d3436',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+      web: {
+        boxShadow: '0px 4px 8px rgba(45, 52, 54, 0.2)',
+      },
+    }),
     padding: 15,
   },
   title: {
@@ -329,11 +338,20 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     borderRadius: 10,
     marginRight: 10,
-    shadowColor: '#2d3436',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 3,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#2d3436',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 3,
+      },
+      web: {
+        boxShadow: '0px 4px 6px rgba(45, 52, 54, 0.3)',
+      },
+    }),
   },
   commentsSection: {
     marginBottom: 20,

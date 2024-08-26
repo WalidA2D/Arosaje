@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, Pressable, Image } from 'react-native';
 import { DevSettings } from 'react-native';
 
 interface Restart {
@@ -16,11 +16,11 @@ export default function App({ setIsModalVisible }: Restart) {
       <Image source={require('../../assets/images/deco.png')} style={[styles.logo, {width: 250, height: 250,}]}/>
       <View style={styles.fixedDetailsBtn}>
         <View style={styles.selectorContainer}>
-          <TouchableOpacity style={styles.selectorButton} onPress={handleRestart}>
+          <Pressable style={styles.selectorButton} onPress={handleRestart}>
               <Text style={{ color: '#668F80', fontSize: 14, fontWeight: 'bold' }}>
                 Reconnectez vous
               </Text>
-            </TouchableOpacity>
+            </Pressable>
         </View>
       </View>
     </View>

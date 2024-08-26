@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Pressable, Modal } from 'react-native';
+import { Platform, StyleSheet, View, Text, FlatList, Image, Pressable, Modal } from 'react-native';
 import AnimatedCheckbox from 'react-native-checkbox-reanimated'
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -104,9 +104,9 @@ export default function PubEspece() {
             <Text>{item.common_name}</Text>
             <View style={styles.itemBtn}>
               {item.id !== -1 && (
-                <TouchableOpacity onPress={() => showSpeciesDetails(item.id)}>
+                <Pressable onPress={() => showSpeciesDetails(item.id)}>
                   <Ionicons name="information-circle-outline" size={32} color="black" />
-                </TouchableOpacity>
+                </Pressable>
               )}
               <Pressable onPress={() => handleCheckboxPress(item.id)} style={styles.checkbox}>
                 <AnimatedCheckbox
@@ -120,9 +120,9 @@ export default function PubEspece() {
           </View>
         )}
       />
-      <TouchableOpacity onPress={() => flatListRef.current?.scrollToOffset({ offset: 0, animated: true })} style={styles.scrollToTopButton}>
+      <Pressable onPress={() => flatListRef.current?.scrollToOffset({ offset: 0, animated: true })} style={styles.scrollToTopButton}>
             <Ionicons name="arrow-up-outline" size={32} color="#fff" />
-          </TouchableOpacity>
+          </Pressable>
       <BigButtonDown buttonText="Choisir" onPress={handleValidation} />
       <Modal visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
         {selectedSpeciesDetails && (
@@ -137,11 +137,11 @@ export default function PubEspece() {
             <Image style={styles.imageModal} source={require('../../assets/images/noflower.png')} />
             <View style={styles.fixedDetailsBtn}>
               <View style={styles.selectorContainer}>
-                <TouchableOpacity style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
+                <Pressable style={[styles.selectorButton, { backgroundColor: '#668F80' }]} onPress={() => setModalVisible(false)}>
                   <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
                     Retour
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             </View>
           </View>
