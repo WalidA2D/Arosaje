@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, TextInput, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AnimatedCheckbox from 'react-native-checkbox-reanimated'
@@ -9,6 +9,14 @@ import HeaderTitle from '../../components/HeaderTitle';
   interface ConnexionScreenProps {
     setIsModalVisible: (isVisible: boolean, type: string) => void;
 }
+
+type RootStackParamList = {
+  // Définissez vos routes ici, par exemple :
+  'connexion': undefined;
+  '(tabs)': undefined;
+  'support': undefined;
+  'inscription': undefined;
+};
 
 export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenProps) {
     const [email, onChangeEmail] = React.useState('a@b.com');
@@ -32,7 +40,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
 
     const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
     const handleLogin = async () => {
         try {
