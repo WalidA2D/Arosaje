@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput, RefreshControl  } from 'react-native';
+import { StyleSheet, View, FlatList, ActivityIndicator, Text, Button, TextInput, RefreshControl } from 'react-native';
 import { NavigationContainer, useNavigation, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import ContentItem from '../../components/navigation/ContentItem';
@@ -35,7 +35,7 @@ type RootStackParamList = {
   Actualités: { cityName?: string; dateStart?: string; dateEnd?: string; plantOrigin?: string; queryString?: string } | undefined;
   Filtre: undefined;
   Carte: undefined;
-  BlogFocus: { id: string };
+  BlogFocus: { id: string; title: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -66,11 +66,7 @@ function HomeScreen({ }) {
               <Ionicons name="map-outline" size={24} color="#fff" onPress={() => navigation.navigate('Carte')} />
             ),
             headerRight: () => (
-              <Button
-                onPress={() => navigation.navigate('Filtre')}
-                title="Filtre"
-                color="#fff"
-              />
+              <Ionicons name="funnel" size={24} color="#fff" onPress={() => navigation.navigate('Filtre')} />
             ),
           })}
         />
@@ -87,7 +83,10 @@ function HomeScreen({ }) {
         <Stack.Screen
           name="BlogFocus"
           component={BlogFocus}
-          options={{ headerBackTitleVisible: false }}
+          options={({ route }) => ({
+            headerBackTitleVisible: false,
+            title: route.params?.title || 'BlogFocus',
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
@@ -196,8 +195,8 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
     }
   };
 
-  const blogFocusNavigate = (id: string) => {
-    navigation.navigate('BlogFocus', { id });
+  const blogFocusNavigate = (id: string, title: string) => {
+    navigation.navigate('BlogFocus', { id, title });
   };
 
   const onRefresh = () => {
@@ -237,7 +236,7 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
             title={item.title}
             description={item.description}
             time={item.time}
-            onPress={blogFocusNavigate}
+            onPress={() => blogFocusNavigate(item.id, item.title)}
           />
         )}
         onEndReached={loadMoreItems}
@@ -268,7 +267,7 @@ const styles = StyleSheet.create({
     borderColor: '#CCC',
     borderWidth: 1,
     borderBottomRightRadius: 20,
-    borderBottomLeftRadius:20,
+    borderBottomLeftRadius: 20,
     paddingLeft: 15,
     backgroundColor: '#F0F0F0',
     color: '#000',

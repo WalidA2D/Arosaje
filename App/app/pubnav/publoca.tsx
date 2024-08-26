@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, FlatList, Keyboard } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, FlatList, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -185,12 +185,12 @@ export default function PubLoca() {
               <Text style={styles.text}>Addresse : {localisation}</Text>
             </>
           ) : null}
-          <TouchableOpacity onPress={handleAutoLocation} style={styles.autoButton}>
+          <Pressable onPress={handleAutoLocation} style={styles.autoButton}>
             <Text style={styles.buttonText}>Localisation automatique</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={editLocalisation} style={styles.manualButton}>
+          </Pressable>
+          <Pressable onPress={editLocalisation} style={styles.manualButton}>
             <Text style={styles.buttonText}>Localisation manuelle</Text>
-          </TouchableOpacity>
+          </Pressable>
           {isEditing && (
             <>
               <TextInput
@@ -209,9 +209,9 @@ export default function PubLoca() {
                 data={suggestions}
                 keyExtractor={(item) => item.place_id}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => handleSelectSuggestion(item)}>
+                  <Pressable onPress={() => handleSelectSuggestion(item)}>
                     <Text style={styles.suggestion}>{item.display_name}</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
               />
               <TextInput
@@ -231,9 +231,9 @@ export default function PubLoca() {
                 data={citySuggestions}
                 keyExtractor={(item) => item.place_id}
                 renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => handleSelectSuggestion(item)}>
+                  <Pressable onPress={() => handleSelectSuggestion(item)}>
                     <Text style={styles.suggestion}>{item.display_name}</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 )}
               />*/}
             </>
@@ -241,9 +241,9 @@ export default function PubLoca() {
           {/*<View style={styles.mapContainer}>
             <OpenLayersMap latitude={region.latitude} longitude={region.longitude} />
           </View>*/}
-          <TouchableOpacity onPress={clearLocalisation} style={styles.clearButtonContainer}>
+          <Pressable onPress={clearLocalisation} style={styles.clearButtonContainer}>
             <Text style={styles.clearButton}>Vider la localisation</Text>
-          </TouchableOpacity>
+          </Pressable>
           <BigButtonDown buttonText="Valider" onPress={handleValidation} />
         </>
       )}

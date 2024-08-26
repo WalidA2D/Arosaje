@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, Image, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
 
 import MessageScreen from '../convnav/messages';
 import ChatbotScreen from '../convnav/bot';
@@ -14,7 +13,7 @@ import Profil from '../convnav/profilconsulte';
 
 type RootStackParamList = {
   Conversations: undefined;
-  Message: { userName: string; idUser: number, initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }> };
+  Message: { userName: string; idUser: number; conversationId: number; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }> };
   Profil: { idUser: number };
   Chatbot: undefined;
   Histoire: undefined;
@@ -63,7 +62,7 @@ export function ExploreScreen() {
   const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]); // Changer le type en number[] pour stocker les ID des conversations
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
   useEffect(() => {
@@ -92,7 +91,7 @@ export function ExploreScreen() {
 
           const chatbotUser: User = {
             id: 0,
-            idUser:0,
+            idUser: 0,
             userName: 'Chatbot',
             avatar: require('../../assets/images/bot.png'),
             initialMessages: [
@@ -126,9 +125,9 @@ export function ExploreScreen() {
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity onPress={() => setShowSearchBar(!showSearchBar)} style={{ marginRight: 10 }}>
+        <Pressable onPress={() => setShowSearchBar(!showSearchBar)} style={{ marginRight: 10 }}>
           <Icon name="filter" size={20} color="#fff" />
-        </TouchableOpacity>
+        </Pressable>
       ),
     });
   }, [navigation, showSearchBar]);
@@ -228,12 +227,13 @@ export function ExploreScreen() {
       )}
       <ScrollView>
         {filteredUsers.map((user: User) => (
-          <TouchableOpacity
+          <Pressable
             key={user.id}
             onLongPress={() => handleLongPressUser(user.id)}
             onPress={() => isSelecting ? handleSelectUser(user.id) : user.userName === 'Chatbot' ? navigation.navigate('Chatbot') : navigation.navigate('Message', {
               userName: user.userName,
               idUser: user.idUser,
+              conversationId: user.id, // Pass the conversation ID here
               initialMessages: user.initialMessages,
             })}
             style={[
@@ -245,24 +245,24 @@ export function ExploreScreen() {
               <Image source={user.userName === 'Chatbot' ? user.avatar : { uri: user.avatar }} style={styles.avatar} />
               <Text style={styles.chatName}>{user.userName}</Text>
               {user.userName !== 'Chatbot' && (
-                <TouchableOpacity
+                <Pressable
                   onPress={() => navigation.navigate('Profil', { idUser: user.idUser })}
                 >
                   <Icon name="user" size={20} color="#668F80" style={{ marginLeft: 10 }} />
-                </TouchableOpacity>
+                </Pressable>
               )}
             </View>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </ScrollView>
       {isSelecting && selectedUsers.length > 0 && (
         <View style={styles.selectionButtonsContainer}>
-          <TouchableOpacity style={styles.cancelButton} onPress={handleCancelSelection}>
+          <Pressable style={styles.cancelButton} onPress={handleCancelSelection}>
             <Text style={styles.cancelButtonText}>Annuler</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteSelectedUsers}>
+          </Pressable>
+          <Pressable style={styles.deleteButton} onPress={handleDeleteSelectedUsers}>
             <Text style={styles.deleteButtonText}>Supprimer</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       )}
     </View>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, ScrollView, Pressable } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -115,9 +115,9 @@ const UpdateProfil = () => {
                 editable={isLastNameEditable}
                 onChangeText={(text) => { setNewLastName(text); }}
               />
-              <TouchableOpacity onPress={() => setIsLastNameEditable(!isLastNameEditable)}>
+              <Pressable onPress={() => setIsLastNameEditable(!isLastNameEditable)}>
                 <Ionicons name={isLastNameEditable ? "close" : "pencil"} size={20} color="#668F80" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
@@ -130,9 +130,9 @@ const UpdateProfil = () => {
                 editable={isFirstNameEditable}
                 onChangeText={(text) => { setNewFirstName(text); }}
               />
-              <TouchableOpacity onPress={() => setIsFirstNameEditable(!isFirstNameEditable)}>
+              <Pressable onPress={() => setIsFirstNameEditable(!isFirstNameEditable)}>
                 <Ionicons name={isFirstNameEditable ? "close" : "pencil"} size={20} color="#668F80" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
@@ -145,9 +145,9 @@ const UpdateProfil = () => {
                 editable={isAddressEditable}
                 onChangeText={(text) => { setNewAddress(text); }}
               />
-              <TouchableOpacity onPress={() => setIsAddressEditable(!isAddressEditable)}>
+              <Pressable onPress={() => setIsAddressEditable(!isAddressEditable)}>
                 <Ionicons name={isAddressEditable ? "close" : "pencil"} size={20} color="#668F80" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
@@ -160,9 +160,9 @@ const UpdateProfil = () => {
                 editable={isCityNameEditable}
                 onChangeText={(text) => { setNewCityName(text); }}
               />
-              <TouchableOpacity onPress={() => setIsCityNameEditable(!isCityNameEditable)}>
+              <Pressable onPress={() => setIsCityNameEditable(!isCityNameEditable)}>
                 <Ionicons name={isCityNameEditable ? "close" : "pencil"} size={20} color="#668F80" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
@@ -176,9 +176,9 @@ const UpdateProfil = () => {
                 keyboardType="numeric"
                 onChangeText={(text) => { setNewPhone(text); setPhoneError(''); }}
               />
-              <TouchableOpacity onPress={() => setIsPhoneEditable(!isPhoneEditable)}>
+              <Pressable onPress={() => setIsPhoneEditable(!isPhoneEditable)}>
                 <Ionicons name={isPhoneEditable ? "close" : "pencil"} size={20} color="#668F80" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
             {phoneError ? <Text style={styles.errorText}>{phoneError}</Text> : null}
           </View>
@@ -186,11 +186,11 @@ const UpdateProfil = () => {
       </ScrollView>
       <View style={styles.fixedDetailsBtn}>
         <View style={styles.selectorContainer}>
-          <TouchableOpacity style={styles.selectorButton} onPress={ModifSubmit}>
+          <Pressable style={styles.selectorButton} onPress={ModifSubmit}>
             <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold' }}>
               Mettre à jour
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       

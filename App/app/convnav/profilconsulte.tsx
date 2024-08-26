@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Image, View, Text, ScrollView, TouchableOpacity, Linking, Alert } from 'react-native';
+import { StyleSheet, Image, View, Text, ScrollView, Pressable, Linking, Alert } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -161,9 +161,9 @@ export default function ProfileConsultView() {
         <View style={styles.profileDetails}>
           <Text style={styles.profileName}>{`${profileData.firstName} ${profileData.lastName}`}</Text>
           
-          <TouchableOpacity onPress={() => openMap(profileData.cityName)}>
+          <Pressable onPress={() => openMap(profileData.cityName)}>
             <Text style={styles.profileRole}>{profileData.role} | {profileData.cityName}</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.selectorContainer}>

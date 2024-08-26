@@ -1,0 +1,20 @@
+# Utiliser l'image Node.js
+FROM node:18
+
+# Créer un répertoire pour l'application
+WORKDIR /usr/src/app
+
+# Copier les fichiers package.json et package-lock.json
+COPY package*.json ./
+
+# Installer les dépendances
+RUN npm install
+
+# Copier le reste du code source
+COPY . .
+
+# Exposer les ports utilisés par Expo
+EXPOSE 19000 19001 19002
+
+# Lancer l'application Expo
+CMD ["npm", "start"]

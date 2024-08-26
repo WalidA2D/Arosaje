@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { StyleSheet, View, useWindowDimensions, FlatList, Image, Text, PanResponder, PanResponderGestureState, PanResponderInstance, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, useWindowDimensions, FlatList, Image, Text, PanResponder, PanResponderGestureState, PanResponderInstance, Pressable } from 'react-native';
 
 // Définir les types pour les props du composant
 type ContentItemProps = {
@@ -33,7 +33,7 @@ const ContentItem: React.FC<ContentItemProps> = ({ id,images, title, description
   return (
     
     <View style={styles.container} {...panResponder.panHandlers}>
-      <TouchableOpacity onPress={() => onPress?.(id)}>
+      <Pressable onPress={() => onPress?.(id)}>
       <FlatList
         ref={flatListRef}
         horizontal
@@ -65,7 +65,7 @@ const ContentItem: React.FC<ContentItemProps> = ({ id,images, title, description
           ))}
         </View>
       </View>
-</TouchableOpacity>
+</Pressable>
     </View>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Pressable, TextInput, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, Pressable, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -141,23 +141,29 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
 
         <View style={styles.selectorContainer}>
 
-            <TouchableOpacity style={styles.selectorButton} onPress={() => { handleLogin(); }}>
+            <Pressable style={styles.selectorButton} onPress={() => { handleLogin(); }}>
                 <Text style={{color : '#FFF', fontSize : 18, fontWeight: 'bold',}}>Connexion</Text>
-            </TouchableOpacity>
+            </Pressable>
 
         </View>
 
-        <TouchableOpacity>
+        <Pressable onPress={() => {
+            setIsModalVisible(false, 'connexion');
+            setIsModalVisible(true, 'support');
+        }}>
             <Text style={styles.selectorButtonConnexionText}>
                 Mot de passe oublié ?
             </Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity>
+        <Pressable onPress={() => {
+            setIsModalVisible(false, 'connexion');
+            setIsModalVisible(true, 'inscription');
+        }}>
             <Text style={styles.selectorButtonConnexionText}>
                 Créer un compte
             </Text>
-        </TouchableOpacity>
+        </Pressable>
 
         </View>
     </View>
@@ -262,4 +268,3 @@ const styles = StyleSheet.create({
       marginTop: 10,
     },
   });
-  
