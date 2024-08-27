@@ -1,0 +1,255 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Support renders correctly 1`] = `
+<View
+  style={
+    {
+      "flex": 1,
+      "justifyContent": "center",
+      "padding": 20,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "fontSize": 32,
+        "paddingBottom": 10,
+      }
+    }
+  >
+    Contactez-nous
+  </Text>
+  <TextInput
+    editable={false}
+    placeholder="A"
+    style={
+      {
+        "borderColor": "gray",
+        "borderWidth": 1,
+        "height": 40,
+        "marginBottom": 10,
+        "padding": 10,
+      }
+    }
+    value="support@arosaje.com"
+  />
+  <Text
+    style={
+      {
+        "fontSize": 14,
+        "paddingBottom": 5,
+        "paddingTop": 10,
+      }
+    }
+  >
+    Votre email :
+  </Text>
+  <TextInput
+    onChangeText={[Function]}
+    placeholder="Votre email"
+    style={
+      {
+        "borderColor": "gray",
+        "borderWidth": 1,
+        "height": 40,
+        "marginBottom": 10,
+        "padding": 10,
+      }
+    }
+    value=""
+  />
+  <Text
+    style={
+      {
+        "fontSize": 14,
+        "paddingBottom": 5,
+        "paddingTop": 10,
+      }
+    }
+  >
+    Sujet :
+  </Text>
+  <View
+    style={
+      [
+        {
+          "alignSelf": "stretch",
+        },
+        undefined,
+      ]
+    }
+  >
+    <View
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
+      testID="ios_touchable_wrapper"
+    >
+      <View
+        pointerEvents="box-only"
+      >
+        <TextInput
+          editable={false}
+          style={
+            [
+              {
+                "borderColor": "gray",
+                "borderRadius": 4,
+                "borderWidth": 1,
+                "color": "black",
+                "fontSize": 16,
+                "paddingHorizontal": 10,
+                "paddingRight": 30,
+                "paddingVertical": 12,
+              },
+              {
+                "color": "#c7c7cd",
+              },
+            ]
+          }
+          testID="text_input"
+          value="Sélectionnez une option"
+        />
+      </View>
+    </View>
+  </View>
+  <Text
+    style={
+      {
+        "fontSize": 14,
+        "paddingBottom": 5,
+        "paddingTop": 10,
+      }
+    }
+  >
+    Description :
+  </Text>
+  <TextInput
+    onChangeText={[Function]}
+    placeholder="Description"
+    style={
+      {
+        "borderColor": "gray",
+        "borderWidth": 1,
+        "height": 100,
+        "marginBottom": 10,
+        "marginTop": 10,
+        "padding": 10,
+      }
+    }
+    value=""
+  />
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "bottom": 0,
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+      }
+    }
+  >
+    <View
+      style={
+        [
+          {
+            "alignItems": "center",
+            "borderRadius": 25,
+            "flexDirection": "row",
+            "marginBottom": 20,
+            "overflow": "hidden",
+            "width": "90%",
+          },
+          {
+            "backgroundColor": "#E0E0E0",
+          },
+        ]
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#668F80",
+            "flex": 1,
+            "justifyContent": "center",
+            "paddingVertical": 20,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFF",
+              "fontSize": 14,
+              "fontWeight": "bold",
+            }
+          }
+        >
+          Envoyer
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
