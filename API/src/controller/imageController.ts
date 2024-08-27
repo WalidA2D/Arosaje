@@ -35,7 +35,7 @@ class ImageController {
 
       await user.update({ photo: fileUrl });
 
-      res.status(201).json({ success: true, msg: "Image ajoutée avec succès", url: fileUrl });
+      res.status(200).json({ success: true, msg: "Image ajoutée avec succès", url: fileUrl });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Upload PP échouée" });

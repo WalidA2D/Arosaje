@@ -14,8 +14,8 @@ class ConversationsController {
 
       const { dateStart, dateEnd, idUser1, idUser2 } = req.body;
 
-      if(user.dataValues.idUsers != idUser1
-        && user.dataValues.idUsers != idUser2
+      if(user.dataValues.idUsers.toString() != idUser1.toString()
+        && user.dataValues.idUsers.toString() != idUser2.toString()
       ){
         return res.status(413).json({ success: false, msg:"Droits requis"})
       }
