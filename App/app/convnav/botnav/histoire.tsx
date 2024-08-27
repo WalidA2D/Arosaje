@@ -1,9 +1,6 @@
 import React from 'react';
-import { WebView } from 'react-native-webview';
-
+import DonneesPersonnelles from '../../optnav/donnees'; // Importer le composant DonneesPersonnelles
 
 export default function Histoire() {
-
-    return <WebView source={{ uri: 'https://support.google.com/websearch' }} />;
-
-  }
+    return <DonneesPersonnelles />; // Afficher le composant DonneesPersonnelles
+}
