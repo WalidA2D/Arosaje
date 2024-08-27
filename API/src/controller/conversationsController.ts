@@ -14,8 +14,8 @@ class ConversationsController {
 
       const { dateStart, dateEnd, idUser1, idUser2 } = req.body;
 
-      if(user.dataValues.idUsers !== idUser1
-        && user.dataValues.idUsers !== idUser2
+      if(user.dataValues.idUsers != idUser1
+        && user.dataValues.idUsers != idUser2
       ){
         return res.status(413).json({ success: false, msg:"Droits requis"})
       }
@@ -28,7 +28,7 @@ class ConversationsController {
           ]
         }
       })
-      if (convExist) return res.status(413).json({ success: true, msg:"Conversation déjà existante"})
+      if (convExist) return res.status(200).json({ success: true, msg:"Conversation déjà existante", idConv:convExist.dataValues.idConversations});
 
       await ConvInstance.create({
         dateStart,
