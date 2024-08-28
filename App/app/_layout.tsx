@@ -28,8 +28,10 @@ export default function RootLayout() {
     try {
       const userToken = await AsyncStorage.getItem('userToken');
       const userId = await AsyncStorage.getItem('userId');
+      const role = await AsyncStorage.getItem('role');
       console.log(userToken);
       console.log(userId);
+      console.log(role);
 
       if (!userToken) {
         return <Stack.Screen name="index" options={{ headerShown: false }} />;

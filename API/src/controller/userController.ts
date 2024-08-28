@@ -25,7 +25,6 @@ class UserController {
         "cityName": u.cityName,
         "password": u.password,
         "photo": u.photo,
-        "role": u.isBotanist?"Botaniste":u.isAdmin?"Administrateur":"Utilisateur",
         "isBan": u.isBan?true:false,
         "note": u.note,
         "uid": u.uid
@@ -132,11 +131,25 @@ class UserController {
   async connexion(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
-      const user = await UserInstance.findOne({ where: { email } });
-      if (!user) return res.status(401).json({ success: false, msg: "Utilisateur non trouvé" });
+      const u = await UserInstance.findOne({ where: { email } });
+      if (!u) return res.status(401).json({ success: false, msg: "Utilisateur non trouvé" });
       const encryptedPassword = await encryptMethod(password);
-      if (user.dataValues.password !== encryptedPassword) return res.status(401).json({ success: false, msg: "Mot de passe incorrect" });
-      return res.status(200).json({ success: true, msg: "Connexion réussie", user });
+      if (u.dataValues.password !== encryptedPassword) return res.status(401).json({ success: false, msg: "Mot de passe incorrect" });
+      return res.status(200).json({ success: true, msg: "Connexion réussie", user : {
+        "idUsers": u.dataValues.idUsers,
+        "lastName": u.dataValues.lastName,
+        "firstName": u.dataValues.firstName,
+        "email": u.dataValues.email,
+        "address": u.dataValues.address,
+        "phone": u.dataValues.phone,
+        "cityName": u.dataValues.cityName,
+        "password": u.dataValues.password,
+        "photo": u.dataValues.photo,
+        "role": u.dataValues.isBotanist?"Botaniste":u.dataValues.isAdmin?"Administrateur":"Utilisateur",
+        "isBan": u.dataValues.isBan?true:false,
+        "note": u.dataValues.note,
+        "uid": u.dataValues.uid
+      }, });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la connexion" });

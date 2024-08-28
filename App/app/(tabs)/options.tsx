@@ -101,6 +101,7 @@ function OptionsContent({ }) {
   const handleLogout = async () => {
     await AsyncStorage.removeItem('userToken');
     await AsyncStorage.removeItem('userId');
+    await AsyncStorage.removeItem('role');
     await AsyncStorage.removeItem('email');
     await AsyncStorage.removeItem('password');
     setModalVisible(true, 'index')

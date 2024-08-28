@@ -63,6 +63,7 @@ export default function BlogFocus() {
   const [commentNote, setCommentNote] = useState<number>(0);
   const [showMessageInput, setShowMessageInput] = useState<boolean>(false);
   const [messageText, setMessageText] = useState<string>("");
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBlogData = async () => {
@@ -115,7 +116,13 @@ export default function BlogFocus() {
       }
     };
 
+    const fetchRole = async () => {
+      const userRole = await AsyncStorage.getItem("role");
+      setRole(userRole)
+    }
+
     fetchBlogData();
+    fetchRole();
   }, [id]);
 
   const toggleFavorite = async () => {
@@ -196,7 +203,7 @@ export default function BlogFocus() {
     try {
       const token = await AsyncStorage.getItem("userToken");
       const userId = await AsyncStorage.getItem("userId");
-  
+
       if (!userId || !blogData.post?.idUser) {
         Alert.alert(
           "Erreur",
@@ -204,7 +211,7 @@ export default function BlogFocus() {
         );
         return;
       }
-  
+
       const convResponse = await fetch(`${apiUrl}/conv/add`, {
         method: "POST",
         headers: {
@@ -216,16 +223,16 @@ export default function BlogFocus() {
           idUser2: blogData.post.idUser
         }),
       });
-  
+
       const convResult = await convResponse.json();
-  
+
       if (!convResult.success) {
         Alert.alert("Erreur lors de la création de la conversation", convResult.msg);
         return;
       }
-  
+
       const idConversation = convResult.idConv;
-  
+
       if (!idConversation) {
         Alert.alert("Erreur", "Impossible de récupérer l'id de la conversation.");
         return;
@@ -242,9 +249,9 @@ export default function BlogFocus() {
           idConversation: idConversation,
         }),
       });
-  
+
       const msgResult = await msgResponse.json();
-  
+
       if (msgResult.success) {
         Alert.alert("Message envoyé avec succès !");
         setMessageText("");
@@ -256,7 +263,7 @@ export default function BlogFocus() {
       console.error("Erreur lors de l'envoi du message:", error);
     }
   };
-  
+
 
   if (loading) {
     return (
@@ -338,41 +345,43 @@ export default function BlogFocus() {
             </View>
           </Modal>
 
-          <View style={styles.addCommentSection}>
-            <Text style={styles.addCommentHeader}>
-              Ajouter un commentaire :
-            </Text>
+          {role !== "Utilisateur" && (
+            <View style={styles.addCommentSection}>
+              <Text style={styles.addCommentHeader}>
+                Ajouter un commentaire :
+              </Text>
 
-            <Text style={styles.inputLabel}>Commentaire :</Text>
-            <TextInput
-              style={styles.commentInput}
-              placeholder="Votre commentaire"
-              value={commentText}
-              onChangeText={setCommentText}
-            />
+              <Text style={styles.inputLabel}>Commentaire :</Text>
+              <TextInput
+                style={styles.commentInput}
+                placeholder="Votre commentaire"
+                value={commentText}
+                onChangeText={setCommentText}
+              />
 
-            <Text style={styles.inputLabel}>Note (0 à 5) :</Text>
-            <TextInput
-              style={styles.noteInput}
-              placeholder="Note (0 à 5)"
-              value={commentNote.toString()}
-              onChangeText={(text) => {
-                const sanitizedText = text
-                  .replace(",", ".")
-                  .replace(/[^0-9.]/g, "");
+              <Text style={styles.inputLabel}>Note (0 à 5) :</Text>
+              <TextInput
+                style={styles.noteInput}
+                placeholder="Note (0 à 5)"
+                value={commentNote.toString()}
+                onChangeText={(text) => {
+                  const sanitizedText = text
+                    .replace(",", ".")
+                    .replace(/[^0-9.]/g, "");
 
-                let note = Number(sanitizedText);
+                  let note = Number(sanitizedText);
 
-                if (note > 5) {
-                  note = 5;
-                }
-                setCommentNote(note);
-              }}
-              keyboardType="numeric"
-            />
+                  if (note > 5) {
+                    note = 5;
+                  }
+                  setCommentNote(note);
+                }}
+                keyboardType="numeric"
+              />
 
-            <Button title="Envoyer" onPress={addComment} />
-          </View>
+              <Button title="Envoyer" onPress={addComment} />
+            </View>
+          )}
 
           <View style={styles.commentsSection}>
             <Text style={styles.commentsHeader}>Commentaires:</Text>

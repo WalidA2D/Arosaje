@@ -1,12 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Assurez-vous que cet import est présent
 import AnimatedCheckbox from 'react-native-checkbox-reanimated';
 import BigButtonDown from '../../components/BigButtonDown';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Ajout de l'import
 
 export default function Notif() {
+    const navigation = useNavigation(); // Utilisation de useNavigation
+
     const [emailChecked, setEmailChecked] = useState(false);
     const [appChecked, setAppChecked] = useState(false);
     const [smsChecked, setSmsChecked] = useState(false);
+
+    // Fonction pour charger les préférences de notification
+    const loadPreferences = async () => {
+        const email = await AsyncStorage.getItem('emailChecked');
+        const app = await AsyncStorage.getItem('appChecked');
+        const sms = await AsyncStorage.getItem('smsChecked');
+        if (email !== null) setEmailChecked(JSON.parse(email));
+        if (app !== null) setAppChecked(JSON.parse(app));
+        if (sms !== null) setSmsChecked(JSON.parse(sms));
+    };
+
+    // Fonction pour sauvegarder les préférences de notification
+    const savePreferences = async () => {
+        await AsyncStorage.setItem('emailChecked', JSON.stringify(emailChecked));
+        await AsyncStorage.setItem('appChecked', JSON.stringify(appChecked));
+        await AsyncStorage.setItem('smsChecked', JSON.stringify(smsChecked));
+    };
+
+    // Charger les préférences lors du premier rendu
+    useEffect(() => {
+        loadPreferences();
+    }, []);
+
+    // Sauvegarder les préférences lors de la validation
+    const handleValidation = () => {
+        savePreferences();
+        navigation.goBack();
+    };
 
     const handleCheckboxPress = (type: string) => {
         if (type === 'email') setEmailChecked(!emailChecked);
@@ -58,7 +90,7 @@ export default function Notif() {
                     Vous pouvez gérer vos préférences de notification dans les paramètres de l'application.
                 </Text>
             </View>
-            <BigButtonDown buttonText="Valider" />
+            <BigButtonDown buttonText="Valider" onPress={handleValidation} />
         </View>
     );
 }
@@ -66,6 +98,7 @@ export default function Notif() {
 const styles = StyleSheet.create({
     notificationContainer: {
         padding: 20,
+        justifyContent: 'center',
     },
     notificationTitle: {
         fontWeight: 'bold',
@@ -88,5 +121,6 @@ const styles = StyleSheet.create({
     },
     notificationType: {
         fontSize: 14,
+        marginRight: 20,
     },
 });
