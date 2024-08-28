@@ -17,10 +17,10 @@ COPY . .
 RUN npm run build
 
 # Exposer le port sur lequel l'application sera accessible
-EXPOSE 3000
+EXPOSE 3000 5070
 
 # Lancer l'application
-CMD ["node", "dist/server.js"]
+CMD ["npm", "run", "dev"]
 
 # Optionnel: Commande pour exécuter les tests
 # CMD ["npm", "test"]

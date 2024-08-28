@@ -3,18 +3,9 @@ version: '3.8'
 services:
   api:
     build:
-      context: ./API
-    networks:
-      - arosaje-network
-
-  nginx:
-    image: nginx:alpine
+      context: ./Api
     ports:
-      - "80:80"  # Le port public pour accéder à l'API via Nginx
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf  # Montre le fichier de configuration nginx.conf
-    depends_on:
-      - api
+      - "3000:3000"
     networks:
       - arosaje-network
 
@@ -28,14 +19,22 @@ services:
     networks:
       - arosaje-network
 
-  api-tests:
-    build:
-      context: ./API
-    command: ["npm", "test"]
-    networks:
-      - arosaje-network
-    depends_on:
-      - api
+  # web:
+  #   build:
+  #     context: ./Web
+  #   ports:
+  #     - "80:80"
+  #   networks:
+  #     - arosaje-network
+
+  # api-tests:
+  #   build:
+  #     context: ./Api
+  #   command: ["npm", "test"]
+  #   networks:
+  #     - arosaje-network
+  #   depends_on:
+  #     - api
 
 networks:
   arosaje-network:
