@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, Pressable, Image, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, Image, ScrollView, Alert, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -63,33 +63,47 @@ export function ExploreScreen() {
   const [users, setUsers] = useState<User[]>([]);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      const userToken = await AsyncStorage.getItem('userToken');
-      const options = {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': userToken || '',
-        },
-      };
+  const fetchConversations = async () => {
+    setRefreshing(true);
+    const userToken = await AsyncStorage.getItem('userToken');
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': userToken || '',
+      },
+    };
 
-      try {
-        const response = await fetch(`${apiUrl}/conv/read`, options);
-        const data = await response.json();
+    try {
+      const response = await fetch(`${apiUrl}/conv/read`, options);
+      const data = await response.json();
 
-        if (data.success) {
-          const apiUsers = data.conversations.map((conv: any) => ({
-            id: conv.idConversation,
-            idUser: conv.idUser,
-            userName: `${conv.firstName} ${conv.lastName}`, 
-            avatar: conv.photo, 
-            initialMessages: [],  
-          }));
+      if (data.success) {
+        const apiUsers = data.conversations.map((conv: any) => ({
+          id: conv.idConversation,
+          idUser: conv.idUser,
+          userName: `${conv.firstName} ${conv.lastName}`, 
+          avatar: conv.photo, 
+          initialMessages: [],  
+        }));
 
-          const chatbotUser: User = {
+        const chatbotUser: User = {
+          id: 0,
+          idUser: 0,
+          userName: 'Chatbot',
+          avatar: require('../../assets/images/bot.png'),
+          initialMessages: [
+            { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
+          ],
+        };
+
+        setUsers([chatbotUser, ...apiUsers]);
+      } else {
+        setUsers([
+          {
             id: 0,
             idUser: 0,
             userName: 'Chatbot',
@@ -97,28 +111,17 @@ export function ExploreScreen() {
             initialMessages: [
               { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
             ],
-          };
-
-          setUsers([chatbotUser, ...apiUsers]);
-        } else {
-          // console.error('No conversations found or data.success is false');
-          setUsers([
-            {
-              id: 0,
-              idUser: 0,
-              userName: 'Chatbot',
-              avatar: require('../../assets/images/bot.png'),
-              initialMessages: [
-                { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
-              ],
-            }
-          ]);
-        }
-      } catch (error) {
-        // console.error('Error fetching conversations:', error);
+          }
+        ]);
       }
-    };
+    } catch (error) {
+      // Gestion des erreurs
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
+  useEffect(() => {
     fetchConversations();
   }, []);
 
@@ -225,7 +228,14 @@ export function ExploreScreen() {
           <Icon name="search" size={20} color="#668F80" style={styles.searchIcon} />
         </View>
       )}
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={fetchConversations}
+          />
+        }
+      >
         {filteredUsers.map((user: User) => (
           <Pressable
             key={user.id}
@@ -233,7 +243,7 @@ export function ExploreScreen() {
             onPress={() => isSelecting ? handleSelectUser(user.id) : user.userName === 'Chatbot' ? navigation.navigate('Chatbot') : navigation.navigate('Message', {
               userName: user.userName,
               idUser: user.idUser,
-              conversationId: user.id, // Pass the conversation ID here
+              conversationId: user.id, 
               initialMessages: user.initialMessages,
             })}
             style={[
