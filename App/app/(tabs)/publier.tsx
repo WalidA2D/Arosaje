@@ -450,9 +450,9 @@ function PublierContent() {
         <ListDash buttonText={`Espèce : ${espece}`} onPress={() => navigation.navigate('Espece', { espece: "" })} />
         <Ionicons name={espValid ? 'checkmark-circle' : 'close-circle'} size={24} color={espValid ? "#668F80" : "#ff2b24"} style={styles.iconValid} />
         <View style={styles.separatorDetails} />
-        <ListDash buttonText={`${entretien ? 'Exigence d’entretien : {...}' : 'Exigence d’entretien (optionel)'}`} onPress={() => navigation.navigate('Entretien', { entretien: "" })} />
+        {/*<ListDash buttonText={`${entretien ? 'Exigence d’entretien : {...}' : 'Exigence d’entretien (optionel)'}`} onPress={() => navigation.navigate('Entretien', { entretien: "" })} />
         <Ionicons name={ettValid ? 'checkmark-circle' : 'close-circle'} size={24} color={ettValid ? "#668F80" : "#828282"} style={styles.iconValid} />
-        <View style={styles.separatorDetails} />
+        <View style={styles.separatorDetails} />*/}
       </View>
       <View style={styles.fixedDetailsBtn}>
         <Pressable onPress={() => resetPost()} style={styles.clearButtonContainer}>
