@@ -67,15 +67,6 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
             plant.commonNames.join(", ") || plant.scientificNameWithoutAuthor,
         }));
         setPlantOrigins(originOptions);
-      } catch (error) {
-        // console.error(
-          "Erreur lors de la récupération des origines des plantes:",
-          error
-        );
-        Alert.alert(
-          "Erreur",
-          "Impossible de récupérer la liste des origines des plantes."
-        );
       } finally {
         setLoading(false);
       }

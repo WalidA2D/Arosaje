@@ -128,7 +128,7 @@ export default function ProfileConsultView() {
                   // console.error("Don't know how to open URI: " + url);
                 }
               })
-              .catch(err => // console.error('An error occurred', err));
+              // .catch(err => // console.error('An error occurred', err));
           },
         },
       ],

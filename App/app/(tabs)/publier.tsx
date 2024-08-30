@@ -257,15 +257,6 @@ function PublierContent() {
       const storedphoto = await AsyncStorage.getItem('photo');
       const storedplantName = await AsyncStorage.getItem('plante')
 
-      // console.log('Loaded Data:', {
-        storedTitreValid,
-        storedDateValid,
-        storedDescValid,
-        storedLocValid,
-        storedEspValid,
-        storedphotoValid,
-        storedettValid
-      });
 
       if (storedTitre) setTitre(storedTitre);
       if (storedStartDate) setSelectedStartDate(storedStartDate);

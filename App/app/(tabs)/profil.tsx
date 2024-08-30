@@ -318,7 +318,7 @@ export function ProfilScreen() {
                   // console.error("Don't know how to open URI: " + url);
                 }
               })
-              .catch((err: Error) => // console.error('An error occurred', err));
+              // .catch((err: Error) => // console.error('An error occurred', err));
           },
         },
       ],
