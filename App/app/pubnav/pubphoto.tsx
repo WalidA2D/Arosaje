@@ -58,8 +58,8 @@ export default function PubPhoto() {
           },
           body: formData,
         });
-        console.log(formData)
-        console.log(response.status)
+        // console.log(formData)
+        // console.log(response.status)
 
         if (!response.ok) {
           if (response.status === 404) {
@@ -75,7 +75,7 @@ export default function PubPhoto() {
         setPlantName(plantName);
 
       } catch (error) {
-        console.error(error);
+        // console.error(error);
         Alert.alert('Erreur', 'Impossible d’identifier la plante');
       } finally {
         setLoading(false);

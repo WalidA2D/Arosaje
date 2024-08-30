@@ -181,7 +181,7 @@ function PublierContent() {
         },
         body: formData,
       });
-      console.log(response)
+      // console.log(response)
       if (response.ok) {
         Alert.alert('Succès', 'Le post a été envoyé avec succès');
         setModalVisible(false);
@@ -257,7 +257,7 @@ function PublierContent() {
       const storedphoto = await AsyncStorage.getItem('photo');
       const storedplantName = await AsyncStorage.getItem('plante')
 
-      console.log('Loaded Data:', {
+      // console.log('Loaded Data:', {
         storedTitreValid,
         storedDateValid,
         storedDescValid,
@@ -290,7 +290,7 @@ function PublierContent() {
 
     const unsubscribe = navigation.addListener('focus', () => {
       const { titreValid, dateValid, descValid, locValid, espValid, photoValid, ettValid, localisation, cityName } = route.params || {};
-      console.log('Params:', { titreValid, dateValid, descValid, locValid, espValid, photoValid, ettValid, localisation, cityName });
+      // console.log('Params:', { titreValid, dateValid, descValid, locValid, espValid, photoValid, ettValid, localisation, cityName });
       setIsValid(
         (titreValid !== undefined ? titreValid : false) &&
         (dateValid !== undefined ? dateValid : false) &&

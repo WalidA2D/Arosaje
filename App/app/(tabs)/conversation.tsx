@@ -101,7 +101,7 @@ export function ExploreScreen() {
 
           setUsers([chatbotUser, ...apiUsers]);
         } else {
-          console.error('No conversations found or data.success is false');
+          // console.error('No conversations found or data.success is false');
           setUsers([
             {
               id: 0,
@@ -115,7 +115,7 @@ export function ExploreScreen() {
           ]);
         }
       } catch (error) {
-        console.error('Error fetching conversations:', error);
+        // console.error('Error fetching conversations:', error);
       }
     };
 
@@ -188,12 +188,12 @@ export function ExploreScreen() {
                 const data = await response.json();
                 
                 if (data.success) {
-                  console.log(`Conversation avec l'ID ${convId} supprimée avec succès.`);
+                  // console.log(`Conversation avec l'ID ${convId} supprimée avec succès.`);
                 } else {
-                  console.error(`Échec de la suppression de la conversation avec l'ID ${convId}:`, data.message);
+                  // console.error(`Échec de la suppression de la conversation avec l'ID ${convId}:`, data.message);
                 }
               } catch (error) {
-                console.error(`Erreur lors de la suppression de la conversation avec l'ID ${convId}:`, error);
+                // console.error(`Erreur lors de la suppression de la conversation avec l'ID ${convId}:`, error);
               }
             }
 

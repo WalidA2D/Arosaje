@@ -71,11 +71,11 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
             profilePic: data.url, // Use the URL from the response
           }));
         } else {
-          console.error('Failed to update profile picture:', data.msg);
+          // console.error('Failed to update profile picture:', data.msg);
         }
       })
       .catch(error => {
-        console.error('Error updating profile picture:', error);
+        // console.error('Error updating profile picture:', error);
       });
   };
 
@@ -100,11 +100,11 @@ const ProfileImagePopup = forwardRef((props: ProfileImagePopupProps, ref) => {
             profilePic: data.url,
           }));
         } else {
-          console.error('Failed to reset profile picture', data.msg);
+          // console.error('Failed to reset profile picture', data.msg);
         }
       })
       .catch(error => {
-        console.error('Error resetting profile picture:', error);
+        // console.error('Error resetting profile picture:', error);
       });
   };
 

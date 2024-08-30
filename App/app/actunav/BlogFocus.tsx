@@ -107,10 +107,10 @@ export default function BlogFocus() {
           });
           setIsFav(data.isFav);
         } else {
-          console.error("Erreur dans la réponse de l'API:", data);
+          // console.error("Erreur dans la réponse de l'API:", data);
         }
       } catch (error) {
-        console.error("Erreur lors du chargement du blog:", error);
+        // console.error("Erreur lors du chargement du blog:", error);
       } finally {
         setLoading(false);
       }
@@ -144,10 +144,10 @@ export default function BlogFocus() {
       if (result.success) {
         setIsFav(!isFav);
       } else {
-        console.error("Erreur dans la gestion des favoris:", result.message);
+        // console.error("Erreur dans la gestion des favoris:", result.message);
       }
     } catch (error) {
-      console.error("Erreur lors de la gestion des favoris:", error);
+      // console.error("Erreur lors de la gestion des favoris:", error);
     }
   };
 
@@ -194,7 +194,7 @@ export default function BlogFocus() {
         Alert.alert("Erreur lors de l'ajout du commentaire:", result.error);
       }
     } catch (error) {
-      console.error("Erreur lors de l'ajout du commentaire:", error);
+      // console.error("Erreur lors de l'ajout du commentaire:", error);
     }
   };
 
@@ -260,7 +260,7 @@ export default function BlogFocus() {
         Alert.alert("Erreur lors de l'envoi du message", msgResult.msg);
       }
     } catch (error) {
-      console.error("Erreur lors de l'envoi du message:", error);
+      // console.error("Erreur lors de l'envoi du message:", error);
     }
   };
 

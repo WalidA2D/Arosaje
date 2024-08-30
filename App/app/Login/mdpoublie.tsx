@@ -20,9 +20,9 @@ export default function Support({ setIsModalVisible }: supportProps) {
     }
     Alert.alert("Envoyé", "Nous vous enverrons une réponse sous 48H");
     setIsModalVisible(false, 'support');
-    console.log('Email:', email);
-    console.log('Subject:', subject);
-    console.log('Description:', description);
+    // console.log('Email:', email);
+    // console.log('Subject:', subject);
+    // console.log('Description:', description);
   };
 
   return (

@@ -21,7 +21,7 @@ export default function SecuCompte() {
                     setEmail(storedEmail);
                 }
             } catch (error) {
-                console.error('Erreur lors de la récupération de l\'email depuis le local storage:', error);
+                // console.error('Erreur lors de la récupération de l\'email depuis le local storage:', error);
             }
         };
 
@@ -49,7 +49,7 @@ export default function SecuCompte() {
                 Alert.alert("Erreur", "Mot de passe actuel incorrect");
             }
         } catch (error) {
-            console.error('Erreur lors de la vérification du mot de passe actuel:', error);
+            // console.error('Erreur lors de la vérification du mot de passe actuel:', error);
         }
     };
 
@@ -89,7 +89,7 @@ export default function SecuCompte() {
                 Alert.alert("Erreur", "Échec du changement de mot de passe.");
             }
         } catch (error) {
-            console.error('Erreur lors du changement de mot de passe:', error);
+            // console.error('Erreur lors du changement de mot de passe:', error);
         }
     };
 

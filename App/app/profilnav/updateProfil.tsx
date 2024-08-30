@@ -97,7 +97,7 @@ const UpdateProfil = () => {
         }
       })
       .catch(error => {
-        console.error('Error updating profile:', error);
+        // console.error('Error updating profile:', error);
         Alert.alert('Erreur', 'Erreur lors de la mise à jour du profil');
       });
   };

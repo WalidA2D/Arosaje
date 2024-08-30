@@ -46,7 +46,7 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
         }));
         setCities(cityOptions);
       } catch (error) {
-        console.error("Erreur lors de la récupération des villes:", error);
+        // console.error("Erreur lors de la récupération des villes:", error);
         Alert.alert("Erreur", "Impossible de récupérer la liste des villes.");
       } finally {
         setLoading(false);
@@ -68,7 +68,7 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
         }));
         setPlantOrigins(originOptions);
       } catch (error) {
-        console.error(
+        // console.error(
           "Erreur lors de la récupération des origines des plantes:",
           error
         );

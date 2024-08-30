@@ -67,13 +67,13 @@ export default function ProfileConsultView() {
         if (idUser) {
           fetchUserPosts(idUser.toString());
         } else {
-          console.error('User ID is undefined');
+          // console.error('User ID is undefined');
         }
       } else {
-        console.error('Failed to fetch profile data:', data.message);
+        // console.error('Failed to fetch profile data:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching profile data:', error);
+      // console.error('Error fetching profile data:', error);
     }
   };
 
@@ -93,10 +93,10 @@ export default function ProfileConsultView() {
       if (data.success) {
         setPosts(data.record);
       } else {
-        console.error('Failed to fetch posts:', data.message);
+        // console.error('Failed to fetch posts:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching user posts:', error); 
+      // console.error('Error fetching user posts:', error); 
     } finally {
       setLoading(false);
     }
@@ -125,10 +125,10 @@ export default function ProfileConsultView() {
                 if (supported) {
                   return Linking.openURL(url);
                 } else {
-                  console.error("Don't know how to open URI: " + url);
+                  // console.error("Don't know how to open URI: " + url);
                 }
               })
-              .catch(err => console.error('An error occurred', err));
+              .catch(err => // console.error('An error occurred', err));
           },
         },
       ],

@@ -34,7 +34,7 @@ export default function PubEntretien() {
         setIsEditing(false);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement de la description :', error);
+      // console.error('Erreur lors du chargement de la description :', error);
     }
   };
 
@@ -42,7 +42,7 @@ export default function PubEntretien() {
     try {
       await AsyncStorage.setItem('savedEntretien', entretien);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de la description :', error);
+      // console.error('Erreur lors de la sauvegarde de la description :', error);
     }
   };
 
@@ -64,7 +64,7 @@ export default function PubEntretien() {
       setEttCompleted(false);
       setIsEditing(true);
     } catch (error) {
-      console.error('Erreur lors de la suppression de la description sauvegardée :', error);
+      // console.error('Erreur lors de la suppression de la description sauvegardée :', error);
     }
   };
 

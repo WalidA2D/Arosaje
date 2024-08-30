@@ -123,13 +123,13 @@ export function ProfilScreen() {
           fetchUserPosts(userId);
           fetchUserFavorites(userId);
         } else {
-          console.error('User ID is undefined');
+          // console.error('User ID is undefined');
         }
       } else {
-        console.error('Failed to fetch profile data:', data.message);
+        // console.error('Failed to fetch profile data:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching profile data:', error);
+      // console.error('Error fetching profile data:', error);
     }
   };
 
@@ -149,10 +149,10 @@ export function ProfilScreen() {
       if (data.success) {
         setPosts(data.record);
       } else {
-        console.error('Failed to fetch posts:', data.message);
+        // console.error('Failed to fetch posts:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching user posts:', error); 
+      // console.error('Error fetching user posts:', error); 
     } finally {
       setLoading(false);
     }
@@ -180,10 +180,10 @@ export function ProfilScreen() {
         }));
         setFavorites(favoritesWithState);
       } else {
-        console.error('Failed to fetch favorites:', data.message);
+        // console.error('Failed to fetch favorites:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching user favorites:', error); 
+      // console.error('Error fetching user favorites:', error); 
     } finally {
       setLoading(false);
     }
@@ -210,7 +210,7 @@ export function ProfilScreen() {
       const response = await fetch(`${apiUrl}/fav/delete/${idPost}`, options);
       const data = await response.json();
       if (!data.success) {
-        console.error('Failed to delete favorite:', data.message);
+        // console.error('Failed to delete favorite:', data.message);
         // Revert state change if API call fails
         setFavorites((prevFavorites) =>
           prevFavorites.map((favorite) =>
@@ -219,7 +219,7 @@ export function ProfilScreen() {
         );
       }
     } catch (error) {
-      console.error('Error deleting favorite:', error);
+      // console.error('Error deleting favorite:', error);
       // Revert state change if API call fails
       setFavorites((prevFavorites) =>
         prevFavorites.map((favorite) =>
@@ -251,7 +251,7 @@ export function ProfilScreen() {
       const response = await fetch(`${apiUrl}/fav/add`, options);
       const data = await response.json();
       if (!data.success) {
-        console.error('Failed to add favorite:', data.message);
+        // console.error('Failed to add favorite:', data.message);
         // Revert state change if API call fails
         setFavorites((prevFavorites) =>
           prevFavorites.map((favorite) =>
@@ -260,7 +260,7 @@ export function ProfilScreen() {
         );
       }
     } catch (error) {
-      console.error('Error adding favorite:', error);
+      // console.error('Error adding favorite:', error);
       // Revert state change if API call fails
       setFavorites((prevFavorites) =>
         prevFavorites.map((favorite) =>
@@ -315,10 +315,10 @@ export function ProfilScreen() {
                 if (supported) {
                   return Linking.openURL(url);
                 } else {
-                  console.error("Don't know how to open URI: " + url);
+                  // console.error("Don't know how to open URI: " + url);
                 }
               })
-              .catch((err: Error) => console.error('An error occurred', err));
+              .catch((err: Error) => // console.error('An error occurred', err));
           },
         },
       ],

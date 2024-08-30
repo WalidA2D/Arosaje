@@ -85,7 +85,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
+                    // console.log(data);
                 });
             Alert.alert("Bienvenue", "Inscription réussi, veuillez vous connectez");
             setIsModalVisible(false, 'inscription');
@@ -98,7 +98,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
         setIsLoading(true);
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-            console.error('Permission to access location was denied');
+            // console.error('Permission to access location was denied');
             setIsLoading(false);
             return;
         }

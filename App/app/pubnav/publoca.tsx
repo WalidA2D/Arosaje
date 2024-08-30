@@ -55,7 +55,7 @@ export default function PubLoca() {
         setIsEditing(false);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement de la localisation:', error);
+      // console.error('Erreur lors du chargement de la localisation:', error);
     }
   };
 
@@ -64,7 +64,7 @@ export default function PubLoca() {
       await AsyncStorage.setItem('savedLocalisation', localisation);
       await AsyncStorage.setItem('savedCityName', cityName);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de la localisation:', error);
+      // console.error('Erreur lors de la sauvegarde de la localisation:', error);
     }
   };
 
@@ -89,7 +89,7 @@ export default function PubLoca() {
         setLocCompleted(false);
       }
     } catch (error) {
-      console.error('Erreur lors de la suppression de la localisation sauvegardée:', error);
+      // console.error('Erreur lors de la suppression de la localisation sauvegardée:', error);
     }
   };
 
@@ -104,7 +104,7 @@ export default function PubLoca() {
     setLoading(true);
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== 'granted') {
-      console.error('Permission to access location was denied');
+      // console.error('Permission to access location was denied');
       setLoading(false);
       return;
     }

@@ -34,7 +34,7 @@ const PubTitre = () => {
         setIsEditing(false);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement du titre:', error);
+      // console.error('Erreur lors du chargement du titre:', error);
     }
   };
 
@@ -42,7 +42,7 @@ const PubTitre = () => {
     try {
       await AsyncStorage.setItem('savedTitre', titre);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde du titre:', error);
+      // console.error('Erreur lors de la sauvegarde du titre:', error);
     }
   };
 
@@ -64,7 +64,7 @@ const PubTitre = () => {
       setTitreCompleted(false);
       setIsEditing(true);
     } catch (error) {
-      console.error('Erreur lors de la suppression du titre sauvegardé:', error);
+      // console.error('Erreur lors de la suppression du titre sauvegardé:', error);
     }
   };
 

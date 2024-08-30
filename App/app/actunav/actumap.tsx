@@ -24,7 +24,7 @@ export default function ActuMap() {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.log('Permission to access location was denied');
+        // console.log('Permission to access location was denied');
         return;
       }
 
@@ -63,10 +63,10 @@ export default function ActuMap() {
         }));
         setMarkers(markersData.filter(marker => marker !== null));
       } else {
-        console.error('Failed to fetch posts:', data.message);
+        // console.error('Failed to fetch posts:', data.message);
       }
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      // console.error('Error fetching posts:', error);
     }
   };
 
@@ -80,11 +80,11 @@ export default function ActuMap() {
         const { lat, lon } = response.data[0];
         return { latitude: lat, longitude: lon };
       } else {
-        console.error('No results found for the address:', formattedAddress);
+        // console.error('No results found for the address:', formattedAddress);
         return null;
       }
     } catch (error) {
-      console.error('Error fetching coordinates:', error);
+      // console.error('Error fetching coordinates:', error);
       return null;
     }
   };
@@ -99,7 +99,7 @@ export default function ActuMap() {
             longitude={location.coords.longitude}
             markers={markers}
             onMarkerPress={(id) => {
-                console.log('Navigating to BlogFocus with ID:', id);
+                // console.log('Navigating to BlogFocus with ID:', id);
                 navigation.navigate('BlogFocus', { id });
             }} // Passer la fonction de navigation ici
           />

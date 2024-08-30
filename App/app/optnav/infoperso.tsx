@@ -35,7 +35,7 @@ export default function InfoPerso() {
             }
           })
           .catch(error => {
-            console.error('Error fetching profile data:', error);
+            // console.error('Error fetching profile data:', error);
           });
       };
 

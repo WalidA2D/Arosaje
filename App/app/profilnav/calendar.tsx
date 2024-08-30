@@ -156,7 +156,7 @@ export default function CalendarScreen() {
 
         setEvents(fetchedEvents);
       } catch (error) {
-        console.error('Erreur lors de la récupération des événements:', error);
+        // console.error('Erreur lors de la récupération des événements:', error);
       }
     };
 

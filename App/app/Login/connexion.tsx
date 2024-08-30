@@ -64,7 +64,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
 
             const response = await fetch(`${apiUrl}/user/login`, options);
             const data = await response.json();
-            console.log("data : ",data);
+            // console.log("data : ",data);
             if (data.success && data.user) {
                 await AsyncStorage.setItem('userToken', data.user.uid);
                 await AsyncStorage.setItem('userId', data.user.idUsers.toString());
@@ -75,7 +75,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
                 Alert.alert("Échec", "Email ou mot de passe incorrect");
             }
         } catch (error) {
-            console.error('Erreur lors de la vérification de la connexion:', error);            
+            // console.error('Erreur lors de la vérification de la connexion:', error);            
         }
     };
 

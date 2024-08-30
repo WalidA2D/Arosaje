@@ -78,7 +78,7 @@ export default function MessageScreen() {
 
   useEffect(() => {
     socket.emit('joinConversation', conversationId);
-    console.log(`Joining conversation: ${conversationId}`);
+    // console.log(`Joining conversation: ${conversationId}`);
 
     loadMessages(conversationId);
 
@@ -103,7 +103,7 @@ export default function MessageScreen() {
     return () => {
         socket.off('receiveMessage');
         socket.emit('leaveConversation', conversationId);
-        console.log(`Leaving conversation: ${conversationId}`);
+        // console.log(`Leaving conversation: ${conversationId}`);
     };
 }, [conversationId]);
 
@@ -138,7 +138,7 @@ export default function MessageScreen() {
                 const timestamp = new Date(formattedTimestamp);
 
                 if (isNaN(timestamp.getTime())) {
-                    console.warn(`Invalid timestamp for message ID: ${msg.idMessages}`);
+                    // console.warn(`Invalid timestamp for message ID: ${msg.idMessages}`);
                     continue;
                 }
 
@@ -153,10 +153,10 @@ export default function MessageScreen() {
 
             setMessages(apiMessages);
         } else {
-            console.error('Failed to load messages from API:', data.msg || 'Unknown error');
+            // console.error('Failed to load messages from API:', data.msg || 'Unknown error');
         }
     } catch (error) {
-        console.error('Error fetching messages from API:', error);
+        // console.error('Error fetching messages from API:', error);
     }
 };
 
@@ -221,9 +221,9 @@ export default function MessageScreen() {
             const data = await response.json();
 
             if (!data.success) {
-                console.error('Failed to send message to API:', data.msg);
+                // console.error('Failed to send message to API:', data.msg);
             } else {
-                console.log('Message successfully sent to API');
+                // console.log('Message successfully sent to API');
 
                 if (data.imageUrl) {
                     setMessages(prevMessages =>
@@ -234,7 +234,7 @@ export default function MessageScreen() {
                 }
             }
         } catch (error) {
-            console.error('Error sending message to API:', error);
+            // console.error('Error sending message to API:', error);
         }
 
         setNewMessage('');
@@ -254,7 +254,7 @@ export default function MessageScreen() {
     if (sender === 'right') {  // Seuls les messages à droite peuvent être sélectionnés
       setIsSelecting(true);
       setSelectedMessages([id]);
-      console.log('Long pressed message with id:', id);
+      // console.log('Long pressed message with id:', id);
     }
   };
 
@@ -265,7 +265,7 @@ export default function MessageScreen() {
           ? prevSelectedMessages.filter(messageId => messageId !== id)
           : [...prevSelectedMessages, id]
       );
-      console.log('Selected message with id:', id);
+      // console.log('Selected message with id:', id);
     }
   };
 
@@ -284,10 +284,10 @@ export default function MessageScreen() {
       const data = await response.json();
 
       if (!data.success) {
-        console.error('Failed to delete message:', data.msg);
+        // console.error('Failed to delete message:', data.msg);
       }
     } catch (error) {
-      console.error('Error deleting message:', error);
+      // console.error('Error deleting message:', error);
     }
   };
 
@@ -326,7 +326,7 @@ export default function MessageScreen() {
     if (uri) {
       setImageToView([{ url: uri }]);
       setIsImageViewerVisible(true);
-      console.log('Image pressed:', uri);
+      // console.log('Image pressed:', uri);
     }
   };
 
