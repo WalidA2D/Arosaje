@@ -368,7 +368,6 @@ export default function MessageScreen() {
         )}
         <Pressable onPress={() => navigation.navigate('Profil', { userName, idUser })}>
           <View style={styles.chatHeader}>
-            <Image source={{ uri: 'https://picsum.photos/620/300' }} style={styles.avatar} />
             <Text style={styles.chatName}>{userName}</Text>
           </View>
         </Pressable>
