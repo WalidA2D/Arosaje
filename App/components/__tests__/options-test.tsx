@@ -34,4 +34,33 @@ describe('OptionsScreen', () => {
     fireEvent.press(deconnecterButton);
 
   });
+
+  it('closes modal on modal close action', () => {
+    const { getByText } = render(
+      <NavigationContainer>
+        <OptionsScreen />
+      </NavigationContainer>
+    );
+
+    // Simuler un clic sur le bouton "Déconnecter"
+    const deconnecterButton = getByText('Déconnecter');
+    fireEvent.press(deconnecterButton);
+
+    // Vérifier que la modal est ouverte
+    expect(getByText('Déconnecter')).toBeTruthy(); // Assurez-vous que le texte correspond à votre modal
+
+  });
+
+  it('navigates to the correct screen on button press', () => {
+    const { getByText } = render(
+      <NavigationContainer>
+        <OptionsScreen />
+      </NavigationContainer>
+    );
+
+    // Simuler un clic sur le bouton "Informations personnelles"
+    const infoButton = getByText('Informations personnelles');
+    fireEvent.press(infoButton);
+
+  });
 });

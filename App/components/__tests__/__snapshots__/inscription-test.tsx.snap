@@ -1,0 +1,215 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Inscription renders correctly 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#FFF",
+      "flex": 1,
+      "paddingBottom": 10,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "#668F80",
+        "flexDirection": "row",
+        "height": 100,
+        "justifyContent": "space-between",
+        "paddingHorizontal": 10,
+        "paddingTop": 20,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "left": 0,
+          "position": "absolute",
+          "right": 0,
+          "top": 50,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#FFF",
+            "fontSize": 24,
+            "fontWeight": "bold",
+          }
+        }
+      >
+        Inscription
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "justifyContent": "center",
+        "marginTop": 15,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "fontSize": 16,
+        }
+      }
+    >
+      Nom:
+    </Text>
+    <TextInput
+      onChangeText={[Function]}
+      placeholder="Nom"
+      style={
+        {
+          "backgroundColor": "#F0F0F0",
+          "borderRadius": 5,
+          "height": 50,
+          "margin": 10,
+          "padding": 10,
+          "width": "90%",
+        }
+      }
+      value=""
+    />
+    <Text
+      style={
+        {
+          "fontSize": 16,
+        }
+      }
+    >
+      Prénom:
+    </Text>
+    <TextInput
+      onChangeText={[Function]}
+      placeholder="Prénom"
+      style={
+        {
+          "backgroundColor": "#F0F0F0",
+          "borderRadius": 5,
+          "height": 50,
+          "margin": 10,
+          "padding": 10,
+          "width": "90%",
+        }
+      }
+      value=""
+    />
+    <Text
+      style={
+        {
+          "fontSize": 16,
+        }
+      }
+    >
+      Email:
+    </Text>
+    <TextInput
+      autoCapitalize="none"
+      autoCorrect={false}
+      keyboardType="email-address"
+      onBlur={[Function]}
+      onChangeText={[Function]}
+      placeholder="Email"
+      style={
+        {
+          "backgroundColor": "#F0F0F0",
+          "borderRadius": 5,
+          "height": 50,
+          "margin": 10,
+          "padding": 10,
+          "width": "90%",
+        }
+      }
+      textContentType="emailAddress"
+      value=""
+    />
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "bottom": 10,
+        "position": "absolute",
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#E0E0E0",
+          "borderRadius": 25,
+          "flexDirection": "row",
+          "marginBottom": 20,
+          "overflow": "hidden",
+          "width": "90%",
+        }
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#668F80",
+            "flex": 1,
+            "justifyContent": "center",
+            "paddingVertical": 20,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFF",
+              "fontSize": 18,
+              "fontWeight": "bold",
+            }
+          }
+        >
+          Suivant
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

@@ -13,7 +13,15 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 }));
 
 // Mock du module expo-location
-jest.mock('expo-location');
+jest.mock('expo-location', () => ({
+    requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
+    getCurrentPositionAsync: jest.fn().mockResolvedValue({
+        coords: {
+            latitude: 37.78825,
+            longitude: -122.4324,
+        },
+    }),
+}));
 
 describe('ActuMap', () => {
   it('renders correctly', async () => {

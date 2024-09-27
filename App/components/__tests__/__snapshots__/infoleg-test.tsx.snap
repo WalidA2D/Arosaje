@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InfoLeg renders correctly 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#f9f9f9",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "padding": 20,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "fontSize": 18,
+          "fontWeight": "bold",
+          "marginBottom": 10,
+        }
+      }
+    >
+      Informations Légales
+    </Text>
+    <Text
+      style={
+        {
+          "fontSize": 14,
+        }
+      }
+    >
+      Ceci est un exemple d'informations légales pour votre application de garde de plante. Veuillez consulter un professionnel pour obtenir des informations légales précises et adaptées à votre situation.
+    </Text>
+  </View>
+</View>
+`;

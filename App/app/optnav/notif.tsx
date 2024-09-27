@@ -17,9 +17,9 @@ export default function Notif() {
         const email = await AsyncStorage.getItem('emailChecked');
         const app = await AsyncStorage.getItem('appChecked');
         const sms = await AsyncStorage.getItem('smsChecked');
-        if (email !== null) setEmailChecked(JSON.parse(email));
-        if (app !== null) setAppChecked(JSON.parse(app));
-        if (sms !== null) setSmsChecked(JSON.parse(sms));
+        if (email) setEmailChecked(JSON.parse(email));
+        if (app) setAppChecked(JSON.parse(app));
+        if (sms) setSmsChecked(JSON.parse(sms));
     };
 
     // Fonction pour sauvegarder les préférences de notification

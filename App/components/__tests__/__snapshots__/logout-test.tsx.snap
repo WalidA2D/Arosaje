@@ -1,0 +1,108 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Logout renders correctly 1`] = `
+<View
+  style={
+    {
+      "alignItems": "center",
+      "backgroundColor": "#668F80",
+      "flex": 1,
+      "justifyContent": "center",
+    }
+  }
+>
+  <Image
+    source={1}
+    style={
+      [
+        {
+          "alignSelf": "center",
+          "marginBottom": "auto",
+          "marginTop": "auto",
+        },
+        {
+          "height": 250,
+          "width": 250,
+        },
+      ]
+    }
+  />
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "bottom": 30,
+        "position": "absolute",
+        "width": "100%",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "#E0E0E0",
+          "borderRadius": 25,
+          "flexDirection": "row",
+          "marginBottom": 20,
+          "overflow": "hidden",
+          "width": "90%",
+        }
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#FFF",
+            "flex": 1,
+            "justifyContent": "center",
+            "paddingVertical": 20,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#668F80",
+              "fontSize": 14,
+              "fontWeight": "bold",
+            }
+          }
+        >
+          Reconnectez vous
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;

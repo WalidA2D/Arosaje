@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Question renders correctly 1`] = `
+<View
+  style={
+    {
+      "padding": 20,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "marginBottom": 20,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "fontSize": 16,
+          "fontWeight": "bold",
+        }
+      }
+    >
+      Comment arroser une plante ?
+    </Text>
+    <Text
+      style={
+        {
+          "fontSize": 14,
+          "marginTop": 5,
+        }
+      }
+    >
+      Arrosez les plantes lorsque le sol est sec.
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "marginBottom": 20,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "fontSize": 16,
+          "fontWeight": "bold",
+        }
+      }
+    >
+      Quelle est la meilleure lumière pour les plantes ?
+    </Text>
+    <Text
+      style={
+        {
+          "fontSize": 14,
+          "marginTop": 5,
+        }
+      }
+    >
+      La lumière indirecte est généralement la meilleure.
+    </Text>
+  </View>
+</View>
+`;

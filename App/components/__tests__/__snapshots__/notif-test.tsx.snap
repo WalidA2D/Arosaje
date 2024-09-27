@@ -1,0 +1,834 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Notif renders correctly 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#f9f9f9",
+      "flex": 1,
+    }
+  }
+>
+  <View
+    style={
+      {
+        "justifyContent": "center",
+        "padding": 20,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "fontSize": 18,
+          "fontWeight": "bold",
+          "marginBottom": 10,
+        }
+      }
+    >
+      Notifications
+    </Text>
+    <Text
+      style={
+        {
+          "fontSize": 14,
+          "marginBottom": 10,
+        }
+      }
+    >
+      Nous utilisons différents types de notifications pour vous tenir informé des soins de vos plantes :
+    </Text>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginBottom": 10,
+        }
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "height": 32,
+            "marginRight": 10,
+            "width": 32,
+          }
+        }
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight="100%"
+          bbWidth="100%"
+          focusable={false}
+          meetOrSlice={0}
+          minX={-10}
+          minY={-10}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": "100%",
+                "width": "100%",
+              },
+            ]
+          }
+          vbHeight={84}
+          vbWidth={84}
+        >
+          <RNSVGGroup
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+          >
+            <RNSVGDefs>
+              <RNSVGClipPath
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                name="clipPath"
+              >
+                <RNSVGPath
+                  d="M24 0.5H40C48.5809 0.5 54.4147 2.18067 58.117 5.88299C61.8193 9.58532 63.5 15.4191 63.5 24V40C63.5 48.5809 61.8193 54.4147 58.117 58.117C54.4147 61.8193 48.5809 63.5 40 63.5H24C15.4191 63.5 9.58532 61.8193 5.88299 58.117C2.18067 54.4147 0.5 48.5809 0.5 40V24C0.5 15.4191 2.18067 9.58532 5.88299 5.88299C9.58532 2.18067 15.4191 0.5 24 0.5Z"
+                  fill={
+                    {
+                      "payload": 4294967295,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                      "stroke",
+                      "strokeLinecap",
+                      "strokeLinejoin",
+                    ]
+                  }
+                  stroke={
+                    {
+                      "payload": 4286611584,
+                      "type": 0,
+                    }
+                  }
+                  strokeLinecap={1}
+                  strokeLinejoin={1}
+                />
+              </RNSVGClipPath>
+            </RNSVGDefs>
+            <RNSVGPath
+              d="M15 31.1977C23.1081 36.4884 29.5946 43 29.5946 43C29.5946 43 37.5 25.5 69 1.5"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+              onLayout={[Function]}
+              propList={
+                [
+                  "stroke",
+                  "strokeWidth",
+                  "strokeOpacity",
+                  "strokeDasharray",
+                  "strokeDashoffset",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4284911488,
+                  "type": 0,
+                }
+              }
+              strokeDasharray={null}
+              strokeDashoffset={null}
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeOpacity={0}
+              strokeWidth={10}
+            />
+            <RNSVGPath
+              d="M24 0.5H40C48.5809 0.5 54.4147 2.18067 58.117 5.88299C61.8193 9.58532 63.5 15.4191 63.5 24V40C63.5 48.5809 61.8193 54.4147 58.117 58.117C54.4147 61.8193 48.5809 63.5 40 63.5H24C15.4191 63.5 9.58532 61.8193 5.88299 58.117C2.18067 54.4147 0.5 48.5809 0.5 40V24C0.5 15.4191 2.18067 9.58532 5.88299 5.88299C9.58532 2.18067 15.4191 0.5 24 0.5Z"
+              fill={
+                {
+                  "payload": 0,
+                  "type": 0,
+                }
+              }
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4284911488,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeWidth={7}
+            />
+            <RNSVGGroup
+              clipPath="clipPath"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            >
+              <RNSVGPath
+                d="M15 31.1977C23.1081 36.4884 29.5946 43 29.5946 43C29.5946 43 37.5 25.5 69 1.5"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                onLayout={[Function]}
+                propList={
+                  [
+                    "stroke",
+                    "strokeWidth",
+                    "strokeOpacity",
+                    "strokeDasharray",
+                    "strokeDashoffset",
+                    "strokeLinecap",
+                    "strokeLinejoin",
+                  ]
+                }
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
+                strokeDasharray={null}
+                strokeDashoffset={null}
+                strokeLinecap={1}
+                strokeLinejoin={1}
+                strokeOpacity={0}
+                strokeWidth={10}
+              />
+            </RNSVGGroup>
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
+      <Text
+        style={
+          {
+            "fontSize": 14,
+            "marginRight": 20,
+          }
+        }
+      >
+        Email : Vous recevrez des emails pour les rappels de soins et les conseils.
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginBottom": 10,
+        }
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "height": 32,
+            "marginRight": 10,
+            "width": 32,
+          }
+        }
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight="100%"
+          bbWidth="100%"
+          focusable={false}
+          meetOrSlice={0}
+          minX={-10}
+          minY={-10}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": "100%",
+                "width": "100%",
+              },
+            ]
+          }
+          vbHeight={84}
+          vbWidth={84}
+        >
+          <RNSVGGroup
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+          >
+            <RNSVGDefs>
+              <RNSVGClipPath
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                name="clipPath"
+              >
+                <RNSVGPath
+                  d="M24 0.5H40C48.5809 0.5 54.4147 2.18067 58.117 5.88299C61.8193 9.58532 63.5 15.4191 63.5 24V40C63.5 48.5809 61.8193 54.4147 58.117 58.117C54.4147 61.8193 48.5809 63.5 40 63.5H24C15.4191 63.5 9.58532 61.8193 5.88299 58.117C2.18067 54.4147 0.5 48.5809 0.5 40V24C0.5 15.4191 2.18067 9.58532 5.88299 5.88299C9.58532 2.18067 15.4191 0.5 24 0.5Z"
+                  fill={
+                    {
+                      "payload": 4294967295,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                      "stroke",
+                      "strokeLinecap",
+                      "strokeLinejoin",
+                    ]
+                  }
+                  stroke={
+                    {
+                      "payload": 4286611584,
+                      "type": 0,
+                    }
+                  }
+                  strokeLinecap={1}
+                  strokeLinejoin={1}
+                />
+              </RNSVGClipPath>
+            </RNSVGDefs>
+            <RNSVGPath
+              d="M15 31.1977C23.1081 36.4884 29.5946 43 29.5946 43C29.5946 43 37.5 25.5 69 1.5"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+              onLayout={[Function]}
+              propList={
+                [
+                  "stroke",
+                  "strokeWidth",
+                  "strokeOpacity",
+                  "strokeDasharray",
+                  "strokeDashoffset",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4284911488,
+                  "type": 0,
+                }
+              }
+              strokeDasharray={null}
+              strokeDashoffset={null}
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeOpacity={0}
+              strokeWidth={10}
+            />
+            <RNSVGPath
+              d="M24 0.5H40C48.5809 0.5 54.4147 2.18067 58.117 5.88299C61.8193 9.58532 63.5 15.4191 63.5 24V40C63.5 48.5809 61.8193 54.4147 58.117 58.117C54.4147 61.8193 48.5809 63.5 40 63.5H24C15.4191 63.5 9.58532 61.8193 5.88299 58.117C2.18067 54.4147 0.5 48.5809 0.5 40V24C0.5 15.4191 2.18067 9.58532 5.88299 5.88299C9.58532 2.18067 15.4191 0.5 24 0.5Z"
+              fill={
+                {
+                  "payload": 0,
+                  "type": 0,
+                }
+              }
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4284911488,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeWidth={7}
+            />
+            <RNSVGGroup
+              clipPath="clipPath"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            >
+              <RNSVGPath
+                d="M15 31.1977C23.1081 36.4884 29.5946 43 29.5946 43C29.5946 43 37.5 25.5 69 1.5"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                onLayout={[Function]}
+                propList={
+                  [
+                    "stroke",
+                    "strokeWidth",
+                    "strokeOpacity",
+                    "strokeDasharray",
+                    "strokeDashoffset",
+                    "strokeLinecap",
+                    "strokeLinejoin",
+                  ]
+                }
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
+                strokeDasharray={null}
+                strokeDashoffset={null}
+                strokeLinecap={1}
+                strokeLinejoin={1}
+                strokeOpacity={0}
+                strokeWidth={10}
+              />
+            </RNSVGGroup>
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
+      <Text
+        style={
+          {
+            "fontSize": 14,
+            "marginRight": 20,
+          }
+        }
+      >
+        App : Des notifications push seront envoyées directement sur votre appareil.
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "flexDirection": "row",
+          "marginBottom": 10,
+        }
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "height": 32,
+            "marginRight": 10,
+            "width": 32,
+          }
+        }
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight="100%"
+          bbWidth="100%"
+          focusable={false}
+          meetOrSlice={0}
+          minX={-10}
+          minY={-10}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": "100%",
+                "width": "100%",
+              },
+            ]
+          }
+          vbHeight={84}
+          vbWidth={84}
+        >
+          <RNSVGGroup
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+          >
+            <RNSVGDefs>
+              <RNSVGClipPath
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                name="clipPath"
+              >
+                <RNSVGPath
+                  d="M24 0.5H40C48.5809 0.5 54.4147 2.18067 58.117 5.88299C61.8193 9.58532 63.5 15.4191 63.5 24V40C63.5 48.5809 61.8193 54.4147 58.117 58.117C54.4147 61.8193 48.5809 63.5 40 63.5H24C15.4191 63.5 9.58532 61.8193 5.88299 58.117C2.18067 54.4147 0.5 48.5809 0.5 40V24C0.5 15.4191 2.18067 9.58532 5.88299 5.88299C9.58532 2.18067 15.4191 0.5 24 0.5Z"
+                  fill={
+                    {
+                      "payload": 4294967295,
+                      "type": 0,
+                    }
+                  }
+                  propList={
+                    [
+                      "fill",
+                      "stroke",
+                      "strokeLinecap",
+                      "strokeLinejoin",
+                    ]
+                  }
+                  stroke={
+                    {
+                      "payload": 4286611584,
+                      "type": 0,
+                    }
+                  }
+                  strokeLinecap={1}
+                  strokeLinejoin={1}
+                />
+              </RNSVGClipPath>
+            </RNSVGDefs>
+            <RNSVGPath
+              d="M15 31.1977C23.1081 36.4884 29.5946 43 29.5946 43C29.5946 43 37.5 25.5 69 1.5"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+              onLayout={[Function]}
+              propList={
+                [
+                  "stroke",
+                  "strokeWidth",
+                  "strokeOpacity",
+                  "strokeDasharray",
+                  "strokeDashoffset",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4284911488,
+                  "type": 0,
+                }
+              }
+              strokeDasharray={null}
+              strokeDashoffset={null}
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeOpacity={0}
+              strokeWidth={10}
+            />
+            <RNSVGPath
+              d="M24 0.5H40C48.5809 0.5 54.4147 2.18067 58.117 5.88299C61.8193 9.58532 63.5 15.4191 63.5 24V40C63.5 48.5809 61.8193 54.4147 58.117 58.117C54.4147 61.8193 48.5809 63.5 40 63.5H24C15.4191 63.5 9.58532 61.8193 5.88299 58.117C2.18067 54.4147 0.5 48.5809 0.5 40V24C0.5 15.4191 2.18067 9.58532 5.88299 5.88299C9.58532 2.18067 15.4191 0.5 24 0.5Z"
+              fill={
+                {
+                  "payload": 0,
+                  "type": 0,
+                }
+              }
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4284911488,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeWidth={7}
+            />
+            <RNSVGGroup
+              clipPath="clipPath"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            >
+              <RNSVGPath
+                d="M15 31.1977C23.1081 36.4884 29.5946 43 29.5946 43C29.5946 43 37.5 25.5 69 1.5"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+                onLayout={[Function]}
+                propList={
+                  [
+                    "stroke",
+                    "strokeWidth",
+                    "strokeOpacity",
+                    "strokeDasharray",
+                    "strokeDashoffset",
+                    "strokeLinecap",
+                    "strokeLinejoin",
+                  ]
+                }
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
+                strokeDasharray={null}
+                strokeDashoffset={null}
+                strokeLinecap={1}
+                strokeLinejoin={1}
+                strokeOpacity={0}
+                strokeWidth={10}
+              />
+            </RNSVGGroup>
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
+      <Text
+        style={
+          {
+            "fontSize": 14,
+            "marginRight": 20,
+          }
+        }
+      >
+        Messages : Vous pouvez également recevoir des SMS pour les rappels importants.
+      </Text>
+    </View>
+    <Text
+      style={
+        {
+          "fontSize": 14,
+          "marginBottom": 10,
+        }
+      }
+    >
+      Vous pouvez gérer vos préférences de notification dans les paramètres de l'application.
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "bottom": 0,
+        "left": 0,
+        "position": "absolute",
+        "right": 0,
+      }
+    }
+  >
+    <View
+      style={
+        [
+          {
+            "alignItems": "center",
+            "borderRadius": 25,
+            "flexDirection": "row",
+            "marginBottom": 20,
+            "overflow": "hidden",
+            "width": "90%",
+          },
+          {
+            "backgroundColor": "#E0E0E0",
+          },
+        ]
+      }
+    >
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "backgroundColor": "#668F80",
+            "flex": 1,
+            "justifyContent": "center",
+            "paddingVertical": 20,
+          }
+        }
+      >
+        <Text
+          style={
+            {
+              "color": "#FFF",
+              "fontSize": 14,
+              "fontWeight": "bold",
+            }
+          }
+        >
+          Valider
+        </Text>
+      </View>
+    </View>
+  </View>
+</View>
+`;
