@@ -3,20 +3,20 @@ import express from "express";
 import Middleware from "../middleware";
 import postValidator from "../validator/postValidator";
 
-import favController from "../controller/favController"
+import favController from "../controller/favController";
 
 const router = express.Router();
 
 router.post(
   "/add",
-  Middleware.authMiddleware({ roles: ["utilisateur"] }),
+  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
   favController.add
 );
 
 router.get(
   "/read",
-  Middleware.authMiddleware({ roles: ["utilisateur"] }),
+  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
   favController.read
 );
@@ -24,9 +24,9 @@ router.get(
 router.delete(
   "/delete/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware({ roles: ["utilisateur"] }),
+  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
   favController.delete
-)
+);
 
 export default router;
