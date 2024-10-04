@@ -20,7 +20,7 @@ router.post(
 router.get(
   "/pp/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["utilisateur"]),  // Utilisation directe du tableau de rôles
+  Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
   ImageController.getPP
 );
@@ -28,7 +28,7 @@ router.get(
 router.put(
   "/resetPP",
   Middleware.handleValidationError,
-  Middleware.authMiddleware(["utilisateur"]),  // Utilisation directe du tableau de rôles
+  Middleware.authMiddleware({ roles: ["utilisateur"] }),
   ImageController.resetPP
 );
 

@@ -12,8 +12,9 @@ const router = express.Router();
 
 router.post(
   "/create",
-  Middleware.authMiddleware(["utilisateur"]),
+  // postValidator.checkCreate(),
   Middleware.handleValidationError,
+  Middleware.authMiddleware({ roles: ["utilisateur"] }),
   upload.array("images"),
   PostController.create
 );
@@ -34,10 +35,10 @@ router.get(
 
 router.get(
   "/missions",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware({ roles: ['utilisateur']}),
   PostController.readMissions
-);
+)
 
 router.get(
   "/:id",
@@ -49,7 +50,7 @@ router.get(
 router.put(
   "/visib/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["admin"]),
+  Middleware.authMiddleware({ roles: ["admin"] }),
   Middleware.handleValidationError,
   PostController.changeVisibility
 );
@@ -57,7 +58,6 @@ router.put(
 router.delete(
   "/delete/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["utilisateur", "admin"]),
   Middleware.handleValidationError,
   PostController.delete
 );

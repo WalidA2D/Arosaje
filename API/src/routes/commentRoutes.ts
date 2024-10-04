@@ -9,7 +9,7 @@ router.post(
   "/create",
   commentValidator.checkCreate(),
   Middleware.handleValidationError,
-  Middleware.authMiddleware(["botaniste"]),
+  Middleware.authMiddleware({ roles: ["botaniste"] }),
   commentController.create
 );
 
