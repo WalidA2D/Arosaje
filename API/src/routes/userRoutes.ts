@@ -14,20 +14,18 @@ router.post(
 
 router.get(
   "/profil",
-  Middleware.authMiddleware(),
+  Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
   UserController.readOwnProfile
 );
 
-
 router.get(
   "/read",
   UserValidator.checkRead(),
-  Middleware.authMiddleware(['admin']),
+  Middleware.authMiddleware({ roles: ["admin"] }),
   Middleware.handleValidationError,
   UserController.readPagination
 );
-
 
 router.get(
   "/read/:id",
@@ -45,7 +43,7 @@ router.put(
 router.delete(
   "/delete/:id",
   UserValidator.checkIdParam(),
-  Middleware.authMiddleware(["admin"]),
+  Middleware.authMiddleware({ roles: ["admin"] }),
   Middleware.handleValidationError,
   UserController.delete
 );
