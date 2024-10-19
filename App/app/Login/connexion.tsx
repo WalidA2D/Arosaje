@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Pressable, TextInput, Alert } from 'react-nativ
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import AnimatedCheckbox from 'react-native-checkbox-reanimated'
+import { CheckBox } from '@rneui/themed';
 import HeaderTitle from '../../components/HeaderTitle';
 
   interface ConnexionScreenProps {
@@ -115,33 +115,33 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
 
             <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'center' }}>
 
-            <TextInput
-                style={styles.inputMdp}
-                onChangeText={onChangeMotDePasse}
-                value={motDePasse}
-                autoCapitalize='words'
-                placeholder="Mot de passe"
-                placeholderTextColor="#BDBDBD"
-                secureTextEntry={!showPassword}
-            />
+              <TextInput
+                  style={styles.inputMdp}
+                  onChangeText={onChangeMotDePasse}
+                  value={motDePasse}
+                  autoCapitalize='words'
+                  placeholder="Mot de passe"
+                  placeholderTextColor="#BDBDBD"
+                  secureTextEntry={!showPassword}
+              />
 
-            <Pressable onPress={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right:30 }}>
-                {showPassword ? <Ionicons name="eye" size={24} color="#668F80" /> : <Ionicons name="eye-off-outline" size={24} color="black" />}
-            </Pressable>
+              <Pressable onPress={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right:30 }}>
+                  {showPassword ? <Ionicons name="eye" size={24} color="#668F80" /> : <Ionicons name="eye-off-outline" size={24} color="black" />}
+              </Pressable>
 
             </View>
 
             <View style={styles.rememberMeContainer}>
-              <Pressable onPress={() => setRememberMe(!rememberMe)} style={{ justifyContent: 'center', height:32, width:32, flexDirection: 'row', alignItems: 'center' }}>
-                <AnimatedCheckbox
-                  checked={rememberMe}
-                  highlightColor="#668F80"
-                  checkmarkColor="#ffffff"
-                  boxOutlineColor="#668F80"
-                />
-              </Pressable>
-          <Text style={{fontSize: 14, paddingLeft: 5}}>Se souvenir de moi</Text>
-        </View>
+              <CheckBox
+                checked={rememberMe}
+                onPress={() => setRememberMe(!rememberMe)}
+                title="Se souvenir de moi"
+                checkedColor='#668F80'
+                uncheckedColor='#668F80'
+                center
+                size={32}
+              />
+            </View>
 
         </View>
     

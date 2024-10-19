@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // Assurez-vous que cet import est présent
-import AnimatedCheckbox from 'react-native-checkbox-reanimated';
+import { CheckBox } from '@rneui/themed';
 import BigButtonDown from '../../components/BigButtonDown';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Ajout de l'import
 
@@ -54,37 +54,38 @@ export default function Notif() {
                     Nous utilisons différents types de notifications pour vous tenir informé des soins de vos plantes :
                 </Text>
                 <View style={styles.notificationItem}>
-                    <Pressable onPress={() => handleCheckboxPress('email')} style={styles.checkbox}>
-                        <AnimatedCheckbox
-                            checked={emailChecked}
-                            highlightColor="#668F80"
-                            checkmarkColor="#ffffff"
-                            boxOutlineColor="#668F80"
-                        />
-                    </Pressable>
-                    <Text style={styles.notificationType}>Email : Vous recevrez des emails pour les rappels de soins et les conseils.</Text>
+                    <CheckBox
+                        checked={emailChecked}
+                        onPress={() => handleCheckboxPress('email')}
+                        title="Email : Vous recevrez des emails pour les rappels de soins et les conseils."
+                        checkedColor='#668F80'
+                        uncheckedColor='#668F80'
+                        size={32}
+                        containerStyle={{backgroundColor: '#f9f9f9'}}
+                    />
                 </View>
                 <View style={styles.notificationItem}>
-                    <Pressable onPress={() => handleCheckboxPress('app')} style={styles.checkbox}>
-                        <AnimatedCheckbox
-                            checked={appChecked}
-                            highlightColor="#668F80"
-                            checkmarkColor="#ffffff"
-                            boxOutlineColor="#668F80"
-                        />
-                    </Pressable>
-                    <Text style={styles.notificationType}>App : Des notifications push seront envoyées directement sur votre appareil.</Text>
+                    <CheckBox
+                        checked={appChecked}
+                        onPress={() => handleCheckboxPress('app')}
+                        title="App : Des notifications push seront envoyées directement sur votre appareil."
+                        textStyle={{marginRight:20}}
+                        checkedColor='#668F80'
+                        uncheckedColor='#668F80'
+                        size={32}
+                        containerStyle={{backgroundColor: '#f9f9f9'}}
+                    />
                 </View>
                 <View style={styles.notificationItem}>
-                    <Pressable onPress={() => handleCheckboxPress('sms')} style={styles.checkbox}>
-                        <AnimatedCheckbox
-                            checked={smsChecked}
-                            highlightColor="#668F80"
-                            checkmarkColor="#ffffff"
-                            boxOutlineColor="#668F80"
-                        />
-                    </Pressable>
-                    <Text style={styles.notificationType}>Messages : Vous pouvez également recevoir des SMS pour les rappels importants.</Text>
+                    <CheckBox
+                        checked={smsChecked}
+                        onPress={() => handleCheckboxPress('sms')}
+                        title="Messages : Vous pouvez également recevoir des SMS pour les rappels importants."
+                        checkedColor='#668F80'
+                        uncheckedColor='#668F80'
+                        size={32}
+                        containerStyle={{backgroundColor: '#f9f9f9'}}
+                    />
                 </View>
                 <Text style={styles.notificationText}>
                     Vous pouvez gérer vos préférences de notification dans les paramètres de l'application.
@@ -110,7 +111,6 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     notificationItem: {
-        flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 10,
     },
