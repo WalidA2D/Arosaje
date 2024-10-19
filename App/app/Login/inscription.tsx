@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TextInput, Text, Alert, Pressable, FlatList } from 'react-native';
+import { StyleSheet, View, TextInput, Text, Alert, Pressable, FlatList, Modal } from 'react-native';
 import HeaderTitle from '../../components/HeaderTitle';
 import * as Location from 'expo-location';
+import { CheckBox } from '@rneui/themed';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import AnimatedCheckbox from 'react-native-checkbox-reanimated';
 import Load from '../../components/Loading';
+import DonneesPersonnelles from '../optnav/donnees';
 import axios from 'axios';
 
 interface InscriptionScreenProps {
@@ -41,6 +42,8 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
     const [addressSuggestions, setAddressSuggestions] = useState([]);
     const [isConsentChecked, setIsConsentChecked] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    const [isDonneesVisible, setIsDonneesVisible] = useState(false);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -347,17 +350,32 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                         <Text style={styles.textSizeInput}>Téléphone: {phone}</Text>
                     </View>
                     <View style={styles.consentContainer}>
-                        <Pressable onPress={() => setIsConsentChecked(!isConsentChecked)} style={styles.checkbox}>
-                            <AnimatedCheckbox
-                                checked={isConsentChecked}
-                                highlightColor="#668F80"
-                                checkmarkColor="#ffffff"
-                                boxOutlineColor="#668F80"
-                            />
-                        </Pressable>
-                        <Text style={[styles.consentText, { color: 'red' }]}>J'accepte les termes et conditions</Text>
+                        <CheckBox
+                            checked={isConsentChecked}
+                            onPress={() => setIsConsentChecked(!isConsentChecked)}
+                            title="J'accepte les termes et conditions"
+                            textStyle={{color: 'red'}}
+                            checkedColor='#668F80'
+                            uncheckedColor='#668F80'
+                            center
+                        />
                     </View>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={isDonneesVisible}
+                        onRequestClose={() => setIsDonneesVisible(false)}
+                    >
+                        <View style={styles.modalContainer}></View>
+                        <DonneesPersonnelles closeModal={() => setIsDonneesVisible(false)} />
+                    </Modal>
+
                     <View style={styles.fixedDetailsBtn}>
+                        <View style={styles.selectorContainer}>
+                            <Pressable style={styles.selectorButton} onPress={() => setIsDonneesVisible(true)}>
+                                <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Politique de Confidentialité</Text>
+                            </Pressable>
+                        </View>
                         <View style={styles.selectorContainer}>
                             <Pressable style={[styles.selectorButton, { backgroundColor: '#fff', borderWidth: 1, borderColor: '#668F80' }]} onPress={() => setStep(1)}>
                                 <Text style={{ color: '#668F80', fontSize: 18, fontWeight: 'bold', }}>Modifier</Text>
@@ -460,7 +478,31 @@ const styles = StyleSheet.create({
         height: 24,
         marginRight: 10,
     },
-    consentText: {
+    modalContainer: {
+        paddingTop: 25,
+        paddingBottom: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    modalText: {
         fontSize: 16,
+        marginBottom: 10,
+    },
+    closeButton: {
+        color: '#007BFF',
+        marginTop: 20,
     },
 });
