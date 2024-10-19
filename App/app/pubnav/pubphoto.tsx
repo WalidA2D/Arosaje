@@ -22,6 +22,7 @@ export default function PubPhoto() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [plantName, setPlantName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const PLANTNET = process.env.EXPO_PUBLIC_API_PLANTNET;
 
   useEffect(() => {
     (async () => {
@@ -51,7 +52,7 @@ export default function PubPhoto() {
       } as unknown as Blob);
 
       try {
-        const response = await fetch('https://my-api.plantnet.org/v2/identify/all?lang=fr&api-key=2b10FKDZzM01FIUFbOcPO6tgF', {
+        const response = await fetch(`https://my-api.plantnet.org/v2/identify/all?lang=fr&pageSize=300&page=1&api-key=${PLANTNET}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'multipart/form-data',

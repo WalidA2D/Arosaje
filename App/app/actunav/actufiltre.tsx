@@ -31,13 +31,14 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
   const [loadingSelect, setLoadingSelect] = useState<boolean>(false);
   const [loadingField, setLoadingField] = useState<boolean>(false);
   const [showPicker, setShowPicker] = useState<boolean>(false);
-
+  const GEONAMES = process.env.EXPO_PUBLIC_API_GEONAMES;
+  const PLANTNET = process.env.EXPO_PUBLIC_API_PLANTNET;
   useEffect(() => {
     const fetchCities = async () => {
       try {
         setLoading(true);
         const response = await fetch(
-          "http://api.geonames.org/searchJSON?country=FR&maxRows=1000&username=arosaje"
+          `http://api.geonames.org/searchJSON?country=FR&maxRows=1000&username=${GEONAMES}`
         );
         const data = await response.json();
         const cityOptions = data.geonames.map((city: any) => ({
@@ -57,7 +58,7 @@ export default function ActuFiltre({ navigation }: { navigation: any }) {
       try {
         setLoading(true);
         const response = await fetch(
-          "https://my-api.plantnet.org/v2/species?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF"
+          `https://my-api.plantnet.org/v2/species?lang=fr&type=kt&pageSize=300&page=1&api-key=${PLANTNET}`
         );
         const data = await response.json();
         const originOptions = data.map((plant: any) => ({
