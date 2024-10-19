@@ -23,7 +23,7 @@ router.get(
 router.get(
   "/read",
   UserValidator.checkRead(),
-  Middleware.authMiddleware(['admin']),
+  Middleware.authMiddleware(['administrateur']),
   Middleware.handleValidationError,
   UserController.readPagination
 );
@@ -45,7 +45,7 @@ router.put(
 router.delete(
   "/delete/:id",
   UserValidator.checkIdParam(),
-  Middleware.authMiddleware(["admin"]),
+  Middleware.authMiddleware(["administrateur"]),
   Middleware.handleValidationError,
   UserController.delete
 );

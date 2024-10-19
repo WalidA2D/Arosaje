@@ -4,15 +4,15 @@ import { auth, storage } from "../config/firebase.config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { UserInstance } from "../models/User";
 import { MessageInstance } from "../models/Message";
-import { verifyToken } from "../helpers/jwtUtils";  // Ajout pour la vérification du JWT
+import { verifyToken } from "../helpers/jwtUtils"; // Vérification du JWT
 
 class MessageController {
   async add(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization?.split(" ")[1];  // Extraction du token JWT
+      const token = req.headers.authorization?.split(" ")[0];
       if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
 
-      const decoded: any = verifyToken(token);  // Décodage du token
+      const decoded: any = verifyToken(token);
       const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
@@ -49,11 +49,10 @@ class MessageController {
 
   async readByUser(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization?.split(" ")[1];  // Extraction du token JWT
+      const token = req.headers.authorization
       if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
 
-      const decoded: any = verifyToken(token);  // Décodage du token
-      const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
+      const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
       const record = await MessageInstance.findAll({ where: { idUser: user.dataValues.idUsers } });
@@ -68,11 +67,10 @@ class MessageController {
 
   async readByConv(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization?.split(" ")[1];  // Extraction du token JWT
+      const token = req.headers.authorization
       if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
 
-      const decoded: any = verifyToken(token);  // Décodage du token
-      const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
+      const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
       const { id } = req.params;
@@ -88,11 +86,10 @@ class MessageController {
 
   async delete(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization?.split(" ")[1];  // Extraction du token JWT
+      const token = req.headers.authorization
       if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
 
-      const decoded: any = verifyToken(token);  // Décodage du token
-      const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
+      const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
       const { id } = req.params;
@@ -100,7 +97,7 @@ class MessageController {
       if (!record) return res.status(500).json({ success: false, msg: "Message introuvable ou déjà supprimé" });
 
       if (record.dataValues.idUser !== user.dataValues.idUsers) {
-        return res.status(413).json({ success: false, msg: "Droits requis" });
+        return res.status(403).json({ success: false, msg: "Droits requis" });
       }
 
       await record.destroy();

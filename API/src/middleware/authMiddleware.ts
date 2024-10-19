@@ -3,13 +3,18 @@ import { verifyToken } from '../helpers/jwtUtils';
 
 const authMiddleware = (roles: string[] = []) => {
     return (req: Request, res: Response, next: NextFunction) => {
-        const token = req.headers.authorization?.split(' ')[1]; // Bearer token
+        const token = req.headers.authorization?.split(" ")[0]; // Extraire le token
 
         if (!token) return res.status(401).json({ success: false, msg: "Accès refusé" });
 
         try {
             const decoded: any = verifyToken(token);
-            req.user = decoded; // Add decoded token to request
+
+            if(!decoded.userId) return res.status(404).json({ success: false, msg: "Aucun Token fournit"})
+
+            req.headers.authorization = decoded.userId; // Add decoded token to request
+            
+            // console.log(req.headers.authorization?.['userId'])
             
             // Check for roles if specified
             if (roles.length && !roles.includes(decoded.roles[0])) {

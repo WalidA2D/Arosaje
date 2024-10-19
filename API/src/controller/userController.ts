@@ -35,19 +35,13 @@ class UserController {
 
     async readOwnProfile(req: Request, res: Response) {
         try {
-            // Récupérer le token depuis l'en-tête Authorization
-            const token = req.headers.authorization?.split(" ")[1]; // Récupérer le token Bearer
+            const token = req.headers.authorization
 
             if (!token) {
                 return res.status(401).json({ success: false, msg: "Accès refusé" });
             }
 
-            // Décodez le token pour obtenir l'uid
-            const decoded: any = verifyToken(token); // Utilisez la fonction que vous avez créée pour vérifier le token
-            const userId = decoded.userId; // ou l'attribut que vous avez utilisé pour stocker l'uid
-
-            // Trouvez l'utilisateur dans la base de données
-            const user = await UserInstance.findOne({ where: { uid: userId } });
+            const user = await UserInstance.findOne({ where: { uid: token } });
 
             if (!user) {
                 return res.status(404).json({ success: false, msg: "Cible non trouvée" });
@@ -107,13 +101,10 @@ class UserController {
 
     async update(req: Request, res: Response) {
       try {
-          const token = req.headers.authorization?.split(" ")[1];
+            const token = req.headers.authorization
           if (!token) return res.status(401).json({ success: false, msg: "Accès refusé" });
-
-          const decoded: any = verifyToken(token);
-          const userId = decoded.userId;
   
-          const record = await UserInstance.findOne({ where: { uid: userId } });
+          const record = await UserInstance.findOne({ where: { uid: token } });
           if (!record) return res.status(404).json({ success: false, msg: "Cible non trouvée" });
   
           const { lastName, firstName, email, address, phone, cityName } = req.body;
@@ -156,8 +147,9 @@ class UserController {
             const encryptedPassword = await encryptMethod(password);
             if (u.dataValues.password !== encryptedPassword) return res.status(401).json({ success: false, msg: "Mot de passe incorrect" });
 
-            // Générer le JWT
-            const token = generateToken(u.dataValues.uid, [u.dataValues.isAdmin ? 'admin' : 'user']);
+            const newUid = (await u.update({ uid : uuidv4()})).dataValues.uid;
+
+            const token = generateToken(newUid, [u.dataValues.isAdmin ? 'administrateur' : 'utilisateur']);
             
             return res.status(200).json({ success: true, msg: "Connexion réussie", token, user: {
                 "idUsers": u.dataValues.idUsers,
@@ -171,7 +163,7 @@ class UserController {
                 "role": u.dataValues.isBotanist ? "Botaniste" : u.dataValues.isAdmin ? "Administrateur" : "Utilisateur",
                 "isBan": u.dataValues.isBan ? true : false,
                 "note": u.dataValues.note,
-                "uid": u.dataValues.uid
+                "uid": token
             }});
         } catch (e) {
             console.error(e);

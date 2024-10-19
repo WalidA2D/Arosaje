@@ -2,7 +2,6 @@ import express from "express";
 import multer from "multer";
 
 import Middleware from "../middleware";
-import postValidator from "../validator/postValidator";
 import messageController from "../controller/messageController";
 
 const storageEngine = multer.memoryStorage();
@@ -34,7 +33,6 @@ router.get(
 
 router.delete(
   "/delete/:id",
-  postValidator.checkIdParam(),
   Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
   messageController.delete

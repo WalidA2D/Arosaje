@@ -13,19 +13,16 @@ import { verifyToken } from "../helpers/jwtUtils";
 class PostController {
   async create(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization?.split(" ")[1]; // Extraction du token Bearer
+      const token = req.headers.authorization
       if (!token) {
         return res.status(404).json({ success: false, msg: "Aucun token fourni" });
       }
 
-      // Vérification du token JWT
-      const decoded: any = verifyToken(token);
-      const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
+      const user = await UserInstance.findOne({ where: { uid: token }});
       if (!user) {
         return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
       }
 
-      // Extraction des données du corps de la requête
       const {
         title,
         description,
@@ -42,12 +39,10 @@ class PostController {
         plantType,
       } = req.body;
 
-      // Validation des dates
       const publishedAtDate = publishedAt ? new Date(publishedAt) : new Date();
       const dateStartDate = dateStart ? new Date(dateStart) : new Date();
       const dateEndDate = dateEnd ? new Date(dateEnd) : new Date();
 
-      // Création du post
       const record = await PostInstance.create({
         title,
         description,
@@ -68,12 +63,10 @@ class PostController {
         image3: "",
       });
 
-      // Authentification Firebase
       const email = process.env.FIREBASE_AUTH_EMAIL!;
       const password = process.env.FIREBASE_AUTH_PASSWORD!;
       await signInWithEmailAndPassword(auth, email, password);
 
-      // Upload des images
       if (!req.files || !Array.isArray(req.files)) {
         return res.status(400).json({ success: false, message: "Aucun fichier trouvé" });
       }
@@ -145,11 +138,10 @@ class PostController {
 
   async readById(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization?.split(" ")[1]; // Récupération du token JWT
+      const token = req.headers.authorization
       if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
 
-      const decoded: any = verifyToken(token);
-      const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
+      const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
 
       const { id } = req.params;
@@ -169,11 +161,10 @@ class PostController {
 
   async readMissions(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization?.split(" ")[1]; // Récupération du token JWT
+      const token = req.headers.authorization
       if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
 
-      const decoded: any = verifyToken(token);
-      const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
+      const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
 
       const missions = await PostInstance.findAll({ where: { acceptedBy: user.dataValues.idUsers } });
@@ -203,11 +194,10 @@ class PostController {
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const token = req.headers.authorization?.split(" ")[1]; // Récupération du token JWT
+      const token = req.headers.authorization
       if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
 
-      const decoded: any = verifyToken(token);
-      const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
+      const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
       const record = await PostInstance.findOne({ where: { idPosts: id } });
@@ -217,7 +207,7 @@ class PostController {
         await record.destroy();
         return res.status(200).json({ success: true, msg: "Post bien supprimé" });
       } else {
-        return res.status(413).json({ success: false, msg: "Droits requis" });
+        return res.status(403).json({ success: false, msg: "Droits requis" });
       }
     } catch (e) {
       console.error(e);

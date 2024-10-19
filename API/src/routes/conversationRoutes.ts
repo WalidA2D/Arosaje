@@ -15,7 +15,7 @@ router.post(
 router.get(
   "/readAll",
   Middleware.handleValidationError,
-  Middleware.authMiddleware(["admin"]),
+  Middleware.authMiddleware(["administrateur"]),
   convController.read
 );
 

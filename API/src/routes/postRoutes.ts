@@ -1,4 +1,4 @@
-import express, { NextFunction } from "express";
+import express from "express";
 import multer from "multer";
 
 const storageEngine = multer.memoryStorage();
@@ -49,7 +49,7 @@ router.get(
 router.put(
   "/visib/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["admin"]),
+  Middleware.authMiddleware(["administrateur"]),
   Middleware.handleValidationError,
   PostController.changeVisibility
 );
@@ -57,7 +57,7 @@ router.put(
 router.delete(
   "/delete/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["utilisateur", "admin"]),
+  Middleware.authMiddleware(["utilisateur", "administrateur"]),
   Middleware.handleValidationError,
   PostController.delete
 );

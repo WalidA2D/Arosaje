@@ -2,7 +2,6 @@ import express from "express";
 
 import Middleware from "../middleware";
 import postValidator from "../validator/postValidator";
-
 import favController from "../controller/favController";
 
 const router = express.Router();
