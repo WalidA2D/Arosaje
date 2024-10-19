@@ -81,13 +81,11 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
 
     useEffect(() => {
         const checkToken = async () => {
-            const userToken = await AsyncStorage.getItem('userToken');
             const storedEmail = await AsyncStorage.getItem('email');
             const storedPassword = await AsyncStorage.getItem('password');
 
-            if (userToken) {
-                setIsModalVisible(false, 'connexion');
-                navigation.navigate('(tabs)');
+            if (storedEmail && storedEmail) {
+                handleLogin();
             } else if (storedEmail && storedPassword) {
             onChangeEmail(storedEmail);
             onChangeMotDePasse(storedPassword);
