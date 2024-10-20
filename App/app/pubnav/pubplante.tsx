@@ -28,6 +28,7 @@ export default function PubPlantes() {
   const [selectedSpeciesDetails, setSelectedSpeciesDetails] = useState<any | null>(null);
   const [checkedId, setCheckedId] = useState<number | null>(null);
   const flatListRef = useRef<FlatList>(null);
+  const PLANTNET = process.env.EXPO_PUBLIC_API_PLANTNET;
 
   const handleCheckboxPress = (id: number) => {
     setCheckedId(prev => (prev === id ? null : id));
@@ -42,7 +43,7 @@ export default function PubPlantes() {
   useEffect(() => {
     const fetchSpecies = async () => {
       try {
-        const response = await axios.get('https://my-api.plantnet.org/v2/species?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF');
+        const response = await axios.get(`https://my-api.plantnet.org/v2/species?lang=fr&type=kt&pageSize=300&page=1&api-key=${PLANTNET}`);
         const speciesData = response.data
           .filter((item: any) => item.commonNames && item.commonNames.length > 0)
           .map((item: any) => ({

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Platform, StyleSheet, View, Text, FlatList, Image, Pressable, Modal } from 'react-native';
-import AnimatedCheckbox from 'react-native-checkbox-reanimated'
+import { CheckBox, Icon } from '@rneui/themed';
 import axios from 'axios';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
@@ -27,6 +27,7 @@ export default function PubEspece() {
   const [selectedSpeciesDetails, setSelectedSpeciesDetails] = useState<any | null>(null);
   const [checkedId, setCheckedId] = useState<number | null>(null);
   const flatListRef = useRef<FlatList>(null);
+  const PLANTNET = process.env.EXPO_PUBLIC_API_PLANTNET;
 
   const handleCheckboxPress = (id: number) => {
     setCheckedId(prev => (prev === id ? null : id));
@@ -41,7 +42,7 @@ export default function PubEspece() {
   useEffect(() => {
     const fetchSpecies = async () => {
       try {
-        const response = await axios.get('https://my-api.plantnet.org/v2/species?lang=fr&type=kt&api-key=2b10FKDZzM01FIUFbOcPO6tgF');
+        const response = await axios.get(`https://my-api.plantnet.org/v2/species?lang=fr&type=kt&pageSize=300&page=1&api-key=${PLANTNET}`);
         const speciesData = response.data
           .filter((item: any) => item.commonNames && item.commonNames.length > 0)
           .map((item: any) => ({
@@ -101,21 +102,30 @@ export default function PubEspece() {
             ) : (
               <View style={styles.image} />
             )}
-            <Text>{item.common_name}</Text>
             <View style={styles.itemBtn}>
-              {item.id !== -1 && (
-                <Pressable onPress={() => showSpeciesDetails(item.id)}>
-                  <Ionicons name="information-circle-outline" size={32} color="black" />
-                </Pressable>
-              )}
-              <Pressable onPress={() => handleCheckboxPress(item.id)} style={styles.checkbox}>
-                <AnimatedCheckbox
-                  checked={checkedId === item.id}
-                  highlightColor="#668F80"
-                  checkmarkColor="#ffffff"
-                  boxOutlineColor="#668F80"
+            {item.id !== -1 && (
+                <Icon
+                  onPress={() => showSpeciesDetails(item.id)}
+                  color='black'
+                  size={32}
+                  name="information-circle-outline"
+                  type="ionicon"
+                  iconStyle={{paddingTop: 15}}
+                  containerStyle={{backgroundColor: '#f9f9f9'}}
                 />
-              </Pressable>
+              )}
+              <CheckBox
+                checked={checkedId === item.id}
+                onPress={() => handleCheckboxPress(item.id)}
+                title={item.common_name}
+                checkedColor='#668F80'
+                uncheckedColor='#668F80'
+                size={32}
+                checkedIcon="dot-circle-o"
+                uncheckedIcon="circle-o"
+                iconRight
+                containerStyle={{backgroundColor: '#f9f9f9'}}
+              />
             </View>
           </View>
         )}
@@ -154,14 +164,13 @@ export default function PubEspece() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f9f9f9'
   },
   item: {
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
   itemBtn: {
     padding: 20,
@@ -171,11 +180,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     marginRight: 10,
-  },
-  checkbox: {
-    width: 32,
-    height: 32,
-    marginLeft: 10
   },
   modalContent: {
     flex: 1,

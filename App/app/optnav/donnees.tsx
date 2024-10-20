@@ -1,7 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
-export default function DonneesPersonnelles() {
+interface DonneesPersonnellesProps {
+    closeModal: () => void;
+}
+
+export default function DonneesPersonnelles({ closeModal }: DonneesPersonnellesProps) {
     return (
         <View style={{ flex: 1, backgroundColor: '#f9f9f9', }}>
             <View style={styles.dataContainer}>
@@ -15,13 +19,29 @@ export default function DonneesPersonnelles() {
                 </Text>
                 <Text style={styles.dataList}>
                     - Nom et prénom{'\n'}
+                    - Age et date de naissance{'\n'}
                     - Adresse e-mail{'\n'}
+                    - Adresse postale{'\n'}
+                    - Ville{'\n'}
+                    - Numéro de téléphone{'\n'}
+                    - Position géographique{'\n'}
+                    - Photos{'\n'}
                     - Historique des soins des plantes{'\n'}
                     - Préférences de notification
                 </Text>
                 <Text style={styles.dataText}>
+                    Ces données sont utilisées pour vous fournir nos services et améliorer votre expérience.
+                </Text>
+                <Text style={styles.dataText}>
+                    Nous nous engageons à protéger vos données personnelles et à respecter le RGPD.
+                </Text>
+                <Text style={styles.dataText}>
                     Pour toute question concernant vos données personnelles, veuillez nous contacter à l'adresse suivante : support@arosaje.com
                 </Text>
+
+                <Pressable onPress={closeModal}>
+                    <Text style={styles.closeButton}>Fermer</Text>
+                </Pressable>
             </View>
         </View>
     );
@@ -43,5 +63,9 @@ const styles = StyleSheet.create({
     dataList: {
         fontSize: 14,
         marginBottom: 10,
+    },
+    closeButton: {
+        color: '#007BFF',
+        marginTop: 20,
     },
 });
