@@ -11,30 +11,30 @@ const router = express.Router();
 
 router.post(
   "/add",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   upload.single("file"),
   messageController.add
 );
 
 router.get(
   "/read",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   messageController.readByUser
 );
 
 router.get(
   "/messages/:id",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   messageController.readByConv
 );
 
 router.delete(
   "/delete/:id",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   messageController.delete
 );
 

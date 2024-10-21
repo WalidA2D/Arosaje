@@ -34,8 +34,8 @@ router.get(
 
 router.get(
   "/missions",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   PostController.readMissions
 );
 
@@ -43,22 +43,23 @@ router.get(
   "/:id",
   postValidator.checkIdParam(),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   PostController.readById
 );
 
 router.put(
   "/visib/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["administrateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["administrateur"]),
   PostController.changeVisibility
 );
 
 router.delete(
   "/delete/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["utilisateur", "administrateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur", "administrateur"]),
   PostController.delete
 );
 

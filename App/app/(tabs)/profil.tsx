@@ -145,7 +145,7 @@ export function ProfilScreen() {
     try {
       const response = await fetch(`${apiUrl}/post/read/${idUser}`, options);
       const data = await response.json();
-      
+      console.log(response)
       if (data.success) {
         setPosts(data.record);
       } else {

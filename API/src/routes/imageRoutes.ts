@@ -12,24 +12,24 @@ const router = express.Router();
 
 router.post(
   "/pp/upload",
+  Middleware.handleValidationError,
   Middleware.authMiddleware(["utilisateur"]),
   upload.single("image"),
-  Middleware.handleValidationError,
   ImageController.uploadPP
 );
 
 router.get(
   "/pp/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   ImageController.getPP
 );
 
 router.put(
   "/resetPP",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   ImageController.resetPP
 );
 

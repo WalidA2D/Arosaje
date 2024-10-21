@@ -29,9 +29,9 @@ router.get(
 
 router.delete(
   "/delete/:id",
-  Middleware.authMiddleware(["botaniste", "administrateur"]), // Ajouter le contrôle d'accès
   commentValidator.checkReadByPost(),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["botaniste", "administrateur"]),
   commentController.delete
 );
 

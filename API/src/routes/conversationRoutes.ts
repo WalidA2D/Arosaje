@@ -21,17 +21,17 @@ router.get(
 
 router.get(
   "/read",
+  postValidator.checkIdParam(),
   Middleware.handleValidationError,
   Middleware.authMiddleware(["utilisateur"]),
-  postValidator.checkIdParam(),
   convController.readByUser
 );
 
 router.delete(
   "/delete/:id",
+  postValidator.checkIdParam(),
   Middleware.handleValidationError,
   Middleware.authMiddleware(["utilisateur"]),
-  postValidator.checkIdParam(),
   convController.delete
 );
 

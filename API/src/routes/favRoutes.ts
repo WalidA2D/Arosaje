@@ -8,23 +8,23 @@ const router = express.Router();
 
 router.post(
   "/add",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   favController.add
 );
 
 router.get(
   "/read",
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   favController.read
 );
 
 router.delete(
   "/delete/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   favController.delete
 );
 
