@@ -1,4 +1,4 @@
-import express, { NextFunction } from "express";
+import express from "express";
 import multer from "multer";
 
 const storageEngine = multer.memoryStorage();
@@ -12,9 +12,8 @@ const router = express.Router();
 
 router.post(
   "/create",
-  // postValidator.checkCreate(),
+  Middleware.authMiddleware(["utilisateur"]),
   Middleware.handleValidationError,
-  Middleware.authMiddleware({ roles: ["utilisateur"] }),
   upload.array("images"),
   PostController.create
 );
@@ -36,22 +35,23 @@ router.get(
 router.get(
   "/missions",
   Middleware.handleValidationError,
-  Middleware.authMiddleware({ roles: ['utilisateur']}),
+  Middleware.authMiddleware(["utilisateur"]),
   PostController.readMissions
-)
+);
 
 router.get(
   "/:id",
   postValidator.checkIdParam(),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   PostController.readById
 );
 
 router.put(
   "/visib/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware({ roles: ["admin"] }),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["administrateur"]),
   PostController.changeVisibility
 );
 
@@ -59,6 +59,7 @@ router.delete(
   "/delete/:id",
   postValidator.checkIdParam(),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur", "administrateur"]),
   PostController.delete
 );
 

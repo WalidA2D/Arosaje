@@ -75,6 +75,7 @@ export default function BlogFocus() {
             Authorization: `${token}`,
           },
         });
+        console.log('token : ' + token + '\nuserId : ' +userId)
         const data = await response.json();
 
         if (data.success) {

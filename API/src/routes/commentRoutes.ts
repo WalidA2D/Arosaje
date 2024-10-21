@@ -9,7 +9,7 @@ router.post(
   "/create",
   commentValidator.checkCreate(),
   Middleware.handleValidationError,
-  Middleware.authMiddleware({ roles: ["botaniste"] }),
+  Middleware.authMiddleware(["botaniste"]),
   commentController.create
 );
 
@@ -31,6 +31,7 @@ router.delete(
   "/delete/:id",
   commentValidator.checkReadByPost(),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["botaniste", "administrateur"]),
   commentController.delete
 );
 

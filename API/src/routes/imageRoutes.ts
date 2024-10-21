@@ -12,26 +12,28 @@ const router = express.Router();
 
 router.post(
   "/pp/upload",
-  upload.single("image"),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
+  upload.single("image"),
   ImageController.uploadPP
 );
 
 router.get(
   "/pp/:id",
   postValidator.checkIdParam(),
-  Middleware.authMiddleware({ roles: ["utilisateur"] }),
   Middleware.handleValidationError,
+  Middleware.authMiddleware(["utilisateur"]),
   ImageController.getPP
 );
 
 router.put(
   "/resetPP",
   Middleware.handleValidationError,
-  Middleware.authMiddleware({ roles: ["utilisateur"] }),
+  Middleware.authMiddleware(["utilisateur"]),
   ImageController.resetPP
 );
 
+// Uncomment if needed
 // router.post(
 //   '/upload/multiple',
 //   upload.array('images'),
@@ -39,7 +41,7 @@ router.put(
 //   ImageController.uploadMultipleImages
 // );
 
-// Delete an image
+// Uncomment if needed
 // router.delete(
 //   '/:id',
 //   Middleware.handleValidationError,
