@@ -2,7 +2,7 @@
 FROM node:18
 
 # Créer un répertoire pour l'application
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/chat-server
 
 # Copier les fichiers package.json et package-lock.json
 COPY package*.json ./
@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Exposer les ports utilisés par Expo
-EXPOSE 8081
+EXPOSE 4000
 
 # Lancer l'application Expo
-CMD ["npx", "expo", "start"]
+CMD ["node", "server.js"]
