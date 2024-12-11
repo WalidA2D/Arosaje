@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize";
 import { UserInstance } from "../models/User";
-import { ConvInstance } from "../models/Conversation";
+import { ConversationInstance } from "../models/Conversation";
 import { MessageInstance } from "../models/Message";
 import { verifyToken } from "../helpers/jwtUtils"; // Importer la fonction de vérification du token
 
@@ -21,7 +21,7 @@ class ConversationsController {
         return res.status(403).json({ success: false, msg: "Droits requis" });
       }
 
-      const convExist = await ConvInstance.findOne({
+      const convExist = await ConversationInstance.findOne({
         where: {
           [Op.or]: [
             { idUser1: idUser1, idUser2: idUser2 },
@@ -33,7 +33,7 @@ class ConversationsController {
         return res.status(200).json({ success: true, msg: "Conversation déjà existante", idConv: convExist.dataValues.idConversations });
       }
 
-      await ConvInstance.create({
+      await ConversationInstance.create({
         dateStart,
         dateEnd,
         seen: 0,
@@ -50,7 +50,7 @@ class ConversationsController {
 
   async read(req: Request, res: Response) {
     try {
-      const records = await ConvInstance.findAll();
+      const records = await ConversationInstance.findAll();
       return res.status(200).json({ success: true, msg: records.length ? "Conversations bien trouvées" : "Aucune conversation répertoriée", records });
     } catch (e) {
       console.error(e);
@@ -67,7 +67,7 @@ class ConversationsController {
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
       const userId = user.dataValues.idUsers;
-      const records = await ConvInstance.findAll({
+      const records = await ConversationInstance.findAll({
         where: {
           [Op.or]: [
             { idUser1: userId },
@@ -112,7 +112,7 @@ class ConversationsController {
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
       const { id } = req.params;
-      const record = await ConvInstance.findOne({ where: { idConversations: id } });
+      const record = await ConversationInstance.findOne({ where: { idConversations: id } });
       if (!record) return res.status(404).json({ success: false, msg: "Conversation cible introuvable ou déjà supprimée" });
 
       if (user.dataValues.idUsers !== record.dataValues.idUser1 &&

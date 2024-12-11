@@ -1,51 +1,49 @@
-import { DataTypes, Model, Optional } from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 import db from '../config/database.config';
+import { UserInstance } from './User';
+import { CommentInstance } from './Comment';
+import { FavInstance } from './UserFavorites';
 
-interface PostAttributes {
-  idPosts: number;
-  title: string;
-  description: string;
-  publishedAt: Date;
-  dateStart: Date;
-  dateEnd: Date;
-  address: string;
-  cityName: string;
-  state: boolean;
-  accepted: boolean;
-  acceptedBy: number | null;
-  idUser: number;
-  plantOrigin: string;
-  plantRequirements: string;
-  plantType: string;
-  image1: string;
-  image2: string;
-  image3: string;
+export class PostInstance extends Model {
+  idPost!: number;
+  title!: string;
+  description!: string;
+  publishedAt!: Date;
+  dateStart!: Date;
+  dateEnd!: Date;
+  address!: string;
+  codePostal!: string;
+  cityName!: string;
+  state!: boolean;
+  plant!: string;
+  image!: string;
+  idUser!: number;
 }
-
-export interface PostCreationAttributes extends Optional<PostAttributes, 'idPosts'> {}
-
-export class PostInstance extends Model<PostAttributes, PostCreationAttributes> {}
 
 PostInstance.init(
   {
-    idPosts: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    title: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.STRING, allowNull: false },
-    publishedAt: { type: DataTypes.DATE, allowNull: true, defaultValue: DataTypes.NOW },
+    idPost: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    title: { type: DataTypes.STRING(50), allowNull: false },
+    description: { type: DataTypes.TEXT, allowNull: false },
+    publishedAt: { type: DataTypes.DATE, allowNull: false },
     dateStart: { type: DataTypes.DATE, allowNull: false },
     dateEnd: { type: DataTypes.DATE, allowNull: false },
-    address: { type: DataTypes.STRING, allowNull: false },
-    cityName: { type: DataTypes.STRING, allowNull: false },
-    state: { type: DataTypes.BOOLEAN, allowNull: false },
-    accepted: { type: DataTypes.BOOLEAN, allowNull: true },
-    acceptedBy: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'Users', key: 'idUsers' } }, 
-    idUser: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Users', key: 'idUsers' } },
-    plantOrigin: { type: DataTypes.STRING, allowNull: false },
-    plantRequirements: { type: DataTypes.STRING, allowNull: false },
-    plantType: { type: DataTypes.STRING, allowNull: false },
-    image1: { type: DataTypes.STRING, allowNull: false},
-    image2: { type: DataTypes.STRING, allowNull: false},
-    image3: { type: DataTypes.STRING, allowNull: false}
+    address: { type: DataTypes.STRING(250) },
+    codePostal: { type: DataTypes.STRING(5) },
+    cityName: { type: DataTypes.STRING(50) },
+    state: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    plant: { type: DataTypes.STRING(50), allowNull: false },
+    image: { type: DataTypes.STRING(255) },
+    idUser: { type: DataTypes.INTEGER, allowNull: true },
   },
-  { sequelize: db, tableName: 'Posts', timestamps: false }
+  {
+    sequelize: db,
+    timestamps: false,
+    tableName: 'Posts',
+  }
 );
+
+// Associations
+PostInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
+PostInstance.hasMany(CommentInstance, { foreignKey: 'idPost', as: 'comments' });
+PostInstance.belongsToMany(UserInstance, { through: FavInstance, foreignKey: 'idPost', as: 'users' });

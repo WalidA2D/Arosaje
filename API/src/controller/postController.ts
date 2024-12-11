@@ -7,7 +7,7 @@ import { Op } from 'sequelize';
 import { PostInstance } from "../models/Post";
 import { UserInstance } from "../models/User";
 import { CommentInstance } from "../models/Comment";
-import { FavInstance } from "../models/Fav";
+import { FavInstance } from "../models/UserFavorites";
 import { verifyToken } from "../helpers/jwtUtils";
 
 class PostController {
@@ -31,6 +31,7 @@ class PostController {
         dateEnd,
         address,
         cityName,
+        codePostal,
         state,
         accepted,
         acceptedBy,
@@ -51,6 +52,7 @@ class PostController {
         dateEnd: dateEndDate,
         address,
         cityName,
+        codePostal,
         state: state === "true",
         accepted: accepted === "true",
         acceptedBy: acceptedBy ? parseInt(acceptedBy, 10) : null,
@@ -58,9 +60,7 @@ class PostController {
         plantOrigin,
         plantRequirements,
         plantType,
-        image1: "",
-        image2: "",
-        image3: "",
+        image: "",
       });
 
       const email = process.env.FIREBASE_AUTH_EMAIL!;
@@ -86,9 +86,7 @@ class PostController {
       await Promise.all(filePromises);
 
       await record.update({
-        image1: filesURLs[0] || "",
-        image2: filesURLs[1] || "",
-        image3: filesURLs[2] || "",
+        image: filesURLs[0] || ""
       });
 
       return res.status(200).json({ success: true, record, msg: "Création post réussie" });

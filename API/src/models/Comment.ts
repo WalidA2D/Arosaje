@@ -1,31 +1,33 @@
-import { DataTypes, Model, Optional} from "sequelize";
+import { DataTypes, Model } from 'sequelize';
 import db from '../config/database.config';
+import { PostInstance } from './Post';
+import { UserInstance } from './User';
 
-export interface CommentAttributes {
-  idComments: number;
-  text: string;
-  note: number;
-  publishedAt: Date;
-  idUser: number;
-  idPost: number;
+export class CommentInstance extends Model {
+  idComment!: number;
+  text!: string;
+  note!: boolean;
+  publishedAt!: Date;
+  idPost!: number;
+  idUser!: number;
 }
-
-export interface MessageCreationAttributes extends Optional<CommentAttributes, 'idComments'> {}
-
-export class CommentInstance extends Model<CommentAttributes, MessageCreationAttributes> {}
 
 CommentInstance.init(
   {
-    idComments: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    text: { type: DataTypes.STRING(1500), allowNull: false },
-    note: { type: DataTypes.DECIMAL(5, 2) },
-    publishedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }, 
-    idUser: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'idUsers' } },
-    idPost: { type: DataTypes.INTEGER, references: { model: 'Posts', key: 'idPosts' } }
+    idComment: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    text: { type: DataTypes.STRING(255), allowNull: false },
+    note: { type: DataTypes.BOOLEAN, allowNull: false },
+    publishedAt: { type: DataTypes.DATE, allowNull: false },
+    idPost: { type: DataTypes.INTEGER, allowNull: true },
+    idUser: { type: DataTypes.INTEGER, allowNull: true },
   },
   {
     sequelize: db,
     timestamps: false,
-    tableName: 'Comments'
+    tableName: 'Comments',
   }
 );
+
+// Associations
+CommentInstance.belongsTo(PostInstance, { foreignKey: 'idPost' });
+CommentInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });

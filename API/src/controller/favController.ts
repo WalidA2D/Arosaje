@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { PostInstance } from "../models/Post";
 import { UserInstance } from "../models/User";
-import { FavInstance } from "../models/Fav";
+import { FavInstance } from "../models/UserFavorites";
 import { verifyToken } from "../helpers/jwtUtils"; // Importer la fonction de vérification du token
 
 class FavController {

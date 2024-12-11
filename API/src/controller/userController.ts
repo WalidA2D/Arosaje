@@ -22,6 +22,7 @@ class UserController {
                 "address": u.address,
                 "phone": u.phone,
                 "cityName": u.cityName,
+                "codePostal": u.codePostal?
                 "photo": u.photo,
                 "isBan": u.isBan ? true : false,
                 "note": u.note,
@@ -56,6 +57,7 @@ class UserController {
                 address: user.dataValues.address,
                 phone: user.dataValues.phone,
                 cityName: user.dataValues.cityName,
+                codePostal: user.dataValues.codePostal,
                 photo: user.dataValues.photo,
                 role,
                 note: user.dataValues.note,
@@ -90,6 +92,7 @@ class UserController {
                 lastName: user.dataValues.lastName,
                 firstName: user.dataValues.firstName,
                 cityName: user.dataValues.cityName,
+                codePostal: user.dataValues.codePostal,
                 role: user.dataValues.isAdmin ? 'Administrateur' : user.dataValues.isBotanist ? 'Botaniste' : 'Utilisateur',
                 profilePic: user.dataValues.photo
             }});
@@ -101,13 +104,13 @@ class UserController {
 
     async update(req: Request, res: Response) {
       try {
-            const token = req.headers.authorization
+          const token = req.headers.authorization
           if (!token) return res.status(401).json({ success: false, msg: "Accès refusé" });
   
           const record = await UserInstance.findOne({ where: { uid: token } });
           if (!record) return res.status(404).json({ success: false, msg: "Cible non trouvée" });
   
-          const { lastName, firstName, email, address, phone, cityName } = req.body;
+          const { lastName, firstName, email, address, phone, cityName, codePostal } = req.body;
           const updatedRecord = await record.update({
               lastName,
               firstName,
@@ -115,6 +118,7 @@ class UserController {
               address,
               phone,
               cityName,
+              codePostal
           });
   
           return res.status(200).json({ success: true, msg: "Modification réussie", record: updatedRecord });
@@ -159,6 +163,7 @@ class UserController {
                 "address": u.dataValues.address,
                 "phone": u.dataValues.phone,
                 "cityName": u.dataValues.cityName,
+                "codePostal": u.dataValues.codePostal,
                 "photo": u.dataValues.photo,
                 "role": u.dataValues.isBotanist ? "Botaniste" : u.dataValues.isAdmin ? "Administrateur" : "Utilisateur",
                 "isBan": u.dataValues.isBan ? true : false,
