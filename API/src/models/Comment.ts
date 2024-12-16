@@ -28,6 +28,6 @@ CommentInstance.init(
   }
 );
 
-// Associations
-CommentInstance.belongsTo(PostInstance, { foreignKey: 'idPost' });
-CommentInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
+// // Associations
+// CommentInstance.belongsTo(PostInstance, { foreignKey: 'idPost' });
+// CommentInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });

@@ -26,6 +26,6 @@ MessageInstance.init(
   }
 );
 
-// Associations
-MessageInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
-MessageInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });
+// // Associations
+// MessageInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
+// MessageInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });

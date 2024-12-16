@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UserInstance } from "../models/User";
 import { encryptMethod } from "../helpers/encryptMethod";
 import { generateToken, verifyToken } from "../helpers/jwtUtils";
+import { compareSync } from "bcrypt";
 
 const defaultPP = "https://firebasestorage.googleapis.com/v0/b/api-arosa-je.appspot.com/o/constants%2Fdefault_pp.jpeg?alt=media&token=c777b8c6-7342-4165-9c0f-7ad9ed91ca3b";
 
@@ -15,14 +16,14 @@ class UserController {
             req.body.password = await encryptMethod(req.body.password);
             const u = (await UserInstance.create({ ...req.body, uid, photo: defaultPP })).dataValues;
             return res.status(201).json({ success: true, record: {
-                "idUsers": u.idUsers.toString(),
+                "idUsers": u.idUsers,
                 "lastName": u.lastName,
                 "firstName": u.firstName,
                 "email": u.email,
                 "address": u.address,
                 "phone": u.phone,
                 "cityName": u.cityName,
-                "codePostal": u.codePostal?
+                "codePostal": u.codePostal,
                 "photo": u.photo,
                 "isBan": u.isBan ? true : false,
                 "note": u.note,
@@ -148,7 +149,7 @@ class UserController {
             const { email, password } = req.body;
             const u = await UserInstance.findOne({ where: { email } });
             if (!u) return res.status(401).json({ success: false, msg: "Utilisateur non trouvé" });
-            const encryptedPassword = await encryptMethod(password);
+            const encryptedPassword = await compareSync(password, u.dataValues.password);
             if (u.dataValues.password !== encryptedPassword) return res.status(401).json({ success: false, msg: "Mot de passe incorrect" });
 
             const newUid = (await u.update({ uid : uuidv4()})).dataValues.uid;

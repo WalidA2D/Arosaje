@@ -20,6 +20,6 @@ UsersConversationsInstance.init(
   }
 );
 
-// Associations
-UsersConversationsInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
-UsersConversationsInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });
+// // Associations
+// UsersConversationsInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
+// UsersConversationsInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });

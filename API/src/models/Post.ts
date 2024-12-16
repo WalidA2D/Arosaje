@@ -43,7 +43,7 @@ PostInstance.init(
   }
 );
 
-// Associations
-PostInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
-PostInstance.hasMany(CommentInstance, { foreignKey: 'idPost', as: 'comments' });
-PostInstance.belongsToMany(UserInstance, { through: FavInstance, foreignKey: 'idPost', as: 'users' });
+// // Associations
+// PostInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
+// PostInstance.hasMany(CommentInstance, { foreignKey: 'idPost', as: 'comments' });
+// PostInstance.belongsToMany(UserInstance, { through: FavInstance, foreignKey: 'idPost', as: 'users' });

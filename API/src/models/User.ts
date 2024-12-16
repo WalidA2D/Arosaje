@@ -50,8 +50,8 @@ UserInstance.init(
   }
 );
 
-// Associations
-UserInstance.hasMany(PostInstance, { foreignKey: 'idUser', as: 'posts' });
-UserInstance.hasMany(CommentInstance, { foreignKey: 'idUser', as: 'comments' });
-UserInstance.belongsToMany(PostInstance, { through: FavInstance, foreignKey: 'idUser', as: 'favorites' });
-UserInstance.belongsToMany(ConversationInstance, { through: UsersConversationsInstance, foreignKey: 'idUser', as: 'conversations' });
+// // Associations
+// UserInstance.hasMany(PostInstance, { foreignKey: 'idUser', as: 'posts' });
+// UserInstance.hasMany(CommentInstance, { foreignKey: 'idUser', as: 'comments' });
+// UserInstance.belongsToMany(PostInstance, { through: FavInstance, foreignKey: 'idUser', as: 'favorites' });
+// UserInstance.belongsToMany(ConversationInstance, { through: UsersConversationsInstance, foreignKey: 'idUser', as: 'conversations' });

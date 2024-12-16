@@ -20,6 +20,6 @@ FavInstance.init(
   }
 );
 
-// Associations
-FavInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
-FavInstance.belongsTo(PostInstance, { foreignKey: 'idPost' });
+// // Associations
+// FavInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
+// FavInstance.belongsTo(PostInstance, { foreignKey: 'idPost' });
