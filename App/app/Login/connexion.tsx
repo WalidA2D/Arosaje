@@ -67,7 +67,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
             console.log("data : ",data);
             if (data.success && data.user) {
                 await AsyncStorage.setItem('userToken', data.user.uid);
-                await AsyncStorage.setItem('userId', data.user.idUsers.toString());
+                await AsyncStorage.setItem('userId', data.user.idUser.toString());
                 await AsyncStorage.setItem('role', data.user.role);
                 setIsModalVisible(false, 'connexion');
                 navigation.navigate('(tabs)');

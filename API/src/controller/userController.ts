@@ -16,7 +16,7 @@ class UserController {
             req.body.password = await encryptMethod(req.body.password);
             const u = (await UserInstance.create({ ...req.body, uid, photo: defaultPP })).dataValues;
             return res.status(201).json({ success: true, record: {
-                "idUsers": u.idUsers,
+                "idUser": u.idUser,
                 "lastName": u.lastName,
                 "firstName": u.firstName,
                 "email": u.email,
@@ -51,7 +51,7 @@ class UserController {
 
             const role = user.dataValues.isAdmin ? "Administrateur" : user.dataValues.isBotanist ? "Botaniste" : "Utilisateur";
             return res.status(200).json({ success: true, msg: "Lecture du profil OK", user: {
-                idUsers: user.dataValues.idUsers,
+                idUser: user.dataValues.idUser,
                 lastName: user.dataValues.lastName,
                 firstName: user.dataValues.firstName,
                 email: user.dataValues.email,
@@ -84,12 +84,12 @@ class UserController {
     async readByID(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const user = await UserInstance.findOne({ where: { idUsers: id } });
+            const user = await UserInstance.findOne({ where: { idUser: id } });
             if (!user) {
                 return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
             }
             return res.status(200).json({ success: true, msg: "Lecture du profil OK", user: {
-                idUser: user.dataValues.idUsers,
+                idUser: user.dataValues.idUser,
                 lastName: user.dataValues.lastName,
                 firstName: user.dataValues.firstName,
                 cityName: user.dataValues.cityName,
@@ -132,7 +132,7 @@ class UserController {
     async delete(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const record = await UserInstance.findOne({ where: { idUsers: id } });
+            const record = await UserInstance.findOne({ where: { idUser: id } });
 
             if (!record) return res.status(500).json({ success: false, msg: "Can not find existing record" });
 
@@ -149,15 +149,15 @@ class UserController {
             const { email, password } = req.body;
             const u = await UserInstance.findOne({ where: { email } });
             if (!u) return res.status(401).json({ success: false, msg: "Utilisateur non trouvé" });
-            const encryptedPassword = await compareSync(password, u.dataValues.password);
-            if (u.dataValues.password !== encryptedPassword) return res.status(401).json({ success: false, msg: "Mot de passe incorrect" });
 
-            const newUid = (await u.update({ uid : uuidv4()})).dataValues.uid;
+            if (!compareSync(password, u.dataValues.password)) return res.status(401).json({ success: false, msg: "Mot de passe incorrect" });
+
+            const newUid = (await u.update({ uid : uuidv4()})).dataValues.uid; 
 
             const token = generateToken(newUid, [u.dataValues.isAdmin ? 'administrateur' : 'utilisateur']);
             
             return res.status(200).json({ success: true, msg: "Connexion réussie", token, user: {
-                "idUsers": u.dataValues.idUsers,
+                "idUser": u.dataValues.idUser,
                 "lastName": u.dataValues.lastName,
                 "firstName": u.dataValues.firstName,
                 "email": u.dataValues.email,

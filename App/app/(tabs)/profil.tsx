@@ -107,7 +107,7 @@ export function ProfilScreen() {
       const data = await response.json();
 
       if (data.success) {
-        const userId = data.user.idUsers;
+        const userId = data.user.idUser;
         setProfileData({
           lastName: data.user.lastName,
           firstName: data.user.firstName,

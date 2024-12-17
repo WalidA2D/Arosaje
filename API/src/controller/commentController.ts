@@ -17,7 +17,7 @@ class CommentController {
       const post = await PostInstance.findOne({ where: { idPosts: idPost } });
       if (!post) return res.status(404).json({ success: false, msg: "Post non trouvé" });
 
-      const record = await CommentInstance.create({ ...req.body, idUser: user.dataValues.idUsers });
+      const record = await CommentInstance.create({ ...req.body, idUser: user.dataValues.idUser });
       return res.status(201).json({ success: true, record, msg: "Commentaire créé avec succès" });
     } catch (e) {
       console.error(e);
@@ -61,7 +61,7 @@ class CommentController {
       const record = await CommentInstance.findOne({ where: { idComments: id } });
       if (!record) return res.status(404).json({ success: false, msg: "Commentaire introuvable" });
 
-      if (user.dataValues.isAdmin || user.dataValues.idUsers === record.dataValues.idUser) {
+      if (user.dataValues.isAdmin || user.dataValues.idUser === record.dataValues.idUser) {
         await record.destroy();
         return res.status(200).json({ success: true, msg: "Commentaire supprimé avec succès" });
       } else {

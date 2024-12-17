@@ -26,7 +26,7 @@ class ImageController {
       if (!req.file) return res.status(400).json({ success: false, message: "Aucun fichier téléchargé" });
 
       const file = req.file;
-      const fileRef = ref(storage, `profilepictures/${user.dataValues.idUsers + user.dataValues.firstName[0]}.jpg`);
+      const fileRef = ref(storage, `profilepictures/${user.dataValues.idUser + user.dataValues.firstName[0]}.jpg`);
       const metadata = { contentType: 'image/jpg' };
       await uploadBytesResumable(fileRef, file.buffer, metadata);
       const fileUrl = await getDownloadURL(fileRef);
@@ -43,7 +43,7 @@ class ImageController {
   async getPP(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const record = await UserInstance.findOne({ where: { idUsers: id } });
+      const record = await UserInstance.findOne({ where: { idUser: id } });
       if (!record) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
       return res.status(200).json({ success: true, url: record.dataValues.photo });
     } catch (e) {

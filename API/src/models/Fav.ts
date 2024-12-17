@@ -14,7 +14,7 @@ export class FavInstance extends Model<FavCreationAttributes, FavCreationAttribu
 FavInstance.init(
   {
     idFavorites: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    idUser: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'idUsers' } },
+    idUser: { type: DataTypes.INTEGER, references: { model: 'Users', key: 'idUser' } },
     idPost: { type: DataTypes.INTEGER, references: { model: 'Posts', key: 'idPosts' } }
   },
   {

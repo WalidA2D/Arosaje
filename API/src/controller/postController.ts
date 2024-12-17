@@ -56,7 +56,7 @@ class PostController {
         state: state === "true",
         accepted: accepted === "true",
         acceptedBy: acceptedBy ? parseInt(acceptedBy, 10) : null,
-        idUser: user.dataValues.idUsers,
+        idUser: user.dataValues.idUser,
         plantOrigin,
         plantRequirements,
         plantType,
@@ -147,7 +147,7 @@ class PostController {
       if (!post) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
 
       const comments = await CommentInstance.findAll({ where: { idPost: id }, order: [["publishedAt", "DESC"]] });
-      const favoris = await FavInstance.findOne({ where: { idPost: post.dataValues.idPosts, idUser: user.dataValues.idUsers } });
+      const favoris = await FavInstance.findOne({ where: { idPost: post.dataValues.idPosts, idUser: user.dataValues.idUser } });
       const isFav = favoris ? true : false;
 
       return res.status(200).json({ success: true, isFav, post, comments });
@@ -165,7 +165,7 @@ class PostController {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
 
-      const missions = await PostInstance.findAll({ where: { acceptedBy: user.dataValues.idUsers } });
+      const missions = await PostInstance.findAll({ where: { acceptedBy: user.dataValues.idUser } });
       if (!missions) return res.status(404).json({ success: false, msg: "Aucune mission trouvée." });
 
       return res.status(200).json({ success: true, missions });
@@ -201,7 +201,7 @@ class PostController {
       const record = await PostInstance.findOne({ where: { idPosts: id } });
       if (!record) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
 
-      if (user?.dataValues.isAdmin || user?.dataValues.idUsers == record.dataValues.idUser) {
+      if (user?.dataValues.isAdmin || user?.dataValues.idUser == record.dataValues.idUser) {
         await record.destroy();
         return res.status(200).json({ success: true, msg: "Post bien supprimé" });
       } else {

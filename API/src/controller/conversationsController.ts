@@ -16,8 +16,8 @@ class ConversationsController {
 
       const { dateStart, dateEnd, idUser1, idUser2 } = req.body;
 
-      if (user.dataValues.idUsers.toString() !== idUser1.toString() &&
-          user.dataValues.idUsers.toString() !== idUser2.toString()) {
+      if (user.dataValues.idUser.toString() !== idUser1.toString() &&
+          user.dataValues.idUser.toString() !== idUser2.toString()) {
         return res.status(403).json({ success: false, msg: "Droits requis" });
       }
 
@@ -66,7 +66,7 @@ class ConversationsController {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
-      const userId = user.dataValues.idUsers;
+      const userId = user.dataValues.idUser;
       const records = await ConversationInstance.findAll({
         where: {
           [Op.or]: [
@@ -81,11 +81,11 @@ class ConversationsController {
       }
 
       const usersId = records.map(record => record.dataValues.idUser1 === userId ? record.dataValues.idUser2 : record.dataValues.idUser1);
-      const users = await Promise.all(usersId.map(idU => UserInstance.findOne({ where: { idUsers: idU } })));
+      const users = await Promise.all(usersId.map(idU => UserInstance.findOne({ where: { idUser: idU } })));
       const validUsers = users.filter(u => u !== null);
 
       const conversations = validUsers.map((u, index) => ({
-        idUser: u.dataValues.idUsers,
+        idUser: u.dataValues.idUser,
         firstName: u.dataValues.firstName,
         lastName: u.dataValues.lastName,
         photo: u.dataValues.photo,
@@ -115,8 +115,8 @@ class ConversationsController {
       const record = await ConversationInstance.findOne({ where: { idConversations: id } });
       if (!record) return res.status(404).json({ success: false, msg: "Conversation cible introuvable ou déjà supprimée" });
 
-      if (user.dataValues.idUsers !== record.dataValues.idUser1 &&
-          user.dataValues.idUsers !== record.dataValues.idUser2) {
+      if (user.dataValues.idUser !== record.dataValues.idUser1 &&
+          user.dataValues.idUser !== record.dataValues.idUser2) {
         return res.status(403).json({ success: false, msg: "Droits requis" });
       }
 

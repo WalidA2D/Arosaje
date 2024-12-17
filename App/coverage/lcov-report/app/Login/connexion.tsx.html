@@ -688,7 +688,7 @@ export default function ConnexionScreen({ setIsModalVisible }: ConnexionScreenPr
 <span class="cstat-no" title="statement not covered" >            console.log("data : ",data);</span>
 <span class="cstat-no" title="statement not covered" >            if (data.success &amp;&amp; data.user) {</span>
 <span class="cstat-no" title="statement not covered" >                await AsyncStorage.setItem('userToken', data.user.uid);</span>
-<span class="cstat-no" title="statement not covered" >                await AsyncStorage.setItem('userId', data.user.idUsers.toString());</span>
+<span class="cstat-no" title="statement not covered" >                await AsyncStorage.setItem('userId', data.user.idUser.toString());</span>
 <span class="cstat-no" title="statement not covered" >                await AsyncStorage.setItem('role', data.user.role);</span>
 <span class="cstat-no" title="statement not covered" >                setIsModalVisible(false, 'connexion');</span>
 <span class="cstat-no" title="statement not covered" >                navigation.navigate('(tabs)');</span>

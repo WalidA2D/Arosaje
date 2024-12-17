@@ -36,7 +36,7 @@ class MessageController {
         text,
         publishedAt: publishedAtDate,
         idConversation,
-        idUser: user.dataValues.idUsers,
+        idUser: user.dataValues.idUser,
         file: urlFile,
       });
 
@@ -55,7 +55,7 @@ class MessageController {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
-      const record = await MessageInstance.findAll({ where: { idUser: user.dataValues.idUsers } });
+      const record = await MessageInstance.findAll({ where: { idUser: user.dataValues.idUser } });
       if (!record) return res.status(404).json({ success: false, msg: "Aucun message trouvé" });
 
       return res.status(200).json({ success: true, msg: "Messages trouvés", record });
@@ -96,7 +96,7 @@ class MessageController {
       const record = await MessageInstance.findOne({ where: { idMessages: id } });
       if (!record) return res.status(500).json({ success: false, msg: "Message introuvable ou déjà supprimé" });
 
-      if (record.dataValues.idUser !== user.dataValues.idUsers) {
+      if (record.dataValues.idUser !== user.dataValues.idUser) {
         return res.status(403).json({ success: false, msg: "Droits requis" });
       }
 
