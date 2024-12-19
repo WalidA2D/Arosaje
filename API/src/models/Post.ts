@@ -16,6 +16,7 @@ export class PostInstance extends Model {
   cityName!: string;
   state!: boolean;
   plant!: string;
+  idUserAssigner!: number;
   image!: string;
   idUser!: number;
 }
@@ -33,6 +34,7 @@ PostInstance.init(
     cityName: { type: DataTypes.STRING(50) },
     state: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     plant: { type: DataTypes.STRING(50), allowNull: false },
+    idUserAssigner: { type: DataTypes.INTEGER, allowNull: true },
     image: { type: DataTypes.STRING(255) },
     idUser: { type: DataTypes.INTEGER, allowNull: true },
   },

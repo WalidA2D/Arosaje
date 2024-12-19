@@ -162,11 +162,14 @@ function PublierContent() {
       formData.append('dateEnd', selectedEndDate);
       formData.append('address', localisation);
       formData.append('cityName', cityName);
+      const codePostal = extractPostalCode(cityName);
+      if (codePostal) {
+        formData.append('codePostal', codePostal);
+      } else {
+        console.error('Code postal non trouvé dans la localisation');
+      }
       formData.append('state', JSON.stringify(false));
-      formData.append('accepted', JSON.stringify(false));
-      formData.append('plantOrigin', espece);
-      formData.append('plantRequirements', entretien);
-      formData.append('plantType', planteName);
+      formData.append('plant', planteName);
       formData.append('images', {
         uri: photo,
         type: 'image/jpeg',
@@ -237,6 +240,12 @@ function PublierContent() {
     setIsValid(false);
   };
 
+  const extractPostalCode = (address: string): string | null => {
+    const regex = /\b\d{5}\b/;
+    const match = address.match(regex);
+    return match ? match[0] : "";
+  };
+
   useEffect(() => {
     const loadData = async () => {
       const storedTitre = await AsyncStorage.getItem('titre');
@@ -290,7 +299,6 @@ function PublierContent() {
 
     const unsubscribe = navigation.addListener('focus', () => {
       const { titreValid, dateValid, descValid, locValid, espValid, photoValid, ettValid, localisation, cityName } = route.params || {};
-      console.log('Params:', { titreValid, dateValid, descValid, locValid, espValid, photoValid, ettValid, localisation, cityName });
       setIsValid(
         (titreValid !== undefined ? titreValid : false) &&
         (dateValid !== undefined ? dateValid : false) &&

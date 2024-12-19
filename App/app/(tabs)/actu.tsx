@@ -134,15 +134,16 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
     const { cityName, dateStart, dateEnd, plantOrigin } = filters;
 
     let queryString = `${apiUrl}/post/read?quantite=${quantite}&saut=${currentSaut}`;
-
+  
     if (cityName) queryString += `&cityName=${encodeURIComponent(cityName)}`;
     if (dateStart) queryString += `&dateStart=${dateStart}`;
     if (dateEnd) queryString += `&dateEnd=${dateEnd}`;
-    if (plantOrigin) queryString += `&plantOrigin=${encodeURIComponent(plantOrigin)}`;
+    if (plantOrigin) queryString += `&plant=${encodeURIComponent(plantOrigin)}`;
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-
+      console.log(queryString) 
+      //laisser le, j'en ai besoin
       const response = await fetch(queryString);
       if (!response.ok) {
         throw new Error('Échec de la réponse du serveur');

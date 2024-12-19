@@ -33,11 +33,7 @@ class PostController {
         cityName,
         codePostal,
         state,
-        accepted,
-        acceptedBy,
-        plantOrigin,
-        plantRequirements,
-        plantType,
+        plant,
       } = req.body;
 
       const publishedAtDate = publishedAt ? new Date(publishedAt) : new Date();
@@ -54,12 +50,8 @@ class PostController {
         cityName,
         codePostal,
         state: state === "true",
-        accepted: accepted === "true",
-        acceptedBy: acceptedBy ? parseInt(acceptedBy, 10) : null,
+        plant: plant,
         idUser: user.dataValues.idUser,
-        plantOrigin,
-        plantRequirements,
-        plantType,
         image: "",
       });
 
@@ -101,9 +93,9 @@ class PostController {
       const quantite = Number(req.query.quantite) || 10;
       const saut = Number(req.query.saut) || 0;
 
-      const filterConditions: any = { state: 0 };
+      const filterConditions: any = { state: false };
       for (const [key, value] of Object.entries(req.query)) {
-        if (["cityName", "dateStart", "dateEnd", "plantType", "plantOrigin"].includes(key)) {
+        if (["cityName", "dateStart", "dateEnd", "plant"].includes(key)) {
           filterConditions[key] = { [Op.like]: `${value}%` };
         }
       }
