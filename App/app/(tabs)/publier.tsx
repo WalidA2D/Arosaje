@@ -162,9 +162,9 @@ function PublierContent() {
       formData.append('dateEnd', selectedEndDate);
       formData.append('address', localisation);
       formData.append('cityName', cityName);
-      const codePostal = extractPostalCode(cityName);
-      if (codePostal) {
-        formData.append('codePostal', codePostal);
+      const postalCode = extractPostalCode(cityName);
+      if (postalCode) {
+        formData.append('postalCode', postalCode);
       } else {
         console.error('Code postal non trouvé dans la localisation');
       }
