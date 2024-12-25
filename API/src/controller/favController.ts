@@ -72,6 +72,19 @@ class FavController {
       return res.status(500).json({ success: false, msg: "Erreur lors de la suppression du favori" });
     }
   }
+
+  async test(req: Request, res: Response) {
+    try {
+      const user = await UserInstance.findOne({
+        where: { idUser: 1 },
+        include: { model: PostInstance, as: 'posts' }
+      });
+      return res.status(200).json({ success: true, user});
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des favoris" });
+    }
+  }
 }
 
 export default new FavController();

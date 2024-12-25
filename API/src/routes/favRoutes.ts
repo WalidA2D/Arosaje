@@ -28,4 +28,9 @@ router.delete(
   favController.delete
 );
 
+router.get(
+  "/test",
+  favController.test
+);
+
 export default router;

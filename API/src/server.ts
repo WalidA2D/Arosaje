@@ -11,6 +11,15 @@ import favRouter from "./routes/favRoutes"
 import msgRouteur from "./routes/messageRoutes"
 import convRouteur from "./routes/conversationRoutes"
 
+import './models/User';
+import './models/Post';
+import './models/Comment';
+import './models/Message';
+import './models/Conversation';
+import './models/UserFavorites';
+import './models/UserConversations';
+import './models/associations';
+
 dotenv.config();
 
 const app = express();
