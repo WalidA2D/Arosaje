@@ -12,13 +12,13 @@ export class PostInstance extends Model {
   dateStart!: Date;
   dateEnd!: Date;
   address!: string;
-  codePostal!: string;
+  postalCode!: string;
   cityName!: string;
   state!: boolean;
   plant!: string;
-  idUserAssigner!: number;
   image!: string;
   idUser!: number;
+  idUserAssigned!: number;
 }
 
 PostInstance.init(
@@ -30,13 +30,13 @@ PostInstance.init(
     dateStart: { type: DataTypes.DATE, allowNull: false },
     dateEnd: { type: DataTypes.DATE, allowNull: false },
     address: { type: DataTypes.STRING(250) },
-    codePostal: { type: DataTypes.STRING(5) },
+    postalCode: { type: DataTypes.STRING(5) },
     cityName: { type: DataTypes.STRING(50) },
     state: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
     plant: { type: DataTypes.STRING(50), allowNull: false },
-    idUserAssigner: { type: DataTypes.INTEGER, allowNull: true },
     image: { type: DataTypes.STRING(255) },
     idUser: { type: DataTypes.INTEGER, allowNull: true },
+    idUserAssigned: { type: DataTypes.INTEGER, allowNull: true },
   },
   {
     sequelize: db,
@@ -46,6 +46,6 @@ PostInstance.init(
 );
 
 // // Associations
-// PostInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
-// PostInstance.hasMany(CommentInstance, { foreignKey: 'idPost', as: 'comments' });
-// PostInstance.belongsToMany(UserInstance, { through: FavInstance, foreignKey: 'idPost', as: 'users' });
+PostInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
+PostInstance.hasMany(CommentInstance, { foreignKey: 'idPost', as: 'comments' });
+PostInstance.belongsToMany(UserInstance, { through: FavInstance, foreignKey: 'idPost', as: 'users' });

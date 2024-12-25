@@ -15,13 +15,13 @@ export class UserInstance extends Model {
   address!: string;
   phone!: string;
   cityName!: string;
-  codePostal!: string;
+  postalCode!: string;
   photo!: string;
   password!: string;
+  note!: number;
   isBotanist!: boolean;
   isAdmin!: boolean;
   isBan!: boolean;
-  note!: number;
   uid!: string;
 }
 
@@ -34,7 +34,7 @@ UserInstance.init(
     address: { type: DataTypes.STRING(255) },
     phone: { type: DataTypes.STRING(25) },
     cityName: { type: DataTypes.STRING(50) },
-    codePostal: { type: DataTypes.STRING(5) },
+    postalCode: { type: DataTypes.STRING(5) },
     photo: { type: DataTypes.STRING(255) },
     password: { type: DataTypes.STRING(255) },
     isBotanist: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
@@ -51,7 +51,7 @@ UserInstance.init(
 );
 
 // // Associations
-// UserInstance.hasMany(PostInstance, { foreignKey: 'idUser', as: 'posts' });
-// UserInstance.hasMany(CommentInstance, { foreignKey: 'idUser', as: 'comments' });
-// UserInstance.belongsToMany(PostInstance, { through: FavInstance, foreignKey: 'idUser', as: 'favorites' });
-// UserInstance.belongsToMany(ConversationInstance, { through: UsersConversationsInstance, foreignKey: 'idUser', as: 'conversations' });
+UserInstance.hasMany(PostInstance, { foreignKey: 'idUser', as: 'posts' });
+UserInstance.hasMany(CommentInstance, { foreignKey: 'idUser', as: 'comments' });
+UserInstance.belongsToMany(PostInstance, { through: FavInstance, foreignKey: 'idUser', as: 'favorites' });
+UserInstance.belongsToMany(ConversationInstance, { through: UsersConversationsInstance, foreignKey: 'idUser', as: 'conversations' });

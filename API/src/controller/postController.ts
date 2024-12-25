@@ -31,7 +31,7 @@ class PostController {
         dateEnd,
         address,
         cityName,
-        codePostal,
+        postalCode,
         state,
         plant,
       } = req.body;
@@ -48,7 +48,7 @@ class PostController {
         dateEnd: dateEndDate,
         address,
         cityName,
-        codePostal,
+        postalCode,
         state: state === "true",
         plant: plant,
         idUser: user.dataValues.idUser,
