@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { UserInstance } from "../models/User";
-import { encryptMethod } from "../helpers/encryptMethod";
 import { generateToken, verifyToken } from "../helpers/jwtUtils";
-import { compareSync } from "bcrypt";
+import { hashSync, compareSync } from "bcrypt";
 
 const defaultPP = "https://firebasestorage.googleapis.com/v0/b/api-arosa-je.appspot.com/o/constants%2Fdefault_pp.jpeg?alt=media&token=c777b8c6-7342-4165-9c0f-7ad9ed91ca3b";
 
@@ -13,13 +12,14 @@ class UserController {
         try {
             const email = await UserInstance.findOne({ where: { email: req.body.email } });
             if (email != null) return res.status(417).json({ success: false, msg: "Email déjà existant" });
-            req.body.password = await encryptMethod(req.body.password);
+            req.body.password = hashSync(req.body.password, 10);
             const u = (await UserInstance.create({ ...req.body, uid, photo: defaultPP })).dataValues;
             return res.status(201).json({ success: true, record: {
                 "idUser": u.idUser,
                 "lastName": u.lastName,
                 "firstName": u.firstName,
                 "email": u.email,
+                "password": req.body.password,
                 "address": u.address,
                 "phone": u.phone,
                 "cityName": u.cityName,
