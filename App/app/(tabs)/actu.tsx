@@ -14,7 +14,7 @@ type ActuNavigationProp = StackNavigationProp<RootStackParamList, 'Actualités'>
 type ActuRouteProp = RouteProp<RootStackParamList, 'Actualités'>;
 
 type Post = {
-  idPosts: number;
+  idPost: number;
   title: string;
   description: string;
   publishedAt: string;
@@ -142,8 +142,7 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
 
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log(queryString) 
-      //laisser le, j'en ai besoin
+
       const response = await fetch(queryString);
       if (!response.ok) {
         throw new Error('Échec de la réponse du serveur');
@@ -160,7 +159,7 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
             const formattedDate = `${datePart} ${timePart}`;
 
             return {
-              id: post.idPosts.toString(),
+              id: post.idPost.toString(),
               images: [post.image1, post.image2, post.image3].filter(Boolean) as string[],
               title: post.title,
               description: post.description,
@@ -176,6 +175,7 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
         setError('Erreur lors de la récupération des postes');
       }
     } catch (error) {
+      console.error(error)
       setError("Impossible de charger les postes. Veuillez vérifier votre connexion et réessayer.");
     } finally {
       if (isRefreshing) {

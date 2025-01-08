@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 
 const sequelize = new Sequelize(
-  'postgresql://postgres.dxaskejiscxzkjajjziy:DreamTeamMSPR2025@aws-0-eu-west-3.pooler.supabase.com:5432/postgres?pgbouncer=true',
+  'postgresql://postgres.dxaskejiscxzkjajjziy:DreamTeamMSPR2025@aws-0-eu-west-3.pooler.supabase.com:6543/postgres',
   {
     dialect: 'postgres',
     dialectOptions: {
@@ -11,6 +11,7 @@ const sequelize = new Sequelize(
       },
     },
     logging: false,
+    //logging: console.log, retirer le commentaire si vous avez besoin de voir les requetes sql lancer par le serv
   }
 );
 
