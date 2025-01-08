@@ -175,7 +175,7 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
         setError('Erreur lors de la récupération des postes');
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
       setError("Impossible de charger les postes. Veuillez vérifier votre connexion et réessayer.");
     } finally {
       if (isRefreshing) {
