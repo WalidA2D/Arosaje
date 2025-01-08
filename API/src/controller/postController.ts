@@ -66,7 +66,7 @@ class PostController {
       const filesURLs: string[] = [];
       const filePromises = (req.files as Express.Multer.File[]).map(
         async (file, index) => {
-          const fileName = `${record.dataValues.idPosts}_${index}`;
+          const fileName = `${record.dataValues.idPost}_${index}`;
           const fileRef = ref(storage, `posts/${fileName}.jpg`);
           const metadata = { contentType: "image/jpg" };
           await uploadBytesResumable(fileRef, file.buffer, metadata);
@@ -106,7 +106,7 @@ class PostController {
         offset: saut,
         order: [["publishedAt", "DESC"]],
       });
-
+      
       return res.status(200).json({ success: true, posts });
     } catch (e) {
       console.error(e);
@@ -135,11 +135,11 @@ class PostController {
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
 
       const { id } = req.params;
-      const post = await PostInstance.findOne({ where: { idPosts: id } });
+      const post = await PostInstance.findOne({ where: { idPost: id } });
       if (!post) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
 
       const comments = await CommentInstance.findAll({ where: { idPost: id }, order: [["publishedAt", "DESC"]] });
-      const favoris = await FavInstance.findOne({ where: { idPost: post.dataValues.idPosts, idUser: user.dataValues.idUser } });
+      const favoris = await FavInstance.findOne({ where: { idPost: post.dataValues.idPost, idUser: user.dataValues.idUser } });
       const isFav = favoris ? true : false;
 
       return res.status(200).json({ success: true, isFav, post, comments });
@@ -170,7 +170,7 @@ class PostController {
   async changeVisibility(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const record = await PostInstance.findOne({ where: { idPosts: id } });
+      const record = await PostInstance.findOne({ where: { idPost: id } });
       if (!record) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
 
       await record.update({ state: !record.dataValues.state });
@@ -190,7 +190,7 @@ class PostController {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
-      const record = await PostInstance.findOne({ where: { idPosts: id } });
+      const record = await PostInstance.findOne({ where: { idPost: id } });
       if (!record) return res.status(404).json({ success: false, msg: "Aucun post trouvé" });
 
       if (user?.dataValues.isAdmin || user?.dataValues.idUser == record.dataValues.idUser) {
