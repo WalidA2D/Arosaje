@@ -64,7 +64,7 @@ type ProfilScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Profi
 type ProfilScreenRouteProp = RouteProp<RootStackParamList, 'Profil'>;
 
 interface Post {
-  idPosts: number;
+  idPost: number;
   title: string;
   description: string;
   publishedAt: string;
@@ -193,7 +193,7 @@ export function ProfilScreen() {
     // Mettre à jour immédiatement l'état local pour refléter la suppression du favori
     setFavorites((prevFavorites) =>
       prevFavorites.map((favorite) =>
-        favorite.idPosts === idPost ? { ...favorite, isFavorite: false } : favorite
+        favorite.idPost === idPost ? { ...favorite, isFavorite: false } : favorite
       )
     );
 
@@ -214,7 +214,7 @@ export function ProfilScreen() {
         // Revert state change if API call fails
         setFavorites((prevFavorites) =>
           prevFavorites.map((favorite) =>
-            favorite.idPosts === idPost ? { ...favorite, isFavorite: true } : favorite
+            favorite.idPost === idPost ? { ...favorite, isFavorite: true } : favorite
           )
         );
       }
@@ -223,7 +223,7 @@ export function ProfilScreen() {
       // Revert state change if API call fails
       setFavorites((prevFavorites) =>
         prevFavorites.map((favorite) =>
-          favorite.idPosts === idPost ? { ...favorite, isFavorite: true } : favorite
+          favorite.idPost === idPost ? { ...favorite, isFavorite: true } : favorite
         )
       );
     }
@@ -233,7 +233,7 @@ export function ProfilScreen() {
     // Mettre à jour immédiatement l'état local pour refléter l'ajout du favori
     setFavorites((prevFavorites) =>
       prevFavorites.map((favorite) =>
-        favorite.idPosts === idPost ? { ...favorite, isFavorite: true } : favorite
+        favorite.idPost === idPost ? { ...favorite, isFavorite: true } : favorite
       )
     );
 
@@ -255,7 +255,7 @@ export function ProfilScreen() {
         // Revert state change if API call fails
         setFavorites((prevFavorites) =>
           prevFavorites.map((favorite) =>
-            favorite.idPosts === idPost ? { ...favorite, isFavorite: false } : favorite
+            favorite.idPost === idPost ? { ...favorite, isFavorite: false } : favorite
           )
         );
       }
@@ -264,7 +264,7 @@ export function ProfilScreen() {
       // Revert state change if API call fails
       setFavorites((prevFavorites) =>
         prevFavorites.map((favorite) =>
-          favorite.idPosts === idPost ? { ...favorite, isFavorite: false } : favorite
+          favorite.idPost === idPost ? { ...favorite, isFavorite: false } : favorite
         )
       );
     }
@@ -348,7 +348,7 @@ export function ProfilScreen() {
           </Text>
           <Pressable
             onPress={() =>
-              isFavorite ? handleRemoveFavorite(item.idPosts) : handleAddFavorite(item.idPosts)
+              isFavorite ? handleRemoveFavorite(item.idPost) : handleAddFavorite(item.idPost)
             }
           >
             <Ionicons
@@ -420,13 +420,13 @@ export function ProfilScreen() {
         <FlatList
           data={posts}
           renderItem={renderItem}
-          keyExtractor={(item) => item.idPosts.toString()}
+          keyExtractor={(item) => item.idPost.toString()}
         />
       ) : (
       <FlatList
           data={favorites}
           renderItem={renderItem}
-          keyExtractor={(item) => item.idPosts.toString()}
+          keyExtractor={(item) => item.idPost.toString()}
         />
       )}
     </View>
