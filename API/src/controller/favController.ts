@@ -43,7 +43,7 @@ class FavController {
       const favs = await FavInstance.findAll({ where: { idUser: user.dataValues.idUser } });
       const postIds = favs.map((fav) => fav.dataValues.idPost);
 
-      const posts = await Promise.all(postIds.map((idPost) => PostInstance.findOne({ where: { idPosts: idPost } })));
+      const posts = await Promise.all(postIds.map((idPost) => PostInstance.findOne({ where: { idPost: idPost } })));
       const record = posts.filter((post) => post !== null);
 
       return res.status(200).json({ success: true, msg: favs.length ? "Favoris bien trouvés" : "Aucun favori répertorié", record });

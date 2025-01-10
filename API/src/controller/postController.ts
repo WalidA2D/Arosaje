@@ -157,7 +157,7 @@ class PostController {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non trouvé" });
 
-      const missions = await PostInstance.findAll({ where: { acceptedBy: user.dataValues.idUser } });
+      const missions = await PostInstance.findAll({ where: { idUserAssigned: user.dataValues.idUser } });
       if (!missions) return res.status(404).json({ success: false, msg: "Aucune mission trouvée." });
 
       return res.status(200).json({ success: true, missions });
