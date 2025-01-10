@@ -49,14 +49,14 @@ export default function ActuMap() {
       const data = await response.json();
 
       if (data.success && data.posts) {
-        const filteredPosts = data.posts.filter((post: { accepted: boolean; acceptedBy: any; address: string; cityName: string; idPosts: string; }) => !post.accepted && post.acceptedBy === null);
-        const markersData = await Promise.all(filteredPosts.map(async (post: { address: string; cityName: string; idPosts: string; }) => {
+        const filteredPosts = data.posts.filter((post: { accepted: boolean; idUserAssigned: any; address: string; cityName: string; idPost: string; }) => !post.accepted && post.idUserAssigned === null);
+        const markersData = await Promise.all(filteredPosts.map(async (post: { address: string; cityName: string; idPost: string; }) => {
           const coordinates = await fetchCoordinates(post.address, post.cityName);
           if (coordinates) {
             return { 
               latitude: Number(coordinates.latitude),
               longitude: Number(coordinates.longitude),
-              id: post.idPosts
+              id: post.idPost
             };
           }
           return null;
