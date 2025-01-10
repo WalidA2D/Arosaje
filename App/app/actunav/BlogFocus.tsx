@@ -41,9 +41,7 @@ interface BlogData {
   post?: {
     title?: string;
     description?: string;
-    image1?: string;
-    image2?: string;
-    image3?: string;
+    image?: string;
     idUser?: number;
   };
   comments?: Array<CommentData>;
@@ -297,21 +295,15 @@ export default function BlogFocus() {
                 <Text style={styles.description}>{post.description}</Text>
               </View>
             )}
-            {(post.image1 || post.image2 || post.image3) && (
+            {(post.image) && (
               <View style={styles.imageContainer}>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
                   contentContainerStyle={styles.imageScrollContainer}
                 >
-                  {post.image1 && (
-                    <Image source={{ uri: post.image1 }} style={styles.image} />
-                  )}
-                  {post.image2 && (
-                    <Image source={{ uri: post.image2 }} style={styles.image} />
-                  )}
-                  {post.image3 && (
-                    <Image source={{ uri: post.image3 }} style={styles.image} />
+                  {post.image && (
+                    <Image source={{ uri: post.image }} style={styles.image} />
                   )}
                 </ScrollView>
                 <Button

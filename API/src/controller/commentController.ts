@@ -14,7 +14,7 @@ class CommentController {
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur non conforme" });
 
       const { idPost } = req.body;
-      const post = await PostInstance.findOne({ where: { idPosts: idPost } });
+      const post = await PostInstance.findOne({ where: { idPost: idPost } });
       if (!post) return res.status(404).json({ success: false, msg: "Post non trouvé" });
 
       const record = await CommentInstance.create({ ...req.body, idUser: user.dataValues.idUser });
