@@ -26,7 +26,9 @@ MessageInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
 MessageInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });
 
 // Conversation Associations
-ConversationInstance.belongsToMany(UserInstance, { through: UsersConversationsInstance, foreignKey: 'idConversation', as: 'participants' });
+UsersConversationsInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });
+ConversationInstance.hasMany(UsersConversationsInstance, { foreignKey: 'idConversation' });
+
 
 // UsersConversations Associations
 UsersConversationsInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });

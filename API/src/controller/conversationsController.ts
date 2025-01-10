@@ -3,6 +3,7 @@ import { Op } from "sequelize";
 import { UserInstance } from "../models/User";
 import { ConversationInstance } from "../models/Conversation";
 import { MessageInstance } from "../models/Message";
+import { UsersConversationsInstance } from "../models/UserConversations";
 import { verifyToken } from "../helpers/jwtUtils"; // Importer la fonction de vérification du token
 
 class ConversationsController {
@@ -14,7 +15,7 @@ class ConversationsController {
       const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
-      const { dateStart, dateEnd, idUser1, idUser2 } = req.body;
+      const { idUser1, idUser2 } = req.body;
 
       if (user.dataValues.idUser.toString() !== idUser1.toString() &&
           user.dataValues.idUser.toString() !== idUser2.toString()) {
@@ -22,26 +23,36 @@ class ConversationsController {
       }
 
       const convExist = await ConversationInstance.findOne({
-        where: {
-          [Op.or]: [
-            { idUser1: idUser1, idUser2: idUser2 },
-            { idUser1: idUser2, idUser2: idUser1 }
-          ]
-        }
+        include: [
+          {
+            model: UsersConversationsInstance,
+            as: 'idConversation',
+            where: { idUser: idUser1 },
+          },
+          {
+            model: UsersConversationsInstance,
+            as: 'idConversation',
+            where: { idUser: idUser2 },
+          },
+        ],
       });
+      
+
       if (convExist) {
         return res.status(200).json({ success: true, msg: "Conversation déjà existante", idConv: convExist.dataValues.idConversations });
       }
 
-      await ConversationInstance.create({
-        dateStart,
-        dateEnd,
-        seen: 0,
-        idUser1,
-        idUser2
+      const newConversation = await ConversationInstance.create({
+        dateStart: new Date(),
       });
 
-      return res.status(201).json({ success: true, msg: "Conversation bien ajoutée" });
+      await UsersConversationsInstance.bulkCreate([
+        { idUser: idUser1, idConversation: newConversation.idConversation },
+        { idUser: idUser2, idConversation: newConversation.idConversation },
+      ]);
+      
+      return res.status(201).json({success: true, msg: "Conversation bien ajoutée"});
+
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de l'addition de la conversation" });

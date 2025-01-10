@@ -1,7 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
 import db from '../config/database.config';
-import { UserInstance } from './User';
-import { ConversationInstance } from './Conversation';
 
 export class UsersConversationsInstance extends Model {
   idUser!: number;
@@ -10,8 +8,8 @@ export class UsersConversationsInstance extends Model {
 
 UsersConversationsInstance.init(
   {
-    idUser: { type: DataTypes.INTEGER, primaryKey: true },
-    idConversation: { type: DataTypes.INTEGER, primaryKey: true },
+    idUser: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+    idConversation: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
   },
   {
     sequelize: db,
@@ -19,7 +17,3 @@ UsersConversationsInstance.init(
     tableName: 'UsersConversations',
   }
 );
-
-// // Associations
-//UsersConversationsInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
-//UsersConversationsInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });

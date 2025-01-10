@@ -18,9 +18,7 @@ type Post = {
   title: string;
   description: string;
   publishedAt: string;
-  image1: string | null;
-  image2: string | null;
-  image3: string | null;
+  image: string | null;
 };
 
 type ContentItemData = {
@@ -160,7 +158,7 @@ function HomeContent({ route }: { route: ActuRouteProp }) {
 
             return {
               id: post.idPost.toString(),
-              images: [post.image1, post.image2, post.image3].filter(Boolean) as string[],
+              images: [post.image].filter(Boolean) as string[],
               title: post.title,
               description: post.description,
               time: formattedDate,
