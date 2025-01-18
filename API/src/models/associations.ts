@@ -10,7 +10,6 @@ import { UsersConversationsInstance } from './UserConversations';
 UserInstance.hasMany(PostInstance, { foreignKey: 'idUser', as: 'posts' });
 UserInstance.hasMany(CommentInstance, { foreignKey: 'idUser', as: 'comments' });
 UserInstance.belongsToMany(PostInstance, { through: FavInstance, foreignKey: 'idUser', as: 'favorites' });
-UserInstance.belongsToMany(ConversationInstance, { through: UsersConversationsInstance, foreignKey: 'idUser', as: 'conversations' });
 
 // Post Associations
 PostInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
@@ -26,13 +25,20 @@ MessageInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
 MessageInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });
 
 // Conversation Associations
-UsersConversationsInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });
-ConversationInstance.hasMany(UsersConversationsInstance, { foreignKey: 'idConversation' });
-
+ConversationInstance.hasMany(UsersConversationsInstance, {
+  foreignKey: 'idConversation',
+  as: 'UsersConversations', // Alias explicite
+});
 
 // UsersConversations Associations
-UsersConversationsInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });
-UsersConversationsInstance.belongsTo(ConversationInstance, { foreignKey: 'idConversation' });
+UsersConversationsInstance.belongsTo(ConversationInstance, {
+  foreignKey: 'idConversation',
+  as: 'Conversation', // Alias explicite
+});
+UsersConversationsInstance.belongsTo(UserInstance, {
+  foreignKey: 'idUser',
+  as: 'User', // Alias explicite pour les utilisateurs
+});
 
 // Fav Associations
 FavInstance.belongsTo(UserInstance, { foreignKey: 'idUser' });

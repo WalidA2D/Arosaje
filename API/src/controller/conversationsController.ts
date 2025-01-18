@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Op } from "sequelize";
+import { Op, Sequelize} from "sequelize";
 import { UserInstance } from "../models/User";
 import { ConversationInstance } from "../models/Conversation";
 import { MessageInstance } from "../models/Message";
@@ -26,15 +26,28 @@ class ConversationsController {
         include: [
           {
             model: UsersConversationsInstance,
-            as: 'idConversation',
-            where: { idUser: idUser1 },
-          },
-          {
-            model: UsersConversationsInstance,
-            as: 'idConversation',
-            where: { idUser: idUser2 },
+            as: 'UsersConversations',
+            where: {
+              idUser: {
+                [Op.in]: [idUser1, idUser2],
+              },
+            },
+            required: true,
           },
         ],
+        where: {
+          idConversation: {
+            [Op.in]: Sequelize.literal(`
+              (SELECT "uc1"."idConversation"
+               FROM "UsersConversations" AS "uc1"
+               JOIN "UsersConversations" AS "uc2"
+               ON "uc1"."idConversation" = "uc2"."idConversation"
+               WHERE "uc1"."idUser" = ${idUser1} AND "uc2"."idUser" = ${idUser2}
+              )
+            `),
+          },
+        },
+        attributes: ['idConversation'], 
       });
       
 
@@ -47,8 +60,8 @@ class ConversationsController {
       });
 
       await UsersConversationsInstance.bulkCreate([
-        { idUser: idUser1, idConversation: newConversation.idConversation },
-        { idUser: idUser2, idConversation: newConversation.idConversation },
+        { idUser: idUser1, idConversation: newConversation.dataValues.idConversation },
+        { idUser: idUser2, idConversation: newConversation.dataValues.idConversation },
       ]);
       
       return res.status(201).json({success: true, msg: "Conversation bien ajoutée"});
@@ -62,7 +75,7 @@ class ConversationsController {
   async read(req: Request, res: Response) {
     try {
       const records = await ConversationInstance.findAll();
-      return res.status(200).json({ success: true, msg: records.length ? "Conversations bien trouvées" : "Aucune conversation répertoriée", records });
+      return res.status(200).json({ success: true, msg: records.length ? "Conversations bien trouvées" : "Aucune conversation répertoriée", conversations : records });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des conversations" });

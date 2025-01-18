@@ -9,35 +9,20 @@ import { verifyToken } from "../helpers/jwtUtils"; // Vérification du JWT
 class MessageController {
   async add(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization?.split(" ")[0];
+      const token = req.headers.authorization;
       if (!token) return res.status(404).json({ success: false, msg: "Aucun token fourni" });
 
-      const decoded: any = verifyToken(token);
-      const user = await UserInstance.findOne({ where: { uid: decoded.userId } });
+      const user = await UserInstance.findOne({ where: { uid: token } });
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
       const { text, publishedAt, idConversation } = req.body;
       const publishedAtDate = publishedAt ? new Date(publishedAt) : new Date();
-      const newToken = Date.now().toString(36) + Math.random().toString(36);
-
-      const email = process.env.FIREBASE_AUTH_EMAIL!;
-      const password = process.env.FIREBASE_AUTH_PASSWORD!;
-      await signInWithEmailAndPassword(auth, email, password);
-
-      let urlFile = "";
-      if (req.file) {
-        const fileRef = ref(storage, `filesMessages/${newToken}.jpg`);
-        const metadata = { contentType: "image/jpg" };
-        await uploadBytesResumable(fileRef, req.file.buffer, metadata);
-        urlFile = await getDownloadURL(fileRef);
-      }
 
       await MessageInstance.create({
         text,
         publishedAt: publishedAtDate,
         idConversation,
-        idUser: user.dataValues.idUser,
-        file: urlFile,
+        idUser: user.dataValues.idUser
       });
 
       return res.status(200).json({ success: true, msg: "Message bien ajouté" });

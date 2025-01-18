@@ -2,14 +2,16 @@ import { DataTypes, Model } from 'sequelize';
 import db from '../config/database.config';
 
 export class UsersConversationsInstance extends Model {
+  idUserConversation!: number;
   idUser!: number;
   idConversation!: number;
 }
 
 UsersConversationsInstance.init(
   {
-    idUser: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
-    idConversation: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true },
+    idUserConversation: { type: DataTypes.INTEGER, allowNull: false, primaryKey: true,autoIncrement: true },
+    idUser: { type: DataTypes.INTEGER, allowNull: false },
+    idConversation: { type: DataTypes.INTEGER, allowNull: false },
   },
   {
     sequelize: db,
