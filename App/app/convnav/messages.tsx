@@ -138,25 +138,24 @@ export default function MessageScreen() {
                 const timestamp = new Date(formattedTimestamp);
 
                 if (isNaN(timestamp.getTime())) {
-                    console.warn(`Invalid timestamp for message ID: ${msg.idMessages}`);
+                    console.warn(`Timestamp invalide pour le message ID: ${msg.idMessages}`);
                     continue;
                 }
 
                 apiMessages.push({
-                    id: msg.idMessages.toString(),
+                    id: msg.idMessage.toString(),
                     text: msg.text,
                     sender: msg.idUser === idUser ? 'left' : 'right',
                     timestamp,
-                    image: msg.file || undefined,
                 });
             }
 
             setMessages(apiMessages);
         } else {
-            console.error('Failed to load messages from API:', data.msg || 'Unknown error');
+            console.error('Échec du chargement des messages depuis l’API :', data.msg || 'Erreur inconnue');
         }
     } catch (error) {
-        console.error('Error fetching messages from API:', error);
+        console.error('Erreur lors de la récupération des messages depuis l’API :', error);
     }
 };
 
@@ -417,9 +416,6 @@ export default function MessageScreen() {
           </View>
         )}
         <View style={styles.footer}>
-          <Pressable style={styles.attachmentButton} onPress={openImagePicker}>
-            <Icon name="paperclip" size={24} color="#668F80" />
-          </Pressable>
           <TextInput
             ref={inputRef}
             style={styles.input}

@@ -92,8 +92,6 @@ class ConversationsController {
         return res.status(400).json({ success: false, msg: "ID utilisateur manquant" });
       }
   
-      console.log('Utilisateur trouvé avec ID :', userId);
-  
       const records = await UsersConversationsInstance.findAll({
         where: { idUser: userId },
         attributes: ['idUser', 'idConversation'], // Récupère les infos nécessaires
@@ -121,8 +119,6 @@ class ConversationsController {
           },
         ],
       });
-  
-      console.log('Conversations récupérées brutes :', JSON.stringify(records, null, 2));
   
       if (!records.length) {
         return res.status(404).json({ success: false, msg: 'Aucune conversation trouvée' });

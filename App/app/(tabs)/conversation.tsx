@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, Pressable, Image, ScrollView, Alert } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  Image,
+  ScrollView,
+  Alert,
+  RefreshControl,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -13,7 +23,12 @@ import Profil from '../convnav/profilconsulte';
 
 type RootStackParamList = {
   Conversations: undefined;
-  Message: { userName: string; idUser: number; conversationId: number; initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }> };
+  Message: {
+    userName: string;
+    idUser: number;
+    conversationId: number;
+    initialMessages: Array<{ id: number; text: string; sender: string; timestamp: string }>;
+  };
   Profil: { idUser: number };
   Chatbot: undefined;
   Histoire: undefined;
@@ -63,65 +78,85 @@ export function ExploreScreen() {
   const [users, setUsers] = useState<User[]>([]);
   const [isSelecting, setIsSelecting] = useState<boolean>(false);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
-  useEffect(() => {
-    const fetchConversations = async () => { 
-      const userToken = await AsyncStorage.getItem('userToken');
-      const userId = await AsyncStorage.getItem('userId');
-      const options = { 
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': userToken || '',
-        },
-      };
+  const fetchConversations = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    const userId = await AsyncStorage.getItem('userId');
+    const options = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: userToken || '',
+      },
+    };
 
-      try {
-        const response = await fetch(`${apiUrl}/conv/read/${userId}`, options);
-        const data = await response.json();
+    try {
+      const response = await fetch(`${apiUrl}/conv/read/${userId}`, options);
+      const data = await response.json();
 
-        if (data.success) { 
-          const apiUsers = data.conversations.map((conv: any) => ({
-            id: conv.Conversation.idConversation, // Adaptez selon la structure reçue
-            idUser: conv.Conversation.UsersConversations[0].User.idUser, 
-            userName: `${conv.Conversation.UsersConversations[0].User.firstName} ${conv.Conversation.UsersConversations[0].User.lastName}`,
-            avatar: conv.Conversation.UsersConversations[0].User.photo,
-            initialMessages: [],
-          }));
-          setUsers(apiUsers);
-          const chatbotUser: User = {
+      if (data.success) {
+        const apiUsers = data.conversations.map((conv: any) => ({
+          id: conv.Conversation.idConversation,
+          idUser: conv.Conversation.UsersConversations[0].User.idUser,
+          userName: `${conv.Conversation.UsersConversations[0].User.firstName} ${conv.Conversation.UsersConversations[0].User.lastName}`,
+          avatar: conv.Conversation.UsersConversations[0].User.photo,
+          initialMessages: [],
+        }));
+        const chatbotUser: User = {
+          id: 0,
+          idUser: 0,
+          userName: 'Chatbot',
+          avatar: require('../../assets/images/bot.png'),
+          initialMessages: [
+            {
+              id: 1,
+              text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?',
+              sender: 'bot',
+              timestamp: new Date().toISOString(),
+            },
+          ],
+        };
+
+        setUsers([chatbotUser, ...apiUsers]);
+      } else {
+        console.error('No conversations found or data.success is false');
+        setUsers([
+          {
             id: 0,
             idUser: 0,
             userName: 'Chatbot',
             avatar: require('../../assets/images/bot.png'),
             initialMessages: [
-              { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
+              {
+                id: 1,
+                text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?',
+                sender: 'bot',
+                timestamp: new Date().toISOString(),
+              },
             ],
-          };
-
-          setUsers([chatbotUser, ...apiUsers]);
-        } else {
-          console.error('No conversations found or data.success is false');
-          setUsers([
-            {
-              id: 0,
-              idUser: 0,
-              userName: 'Chatbot',
-              avatar: require('../../assets/images/bot.png'),
-              initialMessages: [
-                { id: 1, text: 'Bonjour! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd\'hui?', sender: 'bot', timestamp: new Date().toISOString() },
-              ],
-            }
-          ]);
-        }
-      } catch (error) {
-        console.error('Error fetching conversations:', error);
+          },
+        ]);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchConversations();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchConversations();
+    setRefreshing(false);
+  };
+
+  const filteredUsers = users.filter((user: User) =>
+    user.userName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     navigation.setOptions({
@@ -133,10 +168,6 @@ export function ExploreScreen() {
     });
   }, [navigation, showSearchBar]);
 
-  const filteredUsers = users.filter((user: User) =>
-    user.userName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   useEffect(() => {
     if (selectedUsers.length === 0) {
       setIsSelecting(false);
@@ -144,7 +175,7 @@ export function ExploreScreen() {
   }, [selectedUsers]);
 
   const handleLongPressUser = (id: number) => {
-    if (id !== 0) { // Ne pas sélectionner le Chatbot
+    if (id !== 0) {
       setIsSelecting(true);
       setSelectedUsers([id]);
     }
@@ -152,9 +183,9 @@ export function ExploreScreen() {
 
   const handleSelectUser = (id: number) => {
     if (id !== 0) {
-      setSelectedUsers(prevSelectedUsers =>
+      setSelectedUsers((prevSelectedUsers) =>
         prevSelectedUsers.includes(id)
-          ? prevSelectedUsers.filter(convId => convId !== id)
+          ? prevSelectedUsers.filter((convId) => convId !== id)
           : [...prevSelectedUsers, id]
       );
     }
@@ -191,15 +222,22 @@ export function ExploreScreen() {
                 if (data.success) {
                   console.log(`Conversation avec l'ID ${convId} supprimée avec succès.`);
                 } else {
-                  console.error(`Échec de la suppression de la conversation avec l'ID ${convId}:`, data.message);
+                  console.error(
+                    `Échec de la suppression de la conversation avec l'ID ${convId}:`,
+                    data.message
+                  );
                 }
               } catch (error) {
-                console.error(`Erreur lors de la suppression de la conversation avec l'ID ${convId}:`, error);
+                console.error(
+                  `Erreur lors de la suppression de la conversation avec l'ID ${convId}:`,
+                  error
+                );
               }
             }
 
-            // Mettre à jour la liste des utilisateurs en filtrant ceux qui ont été supprimés
-            setUsers((prevUsers: User[]) => prevUsers.filter(user => !selectedUsers.includes(user.id)));
+            setUsers((prevUsers: User[]) =>
+              prevUsers.filter((user) => !selectedUsers.includes(user.id))
+            );
             setIsSelecting(false);
             setSelectedUsers([]);
           },
@@ -226,24 +264,35 @@ export function ExploreScreen() {
           <Icon name="search" size={20} color="#668F80" style={styles.searchIcon} />
         </View>
       )}
-      <ScrollView>
+      <ScrollView
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         {filteredUsers.map((user: User) => (
           <Pressable
             key={user.id}
             onLongPress={() => handleLongPressUser(user.id)}
-            onPress={() => isSelecting ? handleSelectUser(user.id) : user.userName === 'Chatbot' ? navigation.navigate('Chatbot') : navigation.navigate('Message', {
-              userName: user.userName,
-              idUser: user.idUser,
-              conversationId: user.id, // Pass the conversation ID here
-              initialMessages: user.initialMessages,
-            })}
+            onPress={() =>
+              isSelecting
+                ? handleSelectUser(user.id)
+                : user.userName === 'Chatbot'
+                ? navigation.navigate('Chatbot')
+                : navigation.navigate('Message', {
+                    userName: user.userName,
+                    idUser: user.idUser,
+                    conversationId: user.id,
+                    initialMessages: user.initialMessages,
+                  })
+            }
             style={[
               styles.chatItemContainer,
-              selectedUsers.includes(user.id) && styles.userSelected
+              selectedUsers.includes(user.id) && styles.userSelected,
             ]}
           >
             <View style={styles.chatItem}>
-              <Image source={user.userName === 'Chatbot' ? user.avatar : { uri: user.avatar }} style={styles.avatar} />
+              <Image
+                source={user.userName === 'Chatbot' ? user.avatar : { uri: user.avatar }}
+                style={styles.avatar}
+              />
               <Text style={styles.chatName}>{user.userName}</Text>
               {user.userName !== 'Chatbot' && (
                 <Pressable
