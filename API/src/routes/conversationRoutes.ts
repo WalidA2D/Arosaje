@@ -20,8 +20,7 @@ router.get(
 );
 
 router.get(
-  "/read",
-  postValidator.checkIdParam(),
+  "/read/:id",
   Middleware.handleValidationError,
   Middleware.authMiddleware(["utilisateur"]),
   convController.readByUser

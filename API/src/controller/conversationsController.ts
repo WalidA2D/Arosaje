@@ -4,7 +4,7 @@ import { UserInstance } from "../models/User";
 import { ConversationInstance } from "../models/Conversation";
 import { MessageInstance } from "../models/Message";
 import { UsersConversationsInstance } from "../models/UserConversations";
-import { verifyToken } from "../helpers/jwtUtils"; // Importer la fonction de vérification du token
+import { verifyToken } from "../helpers/jwtUtils"; 
 
 class ConversationsController {
   async add(req: Request, res: Response) {
@@ -52,7 +52,7 @@ class ConversationsController {
       
 
       if (convExist) {
-        return res.status(200).json({ success: true, msg: "Conversation déjà existante", idConv: convExist.dataValues.idConversations });
+        return res.status(200).json({ success: true, msg: "Conversation déjà existante", idConv: convExist.dataValues.idConversation });
       }
 
       const newConversation = await ConversationInstance.create({
@@ -63,8 +63,7 @@ class ConversationsController {
         { idUser: idUser1, idConversation: newConversation.dataValues.idConversation },
         { idUser: idUser2, idConversation: newConversation.dataValues.idConversation },
       ]);
-      
-      return res.status(201).json({success: true, msg: "Conversation bien ajoutée"});
+      return res.status(201).json({success: true, msg: "Conversation bien ajoutée", idConv : newConversation.dataValues.idConversation});
 
     } catch (e) {
       console.error(e);
@@ -84,46 +83,62 @@ class ConversationsController {
 
   async readByUser(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization
-      if (!token) return res.status(401).json({ success: false, msg: "Token non fourni" });
-
+      const token = req.headers.authorization;
+      if (!token) { return res.status(401).json({ success: false, msg: 'Token non fourni' });}
       const user = await UserInstance.findOne({ where: { uid: token } });
-      if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
-
+      if (!user) {return res.status(404).json({ success: false, msg: 'Utilisateur introuvable' });}
       const userId = user.dataValues.idUser;
-      const records = await ConversationInstance.findAll({
-        where: {
-          [Op.or]: [
-            { idUser1: userId },
-            { idUser2: userId }
-          ]
-        }
-      });
-
-      if (records.length === 0) {
-        return res.status(404).json({ success: false, msg: "Aucune conversation trouvée concernant cet utilisateur" });
+      if (!userId) {
+        return res.status(400).json({ success: false, msg: "ID utilisateur manquant" });
       }
-
-      const usersId = records.map(record => record.dataValues.idUser1 === userId ? record.dataValues.idUser2 : record.dataValues.idUser1);
-      const users = await Promise.all(usersId.map(idU => UserInstance.findOne({ where: { idUser: idU } })));
-      const validUsers = users.filter(u => u !== null);
-
-      const conversations = validUsers.map((u, index) => ({
-        idUser: u.dataValues.idUser,
-        firstName: u.dataValues.firstName,
-        lastName: u.dataValues.lastName,
-        photo: u.dataValues.photo,
-        role: u.dataValues.isAdmin ? "Administrateur" : u.dataValues.isBotanist ? "Botaniste" : "",
-        note: u.dataValues.note,
-        idConversation: records[index].dataValues.idConversations,
-        dateStart: records[index].dataValues.dateStart,
-        seen: records[index].dataValues.seen
-      }));
-
-      return res.status(200).json({ success: true, msg: "Conversations bien trouvées", conversations });
+  
+      console.log('Utilisateur trouvé avec ID :', userId);
+  
+      const records = await UsersConversationsInstance.findAll({
+        where: { idUser: userId },
+        attributes: ['idUser', 'idConversation'], // Récupère les infos nécessaires
+        include: [
+          {
+            model: ConversationInstance,
+            as: 'Conversation',
+            attributes: ['idConversation', 'dateStart', 'dateEnd', 'seen'], // Infos de la conversation
+            include: [
+              {
+                model: UsersConversationsInstance,
+                as: 'UsersConversations',
+                include: [
+                  {
+                    model: UserInstance,
+                    as: 'User',
+                    attributes: ['idUser', 'firstName', 'lastName', 'photo'], // Infos de l'autre utilisateur
+                    where: {
+                      idUser: { [Op.ne]: userId }, // Exclut l'utilisateur connecté
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+  
+      console.log('Conversations récupérées brutes :', JSON.stringify(records, null, 2));
+  
+      if (!records.length) {
+        return res.status(404).json({ success: false, msg: 'Aucune conversation trouvée' });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        msg: 'Conversations bien trouvées',
+        conversations: records,
+      });
     } catch (e) {
-      console.error(e);
-      return res.status(500).json({ success: false, msg: "Erreur lors de la lecture des conversations" });
+      console.error('Erreur côté serveur :', e);
+      return res.status(500).json({
+        success: false,
+        msg: 'Erreur lors de la lecture des conversations',
+      });
     }
   }
 

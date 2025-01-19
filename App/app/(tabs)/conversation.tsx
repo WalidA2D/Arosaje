@@ -66,9 +66,10 @@ export function ExploreScreen() {
   const apiUrl = process.env.EXPO_PUBLIC_API_IP || '';
 
   useEffect(() => {
-    const fetchConversations = async () => {
+    const fetchConversations = async () => { 
       const userToken = await AsyncStorage.getItem('userToken');
-      const options = {
+      const userId = await AsyncStorage.getItem('userId');
+      const options = { 
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -77,18 +78,18 @@ export function ExploreScreen() {
       };
 
       try {
-        const response = await fetch(`${apiUrl}/conv/read`, options);
+        const response = await fetch(`${apiUrl}/conv/read/${userId}`, options);
         const data = await response.json();
 
-        if (data.success) {
+        if (data.success) { 
           const apiUsers = data.conversations.map((conv: any) => ({
-            id: conv.idConversation,
-            idUser: conv.idUser,
-            userName: `${conv.firstName} ${conv.lastName}`, 
-            avatar: conv.photo, 
-            initialMessages: [],  
+            id: conv.Conversation.idConversation, // Adaptez selon la structure reçue
+            idUser: conv.Conversation.UsersConversations[0].User.idUser, 
+            userName: `${conv.Conversation.UsersConversations[0].User.firstName} ${conv.Conversation.UsersConversations[0].User.lastName}`,
+            avatar: conv.Conversation.UsersConversations[0].User.photo,
+            initialMessages: [],
           }));
-
+          setUsers(apiUsers);
           const chatbotUser: User = {
             id: 0,
             idUser: 0,
