@@ -8,7 +8,7 @@ import Load from '../../components/Loading';
 import DonneesPersonnelles from '../optnav/donnees';
 import axios from 'axios';
 import { debounce } from 'lodash';
-import emailjs from '@emailjs/react-native';
+import emailjs from '@emailjs/browser';
 
 interface InscriptionScreenProps {
     setIsModalVisible: (isVisible: boolean, type: string) => void;
@@ -31,10 +31,6 @@ type AddressSuggestion = {
 const SERVICE_ID = 'service_a31jq0g';
 const TEMPLATE_ID = 'template_wc6me4u';
 const PUBLIC_KEY = 'VGiQ5GzTLtnDUMYhn';
-
-emailjs.init({
-    publicKey: PUBLIC_KEY,
-});
 
 export default function InscriptionScreen({ setIsModalVisible }: InscriptionScreenProps) {
     const [step, setStep] = useState(1);
@@ -61,6 +57,17 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
     const phoneRegex = /^\d{10}$/;
 
     const apiUrl = process.env.EXPO_PUBLIC_API_IP;
+
+    useEffect(() => {
+        // Initialisation d'EmailJS avec les options recommandées
+        emailjs.init({
+            publicKey: PUBLIC_KEY,
+            limitRate: {
+                // Permettre 1 requête toutes les 3 secondes
+                throttle: 3000,
+            }
+        });
+    }, []);
 
     const handleNext = () => {
         if (step === 1 && lastName && firstName && email) {
@@ -103,26 +110,50 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                 const data = await response.json();
                 
                 if (data.success) {
-                    try {
-                        await emailjs.send(
-                            SERVICE_ID,
-                            TEMPLATE_ID,
-                            {
-                                to_name: firstName,
-                                to_email: email,
-                                message: 'Bienvenue sur Arosa-je ! Votre compte a été créé avec succès.',
-                            },
-                            {
-                                publicKey: PUBLIC_KEY,
-                            }
-                        );
-                        console.log('Email envoyé avec succès');
-                    } catch (emailError) {
-                        console.error('Erreur lors de l\'envoi de l\'email:', emailError);
-                    }
+                    const emailData = {
+                        service_id: SERVICE_ID,
+                        template_id: TEMPLATE_ID,
+                        user_id: PUBLIC_KEY,
+                        template_params: {
+                            from_name: "Arosa-je",
+                            to_name: firstName,
+                            to_mail: email,
+                            reply_to: "no-reply@arosa-je.com",
+                            message: 'Bienvenue sur Arosa-je ! Votre compte a été créé avec succès.'
+                        },
+                        accessToken: PUBLIC_KEY
+                    };
 
-                    Alert.alert("Bienvenue", "Inscription réussie ! Un email de confirmation vous a été envoyé.");
-                    setIsModalVisible(false, 'inscription');
+                    try {
+                        setIsLoading(true);
+                        const emailResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'origin': 'http://localhost',
+                            },
+                            body: JSON.stringify(emailData)
+                        });
+
+                        if (emailResponse.ok) {
+                            console.log('Email envoyé avec succès, status:', emailResponse.status);
+                            console.log('Email envoyé à:', email);
+                            Alert.alert(
+                                "Bienvenue", 
+                                "Inscription réussie ! Un email de confirmation vous a été envoyé. Veuillez vérifier votre dossier spam si vous ne le recevez pas dans les prochaines minutes."
+                            );
+                            setIsModalVisible(false, 'inscription');
+                        } else {
+                            const errorData = await emailResponse.text();
+                            console.error('Réponse détaillée du serveur EmailJS:', errorData);
+                            throw new Error(`Erreur lors de l'envoi de l'email: ${errorData}`);
+                        }
+                    } catch (emailError) {
+                        console.error('Détails complets de l\'erreur EmailJS:', emailError);
+                        Alert.alert("Erreur", "Une erreur est survenue lors de l'envoi de l'email.");
+                    } finally {
+                        setIsLoading(false);
+                    }
                 } else {
                     Alert.alert("Échec", data.msg || "L'inscription a échoué. Veuillez réessayer.");
                 }
@@ -348,7 +379,14 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                     </View>
                     <View style={styles.fixedDetailsBtn}>
                         <View style={styles.selectorContainer}>
-                            <Pressable style={styles.selectorButton} onPress={handleNext}>
+                            <Pressable style={styles.selectorButton} onPress={() => {
+                        if (!phoneRegex.test(phone)) {
+                            Alert.alert("Erreur", "Veuillez entrer un numéro de téléphone valide (10 chiffres)");
+                        } else {
+                            handleNext();
+                        }
+                    }}
+                >
                                 <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold', }}>Suivant</Text>
                             </Pressable>
                         </View>
