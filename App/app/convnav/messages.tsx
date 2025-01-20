@@ -147,6 +147,7 @@ export default function MessageScreen() {
                     text: msg.text,
                     sender: msg.idUser === idUser ? 'left' : 'right',
                     timestamp,
+                    image: msg.file || undefined,
                 });
             }
 
@@ -213,7 +214,7 @@ export default function MessageScreen() {
                 headers: {
                     'Authorization': userToken || '',
                 },
-                body: formData,
+                body: formData, 
             };
 
             const response = await fetch(`${apiUrl}/msg/add`, options);
@@ -416,6 +417,9 @@ export default function MessageScreen() {
           </View>
         )}
         <View style={styles.footer}>
+          <Pressable style={styles.attachmentButton} onPress={openImagePicker}>
+            <Icon name="paperclip" size={24} color="#668F80" />
+          </Pressable>
           <TextInput
             ref={inputRef}
             style={styles.input}

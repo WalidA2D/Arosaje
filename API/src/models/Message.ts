@@ -9,6 +9,7 @@ export class MessageInstance extends Model {
   publishedAt!: Date;
   idUser!: number;
   idConversation!: number;
+  file!:string;
 }
 
 MessageInstance.init(
@@ -18,6 +19,7 @@ MessageInstance.init(
     publishedAt: { type: DataTypes.DATE, allowNull: false },
     idUser: { type: DataTypes.INTEGER, allowNull: true },
     idConversation: { type: DataTypes.INTEGER, allowNull: true },
+    file: { type: DataTypes.STRING(255), allowNull: true },
   },
   {
     sequelize: db,
