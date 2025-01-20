@@ -7,6 +7,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Load from '../../components/Loading';
 import DonneesPersonnelles from '../optnav/donnees';
 import axios from 'axios';
+import { debounce } from 'lodash';
+import emailjs from '@emailjs/react-native';
 
 interface InscriptionScreenProps {
     setIsModalVisible: (isVisible: boolean, type: string) => void;
@@ -26,6 +28,14 @@ type AddressSuggestion = {
     display_name: string;
 };
 
+const SERVICE_ID = 'service_a31jq0g';
+const TEMPLATE_ID = 'template_wc6me4u';
+const PUBLIC_KEY = 'VGiQ5GzTLtnDUMYhn';
+
+emailjs.init({
+    publicKey: PUBLIC_KEY,
+});
+
 export default function InscriptionScreen({ setIsModalVisible }: InscriptionScreenProps) {
     const [step, setStep] = useState(1);
     const [lastName, setLastName] = useState('');
@@ -42,7 +52,8 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
     const [addressSuggestions, setAddressSuggestions] = useState([]);
     const [isConsentChecked, setIsConsentChecked] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-
+    const [postalCode, setPostalCode] = useState('');
+    const [postalCodeValid, setPostalCodeValid] = useState(true);
     const [isDonneesVisible, setIsDonneesVisible] = useState(false);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
@@ -62,38 +73,65 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             setStep(3);
         } else if (step === 3 && phone && phoneRegex.test(phone)) {
             setStep(4);
-        } else if (step === 4 && address && cityName && addressValid && cityValid) {
+        } else if (step === 4 && address && cityName && postalCode && addressValid && cityValid && postalCodeValid) {
             setStep(5);
         }
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         if (step === 5 && isConsentChecked) {
             const userData = {
                 lastName,
                 firstName,
                 email,
                 address,
+                postalCode,
                 phone,
                 cityName,
                 password
             };
 
-            fetch(`${apiUrl}/user/create`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(userData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
+            try {
+                const response = await fetch(`${apiUrl}/user/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
                 });
-            Alert.alert("Bienvenue", "Inscription réussi, veuillez vous connectez");
-            setIsModalVisible(false, 'inscription');
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    try {
+                        await emailjs.send(
+                            SERVICE_ID,
+                            TEMPLATE_ID,
+                            {
+                                to_name: firstName,
+                                to_email: email,
+                                message: 'Bienvenue sur Arosa-je ! Votre compte a été créé avec succès.',
+                            },
+                            {
+                                publicKey: PUBLIC_KEY,
+                            }
+                        );
+                        console.log('Email envoyé avec succès');
+                    } catch (emailError) {
+                        console.error('Erreur lors de l\'envoi de l\'email:', emailError);
+                    }
+
+                    Alert.alert("Bienvenue", "Inscription réussie ! Un email de confirmation vous a été envoyé.");
+                    setIsModalVisible(false, 'inscription');
+                } else {
+                    Alert.alert("Échec", data.msg || "L'inscription a échoué. Veuillez réessayer.");
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'inscription:', error);
+                Alert.alert("Erreur", "Une erreur est survenue lors de l'inscription.");
+            }
         } else {
-            Alert.alert("Échec", "Inscription échoué. Veuillez accepter les termes et conditions.");
+            Alert.alert("Échec", "Veuillez accepter les termes et conditions.");
         }
     };
 
@@ -115,22 +153,41 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             const fullAddress = `${street}, ${city}, ${postalCode}, ${region}`;
             const parts = fullAddress.split(', ');
             let addressPart = parts[0];
-            let cityPart = `${parts[1]}, ${parts[2]}`;
+            let cityPart = parts[1];
+            let codePostal = '';
 
-            if (/\d/.test(parts[0][0])) {
-                addressPart = `${parts[0]} ${parts[1]}`;
-                cityPart = `${parts[2]}, ${parts[3]}`;
+            // Cherche le code postal (partie qui commence par un chiffre)
+            const postalCodePart = parts.find(part => /^\d{5}/.test(part));
+            
+            if (postalCodePart) {
+                codePostal = postalCodePart;
+                // Si l'adresse commence par un numéro, prend les deux premières parties
+                if (/^\d/.test(parts[0])) {
+                    addressPart = `${parts[0]} ${parts[1]}`;
+                    // Trouve la ville (partie juste avant le code postal)
+                    const postalIndex = parts.indexOf(postalCodePart);
+                    cityPart = parts[postalIndex - 1];
+                } else {
+                    // Sinon prend juste la première partie comme adresse
+                    addressPart = parts[0];
+                    // Trouve la ville (partie juste avant le code postal)
+                    const postalIndex = parts.indexOf(postalCodePart);
+                    cityPart = parts[postalIndex - 1];
+                }
             }
 
             setAddress(addressPart);
             setCityName(cityPart);
+            setPostalCode(codePostal);
             setAddressValid(true);
             setCityValid(true);
+            setPostalCodeValid(true);
         }
         setIsLoading(false);
     };
 
-    const fetchSuggestions = async (input: string, type: string) => {
+    const debouncedFetchSuggestions = debounce(async (input: string, type: string) => {
+        if (input.length < 3) return;
         const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&countrycodes=fr`);
         const data = response.data.map((item: any) => ({
             place_id: item.place_id,
@@ -144,7 +201,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
         } else {
             setCitySuggestions(data);
         }
-    };
+    }, 500);
 
     const validateCity = async () => {
         if (!cityName) return;
@@ -168,16 +225,32 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
             onPress={() => {
                 const parts = item.display_name.split(', ');
                 let addressPart = parts[0];
-                let cityPart = `${parts[2]}, ${parts[6]}`;
+                let cityPart = parts[1];
+                let codePostal = '';
 
-                // Si le premier caractère de la première partie est un chiffre, c'est probablement un numéro de rue
-                if (/\d/.test(parts[0][0])) {
-                    addressPart = `${parts[0]} ${parts[1]}`;
-                    cityPart = `${parts[3]}, ${parts[8]}`;
+                // Cherche le code postal (partie qui commence par 5 chiffres)
+                const postalCodePart = parts.find(part => /^\d{5}/.test(part));
+                
+                if (postalCodePart) {
+                    codePostal = postalCodePart;
+                    // Si l'adresse commence par un numéro, prend les deux premières parties
+                    if (/^\d/.test(parts[0])) {
+                        addressPart = `${parts[0]} ${parts[1]}`;
+                        // Trouve la ville (partie juste avant le code postal)
+                        const postalIndex = parts.indexOf(postalCodePart);
+                        cityPart = parts[postalIndex - 1];
+                    } else {
+                        // Sinon prend juste la première partie comme adresse
+                        addressPart = parts[0];
+                        // Trouve la ville (partie juste avant le code postal)
+                        const postalIndex = parts.indexOf(postalCodePart);
+                        cityPart = parts[postalIndex - 1];
+                    }
                 }
 
                 setAddress(addressPart);
                 setCityName(cityPart);
+                setPostalCode(codePostal);
                 setAddressSuggestions([]);
                 setCitySuggestions([]);
             }}
@@ -291,7 +364,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                             value={address}
                             onChangeText={(text) => {
                                 setAddress(text);
-                                fetchSuggestions(text, 'address');
+                                debouncedFetchSuggestions(text, 'address');
                             }}
                             style={[styles.input, !addressValid && styles.invalidInput]}
                             onBlur={validateAddress}
@@ -306,10 +379,10 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                         <Text style={styles.textSizeInput}>Ville:</Text>
                         <TextInput
                             placeholder="Ville"
-                            value={cityName}
+                            value={`${cityName} ${postalCode}`}
                             onChangeText={(text) => {
                                 setCityName(text);
-                                fetchSuggestions(text, 'city');
+                                debouncedFetchSuggestions(text, 'city');
                             }}
                             style={[styles.input, !cityValid && styles.invalidInput]}
                             onBlur={validateCity}
@@ -346,7 +419,7 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                         <Text style={styles.textSizeInput}>Prénom: {firstName}</Text>
                         <Text style={styles.textSizeInput}>Email: {email}</Text>
                         <Text style={styles.textSizeInput}>Addresse: {address}</Text>
-                        <Text style={styles.textSizeInput}>Ville: {cityName}</Text>
+                        <Text style={styles.textSizeInput}>Ville: {cityName}, {postalCode}</Text>
                         <Text style={styles.textSizeInput}>Téléphone: {phone}</Text>
                     </View>
                     <View style={styles.consentContainer}>
