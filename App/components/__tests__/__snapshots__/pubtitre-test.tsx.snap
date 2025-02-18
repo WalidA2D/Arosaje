@@ -39,11 +39,17 @@ exports[`PubTitre renders correctly 1`] = `
       onTransitionProgress={[Function]}
       onWillDisappear={[Function]}
       replaceAnimation="push"
-      sheetAllowedDetents="large"
+      sheetAllowedDetents={
+        [
+          1,
+        ]
+      }
       sheetCornerRadius={-1}
+      sheetElevation={24}
       sheetExpandsWhenScrolledToEdge={true}
       sheetGrabberVisible={false}
-      sheetLargestUndimmedDetent="all"
+      sheetInitialDetent={0}
+      sheetLargestUndimmedDetent={-1}
       stackPresentation="push"
       style={
         {
@@ -52,6 +58,7 @@ exports[`PubTitre renders correctly 1`] = `
           "position": "absolute",
           "right": 0,
           "top": 0,
+          "zIndex": undefined,
         }
       }
       swipeDirection="horizontal"
@@ -247,6 +254,17 @@ exports[`PubTitre renders correctly 1`] = `
         hidden={false}
         hideBackButton={false}
         largeTitleHideShadow={false}
+        pointerEvents="box-none"
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "position": "absolute",
+            "top": "-100%",
+            "width": "100%",
+          }
+        }
         title="PubTitre"
         titleColor="rgb(28, 28, 30)"
         topInsetEnabled={false}

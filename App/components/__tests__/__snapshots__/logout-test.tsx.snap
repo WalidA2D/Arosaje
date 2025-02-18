@@ -12,7 +12,11 @@ exports[`Logout renders correctly 1`] = `
   }
 >
   <Image
-    source={1}
+    source={
+      {
+        "testUri": "../../../assets/images/deco.png",
+      }
+    }
     style={
       [
         {
