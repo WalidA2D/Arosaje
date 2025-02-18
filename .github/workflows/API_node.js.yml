@@ -53,3 +53,33 @@ jobs:
         working-directory: API
         run: npm run build
         continue-on-error: true
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+  
+    steps:
+    - name: ------------ RECUPERATION DU CODE DU REPO ------------
+      uses: actions/checkout@v4
+  
+    - name: ------------ CONNEXION À DOCKER HUB ------------
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+  
+    - name: ------------ PULL DE L'IMAGE EXISTANTE (SI DISPONIBLE) ------------
+      run: docker pull ${{ secrets.DOCKER_USERNAME }}/arosaje-api:latest || true
+  
+    - name: ------------ CONSTRUCTION DE L'IMAGE DOCKER AVEC CACHE ------------
+      run: |
+        docker build --cache-from=${{ secrets.DOCKER_USERNAME }}/arosaje-api:latest \
+                      --tag ${{ secrets.DOCKER_USERNAME }}/arosaje-api:latest \
+                      --tag ${{ secrets.DOCKER_USERNAME }}/arosaje-api:${{ github.sha }} \
+                       .
+      working-directory: api
+  
+    - name: ------------ PUSH DE L'IMAGE DOCKER (LATEST & SHA) ------------
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/arosaje-api:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/arosaje-api:${{ github.sha }}
