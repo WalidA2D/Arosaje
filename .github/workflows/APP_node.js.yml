@@ -39,7 +39,7 @@ jobs:
 
       - name: ------------ EXECUTION DES TESTS JEST (APP) ------------
         working-directory: App
-        run: npm test
+        run: npm test -- -u
 
       - name: ------------ ARRÊTER LE SERVEUR EXPO ------------
         if: always()
