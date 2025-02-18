@@ -77,7 +77,7 @@ jobs:
                       --tag ${{ secrets.DOCKER_USERNAME }}/arosaje-api:latest \
                       --tag ${{ secrets.DOCKER_USERNAME }}/arosaje-api:${{ github.sha }} \
                        .
-      working-directory: api
+      working-directory: API
   
     - name: ------------ PUSH DE L'IMAGE DOCKER (LATEST & SHA) ------------
       run: |
