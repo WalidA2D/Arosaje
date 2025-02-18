@@ -1,41 +1,24 @@
 version: '3.8'
 
 services:
-  api:
-    build:
-      context: ./Api
-    ports:
-      - "3000:3000"
-    networks:
-      - arosaje-network
-
   app:
     build:
-      context: ./App
+      context: .
+      dockerfile: Dockerfile
+    image: arosaje_app
+    container_name: arosapp-container
     ports:
-      - "19000:19000"  # Expo DevTools
-      - "19001:19001"  # Expo Packager
-      - "19002:19002"  # Expo Debugger
-    networks:
-      - arosaje-network
-
-  # web:
-  #   build:
-  #     context: ./Web
-  #   ports:
-  #     - "80:80"
-  #   networks:
-  #     - arosaje-network
-
-  # api-tests:
-  #   build:
-  #     context: ./Api
-  #   command: ["npm", "test"]
-  #   networks:
-  #     - arosaje-network
-  #   depends_on:
-  #     - api
-
-networks:
-  arosaje-network:
-    driver: bridge
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: arosaje_api
+    container_name: aroapi-container
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+ 

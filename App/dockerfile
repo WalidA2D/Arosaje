@@ -2,7 +2,7 @@
 FROM node:18
 
 # Créer un répertoire pour l'application
-WORKDIR /usr/src/app
+WORKDIR /Arosaje/App
 
 # Copier les fichiers package.json et package-lock.json
 COPY package*.json ./
@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 19000 19001 19002
 
 # Lancer l'application Expo
-CMD ["npx", "expo", "start"]
+CMD ["npm" , "start"] 

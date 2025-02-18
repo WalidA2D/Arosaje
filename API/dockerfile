@@ -1,8 +1,8 @@
 # Utiliser l'image Node.js
 FROM node:18
 
-# Créer un répertoire pour l'application
-WORKDIR /usr/src/app
+# Créer un répertoire pour l'API
+WORKDIR /Arosaje/API
 
 # Copier les fichiers package.json et package-lock.json
 COPY package*.json ./
@@ -23,4 +23,4 @@ EXPOSE 3000 5070
 CMD ["npm", "run", "dev"]
 
 # Optionnel: Commande pour exécuter les tests
-# CMD ["npm", "test"]
+# CMD ["npm", "test"] 

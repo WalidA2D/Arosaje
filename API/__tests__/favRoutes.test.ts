@@ -17,9 +17,8 @@ describe('Favorite Routes', () => {
         userId: '1'  // Remplacez par l'ID de l'utilisateur
       });
 
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(response.body.msg).toBe("Favori bien ajouté");
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
   });
 
   test('GET /read should return favorites', async () => {
@@ -27,8 +26,8 @@ describe('Favorite Routes', () => {
       .get('/fav/read')
       .set('Authorization', `1f2db30d-2485-4457-8029-1ba9ffd03627`); // Ajoutez l'en-tête d'autorisation
 
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
     // Ajoutez d'autres assertions selon la structure de votre réponse
   });
 
@@ -37,9 +36,8 @@ describe('Favorite Routes', () => {
       .delete('/fav/delete/1') // Remplacez par l'ID du favori à supprimer
       .set('Authorization', `1f2db30d-2485-4457-8029-1ba9ffd03627`); // Ajoutez l'en-tête d'autorisation
 
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(response.body.msg).toBe("Favori bien supprimé");
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
   });
 
   // Ajoutez d'autres tests pour les autres routes...

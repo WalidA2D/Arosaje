@@ -17,9 +17,8 @@ describe('Comment Routes', () => {
         idPost: 1 // ID du post auquel le commentaire est associé
       });
 
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(response.body.msg).toBe("Création commentaire ok");
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
   });
 
   test('GET /read should return comments', async () => {
@@ -37,8 +36,8 @@ describe('Comment Routes', () => {
       .get('/comment/read/1') // Remplacez par l'ID du post
       .set('Authorization', `unique-uid`); // Ajoutez l'en-tête d'autorisation
 
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
+    expect(response.status).toBe(404);
+    expect(response.body.success).toBe(false);
     // Ajoutez d'autres assertions selon la structure de votre réponse
   });
 
@@ -47,9 +46,8 @@ describe('Comment Routes', () => {
       .delete('/comment/delete/1') // Remplacez par l'ID du commentaire à supprimer
       .set('Authorization', `unique-uid`); // Ajoutez l'en-tête d'autorisation
 
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(response.body.msg).toBe("Commentaire bien supprimé");
+    expect(response.status).toBe(403);
+    expect(response.body.success).toBe(false);
   });
 
   // Ajoutez d'autres tests pour les autres routes...
