@@ -9,7 +9,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
-    "lint": "expo lint"
+    "lint": "expo lint" 
   },
   "jest": {
     "preset": "jest-expo"
