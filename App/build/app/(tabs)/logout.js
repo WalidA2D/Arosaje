@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Pressable, Image, DevSettings, Platform } from 
 export default function App({ setIsModalVisible }) {
     const handleRestart = () => {
         if (Platform.OS === 'web') {
-            window.location.href = 'http://localhost:8081';
+            window.location.href = 'https://arosaje-app.onrender.com/';
         }
         else {
             setIsModalVisible(false, 'index');

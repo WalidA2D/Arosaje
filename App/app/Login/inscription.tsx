@@ -130,10 +130,10 @@ export default function InscriptionScreen({ setIsModalVisible }: InscriptionScre
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'origin': 'http://localhost',
+                                'origin': 'https://arosaje-app.onrender.com',
                             },
                             body: JSON.stringify(emailData)
-                        });
+                        }); 
 
                         if (emailResponse.ok) {
                             console.log('Email envoyé avec succès, status:', emailResponse.status);

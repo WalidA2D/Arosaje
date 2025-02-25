@@ -114,7 +114,7 @@ export default function InscriptionScreen({ setIsModalVisible }) {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'origin': 'http://localhost',
+                                'origin': 'https://arosaje-app.onrender.com/',
                             },
                             body: JSON.stringify(emailData)
                         });
