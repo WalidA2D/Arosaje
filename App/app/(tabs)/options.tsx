@@ -58,7 +58,8 @@ function OptionsScreen({ }) {
         options={{
           headerBackTitleVisible: false
       }} />
-        <Stack.Screen name="Mes données" component={Donnees}
+        <Stack.Screen name="Mes données" // @ts-ignore 
+        component={Donnees}
         options={{
           headerBackTitleVisible: false
       }} />

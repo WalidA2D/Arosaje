@@ -15,6 +15,7 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
       <Pressable
         style={styles.heading}
         onPress={() => setIsOpen((value) => !value)}
+        // @ts-ignore
         activeOpacity={0.8}>
         <Ionicons
           name={isOpen ? 'chevron-down' : 'chevron-forward-outline'}
