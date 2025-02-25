@@ -9,7 +9,7 @@ export default function App({ setIsModalVisible }: Restart) {
 
   const handleRestart = () => {
     if (Platform.OS === 'web') {
-      window.location.href = 'http://localhost:8081';
+      window.location.href = 'https://arosaje-app.onrender.com';
     } else {
     setIsModalVisible(false, 'index');
     DevSettings.reload();
