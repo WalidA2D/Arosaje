@@ -16,7 +16,7 @@ type MessageType = {
   text: string;
   sender: 'left' | 'right';
   timestamp: Date;
-  image?: string;
+  image?: string; 
 };
 
 const socketUrl = process.env.EXPO_PUBLIC_SOCKET_IP || '';
@@ -179,13 +179,14 @@ export default function MessageScreen() {
         const newMessageData: MessageType = {
             id: uuidv4(),
             text: newMessage,
-            sender: 'right',  
+            sender: 'right',  // Définit le côté de l'utilisateur actuel
             timestamp: new Date(),
-            image: selectedImage,  
+            image: selectedImage,
         };
 
         setMessages(prevMessages => [...prevMessages, newMessageData]);
 
+        // Émet le message au serveur via le WebSocket
         socket.emit('sendMessage', { conversationId, message: newMessageData, idUser });
 
         try {
@@ -193,15 +194,16 @@ export default function MessageScreen() {
             const formData = new FormData();
 
             if (selectedImage) {
-                const fileName = selectedImage.split('/').pop();
+                const fileName = selectedImage.split('/').pop(); // Récupère le nom du fichier
                 const fileType = mime.getType(selectedImage);
 
+                // Ajoute l'image en tant que fichier dans le formulaire
                 formData.append('file', {
                     uri: selectedImage,
-                    name: fileName || 'image.jpg',
-                    type: fileType || 'image/jpeg',
+                    name: fileName || 'image.jpg', // Définit un nom par défaut si le nom est introuvable
+                    type: fileType || 'image/jpeg', // Définit un type par défaut si le type est introuvable
                 } as any);
-                formData.append('text', '');
+                formData.append('text', ''); // Ajoute un champ texte vide pour l'image
             } else {
                 formData.append('text', newMessage);
             }
@@ -214,7 +216,7 @@ export default function MessageScreen() {
                 headers: {
                     'Authorization': userToken || '',
                 },
-                body: formData, 
+                body: formData,
             };
 
             const response = await fetch(`${apiUrl}/msg/add`, options);
@@ -225,7 +227,7 @@ export default function MessageScreen() {
             } else {
                 console.log('Message successfully sent to API');
 
-                if (data.imageUrl) {
+                if (data.imageUrl) {// Met à jour le message existant avec l'URL de l'image depuis l'API
                     setMessages(prevMessages =>
                         prevMessages.map(msg =>
                             msg.id === newMessageData.id ? { ...msg, image: data.imageUrl } : msg
@@ -326,7 +328,6 @@ export default function MessageScreen() {
     if (uri) {
       setImageToView([{ url: uri }]);
       setIsImageViewerVisible(true);
-      console.log('Image pressed:', uri);
     }
   };
 
@@ -368,7 +369,6 @@ export default function MessageScreen() {
         )}
         <Pressable onPress={() => navigation.navigate('Profil', { userName, idUser })}>
           <View style={styles.chatHeader}>
-            <Image source={{ uri: 'https://picsum.photos/620/300' }} style={styles.avatar} />
             <Text style={styles.chatName}>{userName}</Text>
           </View>
         </Pressable>
