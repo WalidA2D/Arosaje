@@ -13,8 +13,8 @@ RUN npm install
 # Copier le reste du code source
 COPY . .
 
-# Exposer les ports utilisés par Expo
-EXPOSE 4000
+# Exposer les ports utilisés par Expo et Socket
+EXPOSE 4000 8081
 
 # Lancer l'application Expo
 CMD ["npm" , "start"] 
