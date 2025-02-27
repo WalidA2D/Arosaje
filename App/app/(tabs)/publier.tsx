@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Image, View, Text, Pressable, Modal, Alert } from 'react-native';
+import { StyleSheet, Image, View, Text, Pressable, Modal, Alert,Platform } from 'react-native';
 import { NavigationContainer, useNavigation, RouteProp, useRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -128,19 +128,27 @@ function PublierContent() {
   const apiUrl = process.env.EXPO_PUBLIC_API_IP;
 
   const resetPost = () => {
-    Alert.alert(
-      "Confirmation",
-      "ATTENTION êtes vous sûre que vous voulez recommencez le post ? (toutes les informations seront remise à zéro).",
-      [
-        { text: "Oui", onPress: () => resetForm() },
-        {
-          text: "Non",
-          style: "cancel"
-        }
-      ],
-      { cancelable: false }
-    );
-  }
+    if (Platform.OS === 'web') {
+      // 🚀 Version Web : Utilise window.confirm()
+      const confirmation = window.confirm(
+        "ATTENTION êtes-vous sûr de vouloir recommencer le post ? (Toutes les informations seront remises à zéro)."
+      );
+      if (confirmation) {
+        resetForm(); // Réinitialise le formulaire si l'utilisateur confirme
+      }
+    } else {
+      // 📱 Version Mobile : Utilise Alert.alert()
+      Alert.alert(
+        "Confirmation",
+        "ATTENTION êtes-vous sûr de vouloir recommencer le post ? (Toutes les informations seront remises à zéro).",
+        [
+          { text: "Oui", onPress: () => resetForm() },
+          { text: "Non", style: "cancel" }
+        ],
+        { cancelable: false }
+      );
+    }
+  };
 
 
   const handleSend = async () => {
@@ -148,56 +156,76 @@ function PublierContent() {
     setIsSending(true); // Définit l'état à vrai pour indiquer que l'envoi est en cours
 
     try {
-      const userToken = await AsyncStorage.getItem('userToken');
-      if (!userToken) {
-        Alert.alert('Erreur', 'Token utilisateur manquant');
-        return;
-      }
+        const userToken = await AsyncStorage.getItem('userToken');
+        if (!userToken) {
+            Alert.alert('Erreur', 'Token utilisateur manquant');
+            setIsSending(false);
+            return;
+        }
 
-      const formData = new FormData();
-      formData.append('title', titre);
-      formData.append('description', description);
-      formData.append('publishedAt', new Date().toISOString());
-      formData.append('dateStart', selectedStartDate);
-      formData.append('dateEnd', selectedEndDate);
-      formData.append('address', localisation);
-      formData.append('cityName', cityName);
-      const postalCode = extractPostalCode(cityName);
-      if (postalCode) {
-        formData.append('postalCode', postalCode);
-      } else {
-        console.error('Code postal non trouvé dans la localisation');
-      }
-      formData.append('state', JSON.stringify(false));
-      formData.append('plant', planteName);
-      formData.append('images', {
-        uri: photo,
-        type: 'image/jpeg',
-        name: 'photo.jpg',
-      } as unknown as Blob);
+        const formData = new FormData();
+        formData.append('title', titre);
+        formData.append('description', description);
+        formData.append('publishedAt', new Date().toISOString());
+        formData.append('dateStart', selectedStartDate);
+        formData.append('dateEnd', selectedEndDate);
+        formData.append('address', localisation);
+        formData.append('cityName', cityName);
 
-      const response = await fetch(`${apiUrl}/post/create`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': userToken,
-        },
-        body: formData,
-      });
-      console.log(response)
-      if (response.ok) {
-        Alert.alert('Succès', 'Le post a été envoyé avec succès');
-        setModalVisible(false);
-        resetForm();
-      } else {
-        Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du post');
-      }
+        const postalCode = extractPostalCode(cityName);
+        if (postalCode) {
+            formData.append('postalCode', postalCode);
+        }
+
+        formData.append('state', JSON.stringify(false));
+        formData.append('plant', planteName);
+
+        if (photo) {
+            if (Platform.OS === 'web') {
+                // 🔹 Convertir l'image en Blob pour Web
+                const response = await fetch(photo);
+                const blob = await response.blob();
+                formData.append('images', blob, 'photo.jpg');
+            } else {
+                // 📱 Garder le fonctionnement mobile
+                formData.append('images', {
+                    uri: photo,
+                    type: 'image/jpeg',
+                    name: 'photo.jpg',
+                } as unknown as Blob);
+            }
+        }
+
+        console.log("📤 Envoi des données :", formData);
+
+        const options: RequestInit = {
+            method: 'POST',
+            headers: {
+                'Authorization': userToken, // ✅ Garder uniquement l'auth header
+                ...(Platform.OS !== 'web' && { 'Content-Type': 'multipart/form-data' }), // ✅ Ne pas mettre `Content-Type` sur Web
+            },
+            body: formData,
+        };
+
+        const response = await fetch(`${apiUrl}/post/create`, options);
+        const responseData = await response.json();
+        console.log("✅ Réponse API :", responseData);
+
+        if (response.ok) {
+            Alert.alert('Succès', 'Le post a été envoyé avec succès');
+            setModalVisible(false);
+            resetForm();
+        } else {
+            console.error("❌ Erreur API :", responseData);
+            Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du post');
+        }
     } catch (error) {
-      Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du post');
+        console.error("❌ Erreur d'envoi :", error);
+        Alert.alert('Erreur', 'Une erreur est survenue lors de l\'envoi du post');
     } finally {
-      setIsSending(false); // Réinitialise l'état après l'envoi
+        setIsSending(false);
     }
-  };
+};
 
   const resetForm = async () => {
     setTitre('');

@@ -48,7 +48,7 @@ class ConversationsController {
           },
         },
         attributes: ['idConversation'], 
-      });
+      }); 
       
 
       if (convExist) {
@@ -57,6 +57,7 @@ class ConversationsController {
 
       const newConversation = await ConversationInstance.create({
         dateStart: new Date(),
+        seen: false,
       });
 
       await UsersConversationsInstance.bulkCreate([
