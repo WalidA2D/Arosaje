@@ -4,6 +4,7 @@ import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Platform } from 'react-native';
 
 import BigButtonDown from '../../components/BigButtonDown';
 import Loading from '../../components/Loading';
@@ -97,16 +98,60 @@ export default function PubPhoto() {
   };
 
   const handleAddPhoto = async () => {
-    Alert.alert(
-      "Ajouter une photo",
-      "Choisissez une option",
-      [
-        {
-          text: "Prendre une photo",
-          onPress: async () => {
-            const { status } = await ImagePicker.requestCameraPermissionsAsync();
-            if (status === 'granted') {
-              let result = await ImagePicker.launchCameraAsync({
+    if (Platform.OS === 'web') {
+      // Pour le Web : Utiliser un input file invisible
+    let input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+
+    input.onchange = async (event) => {
+      const target = event.target as HTMLInputElement; // TypeScript : S'assurer que c'est un input
+      if (target.files && target.files.length > 0) {
+        let file = target.files[0];
+        let reader = new FileReader();
+
+        reader.onloadend = async () => {
+          if (reader.result) {
+            let uri = reader.result as string;
+            setPhoto(uri);
+            await AsyncStorage.setItem('photo', uri);
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+
+    input.click();
+    } else {
+      Alert.alert(
+        "Ajouter une photo",
+        "Choisissez une option",
+        [
+          {
+            text: "Prendre une photo",
+            onPress: async () => {
+              const { status } = await ImagePicker.requestCameraPermissionsAsync();
+              if (status === 'granted') {
+                let result = await ImagePicker.launchCameraAsync({
+                  mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                  allowsEditing: true,
+                  aspect: [4, 3],
+                  quality: 1,
+                });
+                if (!result.canceled) {
+                  const uri = result.assets[0].uri;
+                  setPhoto(uri);
+                  await AsyncStorage.setItem('photo', uri);
+                }
+              } else {
+                alert('Permission de caméra non accordée');
+              }
+            }
+          },
+          {
+            text: "Choisir dans la galerie",
+            onPress: async () => {
+              let result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
                 aspect: [4, 3],
@@ -117,30 +162,12 @@ export default function PubPhoto() {
                 setPhoto(uri);
                 await AsyncStorage.setItem('photo', uri);
               }
-            } else {
-              alert('Permission de caméra non accordée');
             }
-          }
-        },
-        {
-          text: "Choisir dans la galerie",
-          onPress: async () => {
-            let result = await ImagePicker.launchImageLibraryAsync({
-              mediaTypes: ImagePicker.MediaTypeOptions.Images,
-              allowsEditing: true,
-              aspect: [4, 3],
-              quality: 1,
-            });
-            if (!result.canceled) {
-              const uri = result.assets[0].uri;
-              setPhoto(uri);
-              await AsyncStorage.setItem('photo', uri);
-            }
-          }
-        },
-        { text: "Annuler", style: "cancel" }
-      ]
-    );
+          },
+          { text: "Annuler", style: "cancel" }
+        ]
+      );
+    }
   };
 
   const handleDeletePhoto = async () => {
