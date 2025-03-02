@@ -14,7 +14,7 @@ export class MessageInstance extends Model {
 
 MessageInstance.init(
   {
-    idMessage: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    idMessage: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
     text: { type: DataTypes.STRING(255), allowNull: false },
     publishedAt: { type: DataTypes.DATE, allowNull: false },
     idUser: { type: DataTypes.INTEGER, allowNull: true },

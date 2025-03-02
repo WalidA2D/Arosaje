@@ -176,34 +176,20 @@ export default function MessageScreen() {
 
   const handleSendMessage = async () => {
     if (newMessage.trim() || selectedImage) {
-        const newMessageData: MessageType = {
-            id: uuidv4(),
-            text: newMessage,
-            sender: 'right',  // Définit le côté de l'utilisateur actuel
-            timestamp: new Date(),
-            image: selectedImage,
-        };
-
-        setMessages(prevMessages => [...prevMessages, newMessageData]);
-
-        // Émet le message au serveur via le WebSocket
-        socket.emit('sendMessage', { conversationId, message: newMessageData, idUser });
-
         try {
             const userToken = await AsyncStorage.getItem('userToken');
             const formData = new FormData();
 
             if (selectedImage) {
-                const fileName = selectedImage.split('/').pop(); // Récupère le nom du fichier
+                const fileName = selectedImage.split('/').pop();
                 const fileType = mime.getType(selectedImage);
 
-                // Ajoute l'image en tant que fichier dans le formulaire
                 formData.append('file', {
                     uri: selectedImage,
-                    name: fileName || 'image.jpg', // Définit un nom par défaut si le nom est introuvable
-                    type: fileType || 'image/jpeg', // Définit un type par défaut si le type est introuvable
+                    name: fileName || 'image.jpg',
+                    type: fileType || 'image/jpeg',
                 } as any);
-                formData.append('text', ''); // Ajoute un champ texte vide pour l'image
+                formData.append('text', ''); 
             } else {
                 formData.append('text', newMessage);
             }
@@ -224,23 +210,33 @@ export default function MessageScreen() {
 
             if (!data.success) {
                 console.error('Failed to send message to API:', data.msg);
-            } else {
-                console.log('Message successfully sent to API');
-
-                if (data.imageUrl) {// Met à jour le message existant avec l'URL de l'image depuis l'API
-                    setMessages(prevMessages =>
-                        prevMessages.map(msg =>
-                            msg.id === newMessageData.id ? { ...msg, image: data.imageUrl } : msg
-                        )
-                    );
-                }
+                return;
             }
+
+            // 🔹 Utilisation de l'idMessage retourné par l'API
+            const newMessageData: MessageType = {
+                id: data.idMessage, // Utilise l'idMessage retourné
+                text: newMessage,
+                sender: 'right',  
+                timestamp: new Date(),
+                image: data.imageUrl || selectedImage,
+            };
+
+            setMessages(prevMessages => [...prevMessages, newMessageData]);
+
+            // Émet le message au serveur via WebSocket avec le bon idMessage
+            socket.emit('sendMessage', { 
+                conversationId, 
+                message: newMessageData, 
+                idUser 
+            });
+
         } catch (error) {
             console.error('Error sending message to API:', error);
         }
 
         setNewMessage('');
-        setSelectedImage(undefined); 
+        setSelectedImage(undefined);
         setTimeout(() => {
             scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
@@ -288,7 +284,7 @@ export default function MessageScreen() {
       if (!data.success) {
         console.error('Failed to delete message:', data.msg);
       }
-    } catch (error) {
+    } catch (error) { 
       console.error('Error deleting message:', error);
     }
   };
