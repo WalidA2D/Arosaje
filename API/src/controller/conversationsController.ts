@@ -148,7 +148,7 @@ class ConversationsController {
       if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
 
       const { id } = req.params;
-      const record = await ConversationInstance.findOne({ where: { idConversations: id } });
+      const record = await ConversationInstance.findOne({ where: { idConversation: id } });
       if (!record) return res.status(404).json({ success: false, msg: "Conversation cible introuvable ou déjà supprimée" });
 
       if (user.dataValues.idUser !== record.dataValues.idUser1 &&
@@ -157,7 +157,7 @@ class ConversationsController {
       }
 
       await record.destroy();
-      const messagesConv = await MessageInstance.findAll({ where: { idConversation: record.dataValues.idConversations } });
+      const messagesConv = await MessageInstance.findAll({ where: { idConversation: record.dataValues.idConversation } });
       for (const message of messagesConv) {
         await message.destroy();
       }

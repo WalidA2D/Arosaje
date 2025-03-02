@@ -9,6 +9,7 @@ import {
   ScrollView,
   Alert,
   RefreshControl,
+  Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -192,60 +193,55 @@ export function ExploreScreen() {
   };
 
   const handleDeleteSelectedUsers = async () => {
-    Alert.alert(
-      'Supprimer les conversations',
-      `Êtes-vous sûr de vouloir supprimer les conversations sélectionnées ?`,
-      [
-        {
-          text: 'Annuler',
-          style: 'cancel',
-        },
-        {
-          text: 'Supprimer',
-          style: 'destructive',
-          onPress: async () => {
-            const userToken = await AsyncStorage.getItem('userToken');
-            
-            for (const convId of selectedUsers) {
-              const options = {
+    const userToken = await AsyncStorage.getItem('userToken');
+
+    const deleteConversations = async () => {
+        for (const convId of selectedUsers) {
+            const options = {
                 method: 'DELETE',
                 headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': userToken || '',
+                    'Content-Type': 'application/json',
+                    'Authorization': userToken || '',
                 },
-              };
+            };
 
-              try {
+            try {
                 const response = await fetch(`${apiUrl}/conv/delete/${convId}`, options);
                 const data = await response.json();
-                
-                if (data.success) {
-                  console.log(`Conversation avec l'ID ${convId} supprimée avec succès.`);
-                } else {
-                  console.error(
-                    `Échec de la suppression de la conversation avec l'ID ${convId}:`,
-                    data.message
-                  );
-                }
-              } catch (error) {
-                console.error(
-                  `Erreur lors de la suppression de la conversation avec l'ID ${convId}:`,
-                  error
-                );
-              }
-            }
 
-            setUsers((prevUsers: User[]) =>
-              prevUsers.filter((user) => !selectedUsers.includes(user.id))
-            );
-            setIsSelecting(false);
-            setSelectedUsers([]);
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
+                if (data.success) {
+                    console.log(`✅ Conversation avec l'ID ${convId} supprimée avec succès.`);
+                } else {
+                    console.error(`❌ Échec de la suppression de la conversation avec l'ID ${convId}:`, data.message);
+                }
+            } catch (error) {
+                console.error(`❌ Erreur lors de la suppression de la conversation avec l'ID ${convId}:`, error);
+            }
+        }
+
+        setUsers((prevUsers: User[]) =>
+            prevUsers.filter((user) => !selectedUsers.includes(user.id))
+        );
+        setIsSelecting(false);
+        setSelectedUsers([]);
+    };
+
+    //  Mobile : Afficher une alerte avant la suppression
+    if (Platform.OS !== 'web') {
+        Alert.alert(
+            'Supprimer les conversations',
+            `Êtes-vous sûr de vouloir supprimer les conversations sélectionnées ?`,
+            [
+                { text: 'Annuler', style: 'cancel' },
+                { text: 'Supprimer', style: 'destructive', onPress: deleteConversations },
+            ],
+            { cancelable: true }
+        );
+    } else {
+        //  Web : Supprime directement sans alerte
+        await deleteConversations();
+    }
+};
 
   const handleCancelSelection = () => {
     setIsSelecting(false);
