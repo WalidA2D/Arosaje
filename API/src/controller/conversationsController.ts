@@ -141,33 +141,31 @@ class ConversationsController {
 
   async delete(req: Request, res: Response) {
     try {
-      const token = req.headers.authorization
-      if (!token) return res.status(401).json({ success: false, msg: "Token non fourni" });
+        const token = req.headers.authorization;
+        if (!token) {
+            return res.status(401).json({ success: false, msg: "Token non fourni" });
+        }
 
-      const user = await UserInstance.findOne({ where: { uid: token } });
-      if (!user) return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
+        const user = await UserInstance.findOne({ where: { uid: token } });
+        if (!user) {
+            return res.status(404).json({ success: false, msg: "Utilisateur introuvable" });
+        }
 
-      const { id } = req.params;
-      const record = await ConversationInstance.findOne({ where: { idConversation: id } });
-      if (!record) return res.status(404).json({ success: false, msg: "Conversation cible introuvable ou déjà supprimée" });
+        const { id } = req.params;
+        const record = await ConversationInstance.findOne({ where: { idConversation: id } });
+        if (!record) {
+            return res.status(404).json({ success: false, msg: "Conversation cible introuvable ou déjà supprimée" });
+        }
 
-      if (user.dataValues.idUser !== record.dataValues.idUser1 &&
-          user.dataValues.idUser !== record.dataValues.idUser2) {
-        return res.status(403).json({ success: false, msg: "Droits requis" });
-      }
+        await MessageInstance.destroy({ where: { idConversation: id } });
+        await UsersConversationsInstance.destroy({ where: { idConversation: id } });
+        await record.destroy();
 
-      await record.destroy();
-      const messagesConv = await MessageInstance.findAll({ where: { idConversation: record.dataValues.idConversation } });
-      for (const message of messagesConv) {
-        await message.destroy();
-      }
-
-      return res.status(200).json({ success: true, msg: "Conversation bien supprimée" });
+        return res.status(200).json({ success: true, msg: "Conversation bien supprimée" });
     } catch (e) {
-      console.error(e);
-      return res.status(500).json({ success: false, msg: "Erreur lors de la suppression de la conversation" });
+        return res.status(500).json({ success: false, msg: "Erreur lors de la suppression de la conversation" });
     }
-  }
+}
 }
 
 export default new ConversationsController();
